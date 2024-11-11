@@ -16,10 +16,13 @@
     "@popperjs/core": "^2.11.8",
     "bootstrap": "^5.3.3",
     "bootstrap-icons": "^1.11.3",
+    "parse": "^5.3.0",
     "pinia": "^2.2.6",
+    "sweetalert2": "^11.14.5",
     "vue": "^3.5.12",
     "vue-router": "^4.4.5",
-    "vuedraggable": "^2.24.3"
+    "vue-sweetalert2": "^5.0.11",
+    "vuedraggable": "^4.1.0"
   },
   "devDependencies": {
     "@tsconfig/node22": "^22.0.0",
