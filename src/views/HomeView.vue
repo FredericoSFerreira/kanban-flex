@@ -61,6 +61,22 @@ export default {
       this.modalNewBoard.show()
     },
     saveBoard() {
+      if (!this.user) {
+        return this.$swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: "Você precisa informar o seu nome!",
+        });
+      }
+
+      if (!this.boardName) {
+        return this.$swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: "Você precisa informar o nome do board!",
+        });
+      }
+
       board.save({
         name: this.boardName,
         owner: this.user,
@@ -73,16 +89,20 @@ export default {
           }]
       })
         .then((boardDatabase) => {
-          this.$router.push(`/board/${boardDatabase.id}`);
+          localStorage.setItem("user", JSON.stringify({'user': this.user }))
+          this.$router.push(`/board/${boardDatabase.id}`)
         }, (error) => {
-          // Execute any logic that should take place if the save fails.
-          // error is a Parse.Error with an error code and message.
-          alert('Failed to create new object, with error code: ' + error.message);
-        });
+          console.log('Failed to create new object, with error code: ' + error.message)
+          return this.$swal.fire({
+            icon: "error",
+            title: "Oops...",
+            text: "Ocorreu um erro ao criar o board!",
+          })
+        })
     }
   },
   mounted() {
-    this.modalNewBoard = new Modal(document.getElementById('modalNewBoard'));
+    this.modalNewBoard = new Modal(document.getElementById('modalNewBoard'))
   }
 }
 </script>

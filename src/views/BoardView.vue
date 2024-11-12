@@ -1,5 +1,6 @@
 <template>
   <div class="container p-3">
+    {{ userName }}
     <div class="row">
       <div class="col-10 p-2">
         <h2>{{ board.name }}</h2>
@@ -18,8 +19,6 @@
             <h4>{{ b.name }}</h4>
           </div>
           <div class="col-2 text-right">
-                     <button type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#newCard"><i
-              class="bi bi-plus-lg"></i></button>
             <button type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#newCard"><i
               class="bi bi-plus-lg"></i></button>
           </div>
@@ -53,11 +52,11 @@
         </div>
         <div class="modal-body">
           <label for="exampleInputEmail1" class="form-label">Descrição</label>
-          <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+          <input type="text" v-model="cardName" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
-          <button type="button" class="btn btn-primary">Salvar</button>
+          <button type="button" class="btn btn-primary" @click="saveCard()">Salvar</button>
         </div>
       </div>
     </div>
@@ -104,12 +103,14 @@
 import draggable from "vuedraggable";
 import {Modal} from 'bootstrap';
 import Parse from 'parse/dist/parse.min.js';
-import { useRoute } from 'vue-router'
+import {useRoute} from 'vue-router'
+import uniqueId from "@/utils/uuid.js";
 
 Parse.initialize("myAppId");
 Parse.serverURL = 'http://localhost:3000/parse'
 const Boards = Parse.Object.extend("boards");
 const board = new Boards();
+const query = new Parse.Query(Boards);
 
 export default {
   components: {
@@ -118,13 +119,13 @@ export default {
   data() {
     return {
       columnName: "",
+      cardName: "",
       board: {
         _id: "",
         name: null,
         owner: null,
         slug: "",
-        columns: [
-        ]
+        columns: []
       },
       userName: null,
       modalUserName: null,
@@ -135,31 +136,9 @@ export default {
           id: 1,
           description: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy"
         },
-        {
-          name: "Joao",
-          id: 2,
-          description: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy"
-        },
-        {
-          name: "Jean",
-          id: 3,
-          description: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy"
-        },
-        {
-          name: "Gerard",
-          id: 4,
-          description: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy"
-        }
-      ],
-      list2: [
-        {name: "Juan", id: 5},
-        {name: "Edgard", id: 6},
-        {name: "Johnson", id: 7}
       ]
     };
-
-  }
-  ,
+  },
   methods: {
     saveUserName() {
       if (!this.userName) {
@@ -169,6 +148,7 @@ export default {
           text: "Você precisa informar o seu nome!",
         });
       }
+      localStorage.setItem("user", JSON.stringify({'user': this.userName}))
       this.modalUserName.hide()
 
     },
@@ -176,43 +156,78 @@ export default {
       this.modalcolumnName.show()
     },
     saveColumn() {
-
-      board.set("name", this.columnName);
-      board.save()
-        .then((gameScore) => {
-          // Execute any logic that should take place after the object is saved.
-          alert('New object created with objectId: ' + gameScore.id);
-        }, (error) => {
-          // Execute any logic that should take place if the save fails.
-          // error is a Parse.Error with an error code and message.
-          alert('Failed to create new object, with error code: ' + error.message);
+      if (!this.columnName) {
+        return this.$swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: "Você precisa informar o nome da coluna!",
         });
-
-      this.board.columns.push({id: 6546, name: this.columnName, itens: []});
-      this.columnName = ""
-      this.modalcolumnName.hide()
+      }
+      query.equalTo('objectId', this.$route.params.id)
+      query.first().then((retorno) => {
+        retorno.add("columns", {
+          id: uniqueId(),
+          name: this.columnName,
+          itens: []
+        });
+        retorno.save()
+        this.getBoard()
+        this.columnName = ""
+        this.modalcolumnName.hide()
+      }).catch((error) => {
+        console.error('Erro ao salvar documento: ' + error)
+      })
     },
-    newCard() {
-      this.list1.push({name: "Frederico Ferreira", id: 100});
+    saveCard() {
+      if (!this.cardName) {
+        return this.$swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: "Você precisa informar a descrição do card!",
+        });
+      }
     },
     log(evt) {
       window.console.log(evt);
-    }
-  }
-  ,
-  mounted() {
-    const route = useRoute()
-    const query = new Parse.Query(Boards);
-    query.get(route.params.id)
-      .then((board) => {
-        console.log(board.attributes, "BOARD");
-        this.board = board.attributes
-      }, (error) => {
-           alert('Failed to create new object, with error code: ' + error.message);
-      });
+    },
+    getBoard() {
+      const route = useRoute()
+      query.get(this.$route.params.id)
+        .then((board) => {
+          console.log(board.attributes, "BOARD");
+          this.board = board.attributes
+        }, (error) => {
+          alert('Failed to create new object, with error code: ' + error.message);
+        });
+    },
+    async realTimeBoard () {
+        const queryBoard = new Parse.Query('boards');
+        this.subscriptionBoard = await queryBoard.subscribe()
 
+        this.subscriptionBoard.on('open', () => {
+          console.log('board opened')
+        })
+
+        this.subscriptionBoard.on('update', (object) => {
+          setTimeout(() => {
+            this.getBoard()
+          }, 3000)
+        })
+
+        this.subscriptionBoard.on('close', () => {
+          console.log('board edit subscription closed');
+        })
+      },
+  },
+  mounted() {
+    this.getBoard();
+    this.realTimeBoard();
     this.modalUserName = new Modal(document.getElementById('modalUserName'), {backdrop: 'static', keyboard: false});
-    // this.modalUserName.show()
+    const user = JSON.parse(localStorage.getItem("user"));
+    this.userName = user ? user.user : null;
+    if (!this.userName) {
+      this.modalUserName.show()
+    }
     this.modalcolumnName = new Modal(document.getElementById('modalcolumnName'), {backdrop: 'static', keyboard: false});
   }
 }
