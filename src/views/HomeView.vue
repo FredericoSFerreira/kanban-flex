@@ -81,15 +81,11 @@ export default {
         name: this.boardName,
         owner: this.user,
         slug: "",
-        columns: [
-          {
-            id: uniqueId(),
-            name: "Foi muito bom",
-            itens: []
-          }]
+        columns: []
       })
         .then((boardDatabase) => {
-          localStorage.setItem("user", JSON.stringify({'user': this.user }))
+          this.modalNewBoard.hide()
+          localStorage.setItem("user", JSON.stringify({'user': this.user}))
           this.$router.push(`/board/${boardDatabase.id}`)
         }, (error) => {
           console.log('Failed to create new object, with error code: ' + error.message)
