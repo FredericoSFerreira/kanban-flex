@@ -2,7 +2,7 @@ const express = require('express')
 const ParseServer = require('parse-server').ParseServer
 require('dotenv').config()
 const app = express()
-const host = process.env.HOST || 'localhost'
+const host = process.env.APP_HOST || 'localhost'
 const port = process.env.APP_PORT || 3000
 
 const api = new ParseServer({
