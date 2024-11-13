@@ -2,6 +2,7 @@ const express = require('express')
 const ParseServer = require('parse-server').ParseServer
 require('dotenv').config()
 const app = express()
+const cors = require('cors')
 const host = process.env.APP_HOST || 'localhost'
 const port = process.env.APP_PORT || 3000
 
@@ -21,6 +22,9 @@ const api = new ParseServer({
 
 api.start();
 
+app.use(cors({
+    origin: '*'
+}));
 app.use('/parse', api.app);
 
 app.get('/healthcheck', (req, res) => {
