@@ -45,8 +45,8 @@ import {Modal} from 'bootstrap';
 import Parse from 'parse/dist/parse.min.js';
 import uniqueId from "@/utils/uuid.js";
 
-Parse.initialize("myAppId");
-Parse.serverURL = 'http://localhost:3000/parse'
+Parse.initialize(import.meta.env.VITE_PARSE_APP_ID);
+Parse.serverURL = import.meta.env.VITE_BACKEND_URL
 const Boards = Parse.Object.extend("boards");
 const board = new Boards();
 export default {

@@ -23,8 +23,8 @@ api.start();
 
 app.use('/parse', api.app);
 
-app.get('/', (req, res) => {
-  res.send('Hello World!')
+app.get('/healthcheck', (req, res) => {
+  res.send('OK')
 })
 
 
