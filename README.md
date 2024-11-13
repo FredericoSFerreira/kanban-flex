@@ -1,4 +1,4 @@
-# open-sprint-retro
+# open-sprint-retro [![Netlify Status](https://api.netlify.com/api/v1/badges/08200383-b16d-4391-a914-37fe41309b3c/deploy-status)](https://app.netlify.com/sites/open-sprint-retro/deploys)
 
 This template should help get you started developing with Vue 3 in Vite.
 
