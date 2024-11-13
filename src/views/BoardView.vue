@@ -1,43 +1,64 @@
 <template>
-  <div class="container-fullscreen p-5">
-    Criado por: {{ board.owner }}
 
-    <div class="row">
-      <div class="col-10 p-2">
-        <h2>{{ board.name }}</h2>
-      </div>
-      <div class="col-2  text-right p-2">
-        <button type="button" @click="newColumn()" class="btn btn-light" data-bs-toggle="modal"
-                data-bs-target="#newColumn"><i
-          class="bi bi-plus-lg"></i> Nova Coluna
-        </button>
-      </div>
+
+  <div class="container-fullscreen">
+
+
+    <div class="kanban-header d-flex justify-content-between align-items-center">
+      <h2 class="mb-0">{{ board.name }}
+        <button class="btn btn-sm btn btn-light edit-column" @click="editBoardName(board.name)"><i
+          class="bi bi-pencil-square"></i></button>
+      </h2>
+      <button v-if="board.columns.length > 0" type="button" @click="newColumn()" class="btn btn-light"
+              data-bs-toggle="modal"
+              data-bs-target="#newColumn"><i
+        class="bi bi-plus-lg"></i> Nova Coluna
+      </button>
     </div>
-    <div class="row flex-nowrap overflow-auto">
-      <div class="col-4 bg-light p-3" v-for="b in board.columns">
-        <div class="row">
-          <div class="col-10">
-            <h4>{{ b.name }}</h4>
-          </div>
-          <div class="col-2">
-            <button type="button" class="btn btn-light" @click="newCard(b.id)"><i
-              class="bi bi-plus-lg"></i></button>
+
+
+    <section class="py-5 text-center container empty-state" v-if="board.columns.length === 0">
+      <div class="row py-lg-5">
+        <div class="col-lg-6 col-md-8 mx-auto">
+          <h2 class="fw-light">Começe criando as colunas do seu board</h2>
+          <i class="bi bi-layout-three-columns icon-big"></i>
+          <br>
+          <i class="bi bi-arrow-down" style="font-size: 50px"></i>
+          <br>
+          <br>
+          <button type="button" @click="newColumn()" class="btn btn-light btn-lg"><i class="bi bi-plus-lg"></i> Nova Coluna
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <div class="kanban-board" id="kanban-board">
+      <!-- Coluna de exemplo -->
+      <div class="kanban-column" v-for="column in board.columns">
+        <div class="d-flex justify-content-between align-items-center mb-2 p-2">
+          <h4 class="column-title">{{ column.name }}</h4>
+          <div>
+            <button class="btn btn-sm btn btn-light edit-column" @click="editColumn(column.id, column.name)"><i
+              class="bi bi-pencil-square"></i></button>
+            <button class="btn btn-sm btn btn-light remove-column" @click="removeColumn(column.id)"><i
+              class="bi bi-trash-fill"></i></button>
           </div>
         </div>
-        <draggable
-          class="list-group"
-          :list="b.itens"
-          group="people"
-          @change="log"
-          itemKey="name"
-        >
-          <template #item="{ element, index }">
-            <div class="list-group-item list-group-item-action flex-column align-items-start">
-              <p class="mb-1 text-gray-400"> {{ element.description }} - {{ element.id }}</p>
-              <small>{{ element.name }}</small>
+        <button class="btn btn-sm btn btn-light add-task mb-3 mx-2" @click="newCard(column.id)"><i
+          class="bi bi-plus-lg"></i></button>
+        <div class="kanban-card card p-2 mx-2" v-for="card in column.itens">
+          <div class="d-flex justify-content-between align-items-center">
+            <strong>{{ card.description }}</strong>
+            <div>
+              <button class="btn btn-sm btn btn-light edit-column"
+                      @click="editCardDescription(column.id, card.id, card.description)"><i
+                class="bi bi-pencil-square"></i></button>
+              <button class="btn btn-sm tn-sm btn btn-light remove-task" @click="removeCard(column.id, card.id)"><i
+                class="bi bi-x"></i></button>
             </div>
-          </template>
-        </draggable>
+          </div>
+          <small>{{ card.name }}</small>
+        </div>
       </div>
     </div>
   </div>
@@ -53,8 +74,8 @@
         </div>
         <div class="modal-body">
           <label for="exampleInputEmail1" class="form-label">Descrição</label>
-          <input type="text" v-model="cardName" class="form-control" id="exampleInputEmail1"
-                 aria-describedby="emailHelp">
+          <textarea rows="5" v-model="cardName" class="form-control" id="exampleInputEmail1"
+                    aria-describedby="emailHelp"></textarea>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
@@ -83,11 +104,31 @@
   </div>
 
 
+  <div class="modal fade" id="modalBoardName" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Editar nome do board</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <label for="userName" class="form-label">Nome do board</label>
+          <input type="text" v-model="boardName" class="form-control" id="columnName" aria-describedby="columnName">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" @click="saveBoardName()">Salvar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
   <div class="modal fade" id="modalColumnName" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLabel">Nova coluna</h5>
+          <h5 class="modal-title" id="modalColumnNameLabel">Nova coluna</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
           <label for="userName" class="form-label">Nome da coluna</label>
@@ -95,6 +136,46 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-primary" @click="saveColumn()">Salvar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="modalEditColumnName" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Editar coluna</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <label for="userName" class="form-label">Nome da coluna</label>
+          <input type="text" v-model="columnEditName" class="form-control" id="editColumnName"
+                 aria-describedby="editColumnName">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" @click="saveEditColumn()">Salvar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="modal fade" id="modalCardDescription" tabindex="-1" aria-labelledby="exampleModalLabel"
+       aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Editar card</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <label for="exampleInputEmail1" class="form-label">Descrição</label>
+          <textarea rows="5" v-model="cardEditDescription" class="form-control" id="exampleInputEmail1"
+                    aria-describedby="emailHelp"></textarea>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" @click="saveEditCard()">Salvar</button>
         </div>
       </div>
     </div>
@@ -120,9 +201,13 @@ export default {
   },
   data() {
     return {
+      boardName: "",
       columnName: "",
+      columnEditName: "",
+      cardEditDescription: "",
       cardName: "",
       columnSelectedId: "",
+      cardSelectedId: "",
       board: {
         _id: "",
         name: null,
@@ -135,6 +220,9 @@ export default {
       modalUserName: null,
       modalColumnName: null,
       modalCardName: null,
+      modalEditColumnName: null,
+      modalBoardName: null,
+      modalCardDescription: null,
       list1: [
         {
           name: "John",
@@ -145,6 +233,37 @@ export default {
     };
   },
   methods: {
+    editBoardName() {
+      this.boardName = this.board.name
+      this.modalBoardName.show()
+    },
+    editCardDescription(columnId, cardId, description) {
+      this.columnSelectedId = columnId
+      this.cardEditDescription = description
+      this.cardSelectedId = cardId
+      this.modalCardDescription.show()
+    },
+    saveBoardName() {
+      if (!this.boardName) {
+        return this.$swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: "Você precisa informar o seu nome!",
+        });
+      }
+
+      query.equalTo('objectId', this.$route.params.id)
+      query.first().then((retorno) => {
+        retorno.set('name', this.boardName)
+        retorno.save()
+        this.getBoard()
+        this.boardName = ""
+        this.modalBoardName.hide()
+      }).catch((error) => {
+        console.error('Erro ao salvar documento: ' + error)
+      })
+
+    },
     saveUserName() {
       if (!this.userName) {
         return this.$swal.fire({
@@ -164,6 +283,135 @@ export default {
     newColumn() {
       this.modalColumnName.show()
     },
+    editColumn(id, name) {
+      this.columnEditName = name
+      this.columnSelectedId = id
+      this.modalEditColumnName.show()
+    },
+    saveEditCard() {
+      if (!this.cardEditDescription) {
+        return this.$swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: "Você precisa informar a descrição do card!",
+        });
+      }
+
+      query.equalTo('objectId', this.$route.params.id)
+      query.first().then((retorno) => {
+        const columns = retorno.attributes.columns
+        for (const c in columns) {
+          if (columns[c].id === this.columnSelectedId) {
+            for (const i in columns[c].itens) {
+              if (columns[c].itens[i].id === this.cardSelectedId) {
+                retorno.set(`columns.${c}.itens.${i}.description`, this.cardEditDescription);
+                retorno.save()
+                this.columnSelectedId = null
+                this.cardSelectedId = null
+                this.cardEditDescription = null
+                this.modalCardDescription.hide()
+                this.getBoard()
+                break;
+              }
+            }
+          }
+        }
+      })
+    },
+    removeCard(columnId, cardId) {
+      console.log(columnId, cardId, 'IDSSSSSS');
+      this.$swal.fire({
+        title: "Tem certeza que deseja remover este card?",
+        icon: "question",
+        showDenyButton: true,
+        showCancelButton: false,
+        confirmButtonText: "Sim",
+        denyButtonText: `Não`
+      }).then((result) => {
+        if (result.isConfirmed) {
+          query.equalTo('objectId', this.$route.params.id)
+          query.first().then((retorno) => {
+            const columns = retorno.attributes.columns
+            for (const c in columns) {
+              if (columns[c].id === columnId) {
+                for (const i in columns[c].itens) {
+                  if (columns[c].itens[i].id === cardId) {
+                    retorno.remove(`columns.${c}.itens`, columns[c].itens[i]);
+                    retorno.save()
+                    this.getBoard()
+                    break;
+                  }
+                }
+              }
+            }
+          }).catch((error) => {
+            console.error('Erro ao salvar documento: ' + error)
+          })
+        }
+      });
+
+    }
+    ,
+    removeColumn(id) {
+      this.$swal.fire({
+        title: "Tem certeza que deseja remover esta coluna?",
+        icon: "question",
+        showDenyButton: true,
+        showCancelButton: false,
+        confirmButtonText: "Sim",
+        denyButtonText: `Não`
+      }).then((result) => {
+        /* Read more about isConfirmed, isDenied below */
+        if (result.isConfirmed) {
+          query.equalTo('objectId', this.$route.params.id)
+          query.first().then((retorno) => {
+            const columns = retorno.attributes.columns
+            for (const c in columns) {
+              if (columns[c].id === id) {
+                retorno.remove('columns', columns[c]);
+                retorno.save()
+                this.getBoard()
+                break;
+              }
+            }
+            this.columnEditName = ""
+            this.modalEditColumnName.hide()
+          }).catch((error) => {
+            console.error('Erro ao salvar documento: ' + error)
+          })
+        }
+      });
+
+    }
+    ,
+    saveEditColumn() {
+      if (!this.columnEditName) {
+        return this.$swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: "Você precisa informar o nome da coluna!",
+        });
+      }
+
+      query.equalTo('objectId', this.$route.params.id)
+      query.first().then((retorno) => {
+        const columns = retorno.attributes.columns
+        for (const c in columns) {
+          if (columns[c].id === this.columnSelectedId) {
+            retorno.set(`columns.${c}.name`, this.columnEditName);
+            retorno.save()
+            this.columnSelectedId = ""
+            break;
+          }
+        }
+        this.getBoard()
+        this.columnEditName = ""
+        this.modalEditColumnName.hide()
+      }).catch((error) => {
+        console.error('Erro ao salvar documento: ' + error)
+      })
+    }
+    ,
     saveColumn() {
       if (!this.columnName) {
         return this.$swal.fire({
@@ -186,7 +434,8 @@ export default {
       }).catch((error) => {
         console.error('Erro ao salvar documento: ' + error)
       })
-    },
+    }
+    ,
     saveCard() {
       if (!this.cardName) {
         return this.$swal.fire({
@@ -198,7 +447,6 @@ export default {
 
       query.equalTo('objectId', this.$route.params.id)
       query.first().then((retorno) => {
-        console.log(retorno, "QQQQQQQ")
         const columns = retorno.attributes.columns
         for (const c in columns) {
           if (columns[c].id === this.columnSelectedId) {
@@ -220,10 +468,12 @@ export default {
       })
 
 
-    },
+    }
+    ,
     log(evt) {
       window.console.log(evt);
-    },
+    }
+    ,
     getBoard() {
       const route = useRoute()
       query.get(this.$route.params.id)
@@ -233,7 +483,8 @@ export default {
         }, (error) => {
           alert('Failed to create new object, with error code: ' + error.message);
         });
-    },
+    }
+    ,
     async realTimeBoard() {
       const queryBoard = new Parse.Query('boards');
       this.subscriptionBoard = await queryBoard.subscribe()
@@ -251,7 +502,8 @@ export default {
       this.subscriptionBoard.on('close', () => {
         console.log('board edit subscription closed');
       })
-    },
+    }
+    ,
   },
   mounted() {
     this.getBoard();
@@ -262,8 +514,73 @@ export default {
     if (!this.userName) {
       this.modalUserName.show()
     }
-    this.modalColumnName = new Modal(document.getElementById('modalColumnName'), {backdrop: 'static', keyboard: false});
+    this.modalColumnName = new Modal(document.getElementById('modalColumnName'));
     this.modalCardName = new Modal(document.getElementById('modalCardName'));
+    this.modalEditColumnName = new Modal(document.getElementById('modalEditColumnName'));
+    this.modalBoardName = new Modal(document.getElementById('modalBoardName'));
+    this.modalCardDescription = new Modal(document.getElementById('modalCardDescription'));
   }
 }
 </script>
+<style scoped>
+/* Ocupação total da tela */
+body, html {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+.icon-big {
+  font-size: 180px;
+}
+
+.container-fullscreen {
+  display: flex;
+  flex-direction: column;
+  height: 88vh;
+}
+
+.kanban-header {
+  padding: 1rem;
+  background-color: #f8f9fa;
+}
+
+/* Kanban board com rolagem horizontal */
+.kanban-board {
+  display: flex;
+  overflow-x: auto;
+  padding: 1rem;
+  flex-grow: 1;
+  background-color: #e9ecef;
+}
+
+/* Configura colunas para preencher a tela em altura e ter rolagem interna */
+.kanban-column {
+  min-width: 32.4%;
+  max-height: 100%;
+  margin-right: 1rem;
+  position: relative;
+  background-color: #f8f9fa;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.kanban-card {
+  margin-bottom: 1rem;
+  overflow-wrap: break-word;
+  max-width: 95%;
+}
+
+/* Quebra de linha para o nome do usuário e o título da tarefa */
+.kanban-card small,
+.kanban-card strong {
+  display: block;
+  white-space: normal;
+  word-wrap: break-word;
+  word-break: break-word;
+}
+</style>

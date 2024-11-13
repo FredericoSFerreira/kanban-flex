@@ -21,6 +21,7 @@
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="exampleModalLabel">Novo board</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
           <label for="userName" class="form-label">Qual o seu nome?</label>
@@ -80,7 +81,8 @@ export default {
       board.save({
         name: this.boardName,
         owner: this.user,
-        slug: "",
+        owner_id: uniqueId(),
+        slug: this.boardName.replace(" ", "-").toLowerCase(),
         columns: []
       })
         .then((boardDatabase) => {

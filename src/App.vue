@@ -31,16 +31,32 @@
     </div>
   </header>
   <RouterView />
-  <footer class="text-center">
+  <footer class="text-center footer">
     <p>© 2024 Open Sprint Retro. Licensed under MIT License. Feel free to use and contribute! Create by <a href="https://github.com/FredericoSFerreira" class=""><i class="bi bi-github"></i> Frederico Ferreira </a></p>
   </footer>
 
 </template>
 
 
-<script>
-import { RouterLink, RouterView } from 'vue-router'
-</script>
+<style>
+.footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  /* Set the fixed height of the footer here */
+  height: 60px;
+  line-height: 60px; /* Vertically center the text there */
+  background-color: #f5f5f5;
+}
 
-<style scoped>
+
+/* Custom page CSS
+-------------------------------------------------- */
+/* Not required for template or sticky footer method. */
+
+.footer > .container {
+  padding-right: 15px;
+  padding-left: 15px;
+}
+
 </style>
