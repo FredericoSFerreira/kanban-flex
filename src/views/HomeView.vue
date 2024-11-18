@@ -108,9 +108,16 @@ export default {
         columns: []
       })
         .then((boardDatabase) => {
-          this.modalNewBoard.hide()
           localStorage.setItem("user", JSON.stringify({'name': this.user, 'id': this.owner_id, 'email': this.email}))
-          this.$router.push(`/board/${boardDatabase.id}`)
+          this.modalNewBoard.hide()
+          this.$swal.fire({
+            icon: "success",
+            title: "Board criado com sucesso!",
+            showConfirmButton: true,
+          }).then(() => {
+            this.$router.push(`/board/${boardDatabase.id}`)
+          });
+
         }, (error) => {
           console.log('Failed to create new object, with error code: ' + error.message)
           return this.$swal.fire({
