@@ -6,7 +6,7 @@
 
     <div class="kanban-header d-flex justify-content-between align-items-center">
       <h2 class="mb-0">{{ board.name }}
-        <button class="btn btn-sm btn btn-light edit-column" @click="editBoardName(board.name)"><i
+        <button v-if="checkPermission()" class="btn btn-sm btn btn-light edit-column" @click="editBoardName(board.name)"><i
           class="bi bi-pencil-square"></i></button>
       </h2>
       <button v-if="board.columns.length > 0" type="button" @click="newColumn()" class="btn btn-light"
@@ -26,7 +26,8 @@
           <i class="bi bi-arrow-down" style="font-size: 50px"></i>
           <br>
           <br>
-          <button type="button" @click="newColumn()" class="btn btn-light btn-lg"><i class="bi bi-plus-lg"></i> Nova Coluna
+          <button type="button" @click="newColumn()" class="btn btn-light btn-lg"><i class="bi bi-plus-lg"></i> Nova
+            Coluna
           </button>
         </div>
       </div>
@@ -38,10 +39,12 @@
         <div class="d-flex justify-content-between align-items-center mb-2 p-2">
           <h4 class="column-title">{{ column.name }}</h4>
           <div>
-            <button class="btn btn-sm btn btn-light edit-column" @click="editColumn(column.id, column.name)"><i
-              class="bi bi-pencil-square"></i></button>
-            <button class="btn btn-sm btn btn-light remove-column" @click="removeColumn(column.id)"><i
-              class="bi bi-trash-fill"></i></button>
+            <div class="btn-group" role="group" aria-label="actionsCollun" v-if="checkPermission()">
+              <button class="btn btn-sm btn btn-light edit-column" @click="editColumn(column.id, column.name)"><i
+                class="bi bi-pencil-square"></i></button>
+              <button class="btn btn-sm btn btn-light remove-column" @click="removeColumn(column.id)"><i
+                class="bi bi-trash-fill"></i></button>
+            </div>
           </div>
         </div>
         <button class="btn btn-sm btn btn-light add-task mb-3 mx-2" @click="newCard(column.id)"><i
@@ -50,11 +53,13 @@
           <div class="d-flex justify-content-between align-items-center">
             <strong>{{ card.description }}</strong>
             <div>
-              <button class="btn btn-sm btn btn-light edit-column"
-                      @click="editCardDescription(column.id, card.id, card.description)"><i
-                class="bi bi-pencil-square"></i></button>
-              <button class="btn btn-sm tn-sm btn btn-light remove-task" @click="removeCard(column.id, card.id)"><i
-                class="bi bi-x"></i></button>
+              <div class="btn-group" role="group" aria-label="actions" v-if="checkPermission(card.user_id)">
+                <button class="btn btn-sm btn btn-light edit-column"
+                        @click="editCardDescription(column.id, card.id, card.description)"><i
+                  class="bi bi-pencil-square"></i></button>
+                <button class="btn btn-sm tn-sm btn btn-light remove-task" @click="removeCard(column.id, card.id)"><i
+                  class="bi bi-trash-fill"></i></button>
+              </div>
             </div>
           </div>
           <small>{{ card.name }}</small>
@@ -90,14 +95,20 @@
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLabel">Qual o seu nome?</h5>
+          <h5 class="modal-title" id="exampleModalLabel">Identifique-se</h5>
         </div>
         <div class="modal-body">
           <label for="userName" class="form-label">Nome</label>
-          <input type="text" v-model="userName" class="form-control" id="userName" aria-describedby="userName">
+          <input type="text" v-model="user.name" class="form-control" id="userName" aria-describedby="userName">
+
+          <br>
+
+          <label for="email" class="form-label">Email</label>
+          <input type="email" v-model="user.email" class="form-control" id="userName" aria-describedby="email">
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-primary" @click="saveUserName()">Salvar</button>
+          <button type="button" class="btn btn-danger" @click="saveUserName(true)">Entrar como Anônimo</button>
+          <button type="button" class="btn btn-primary" @click="saveUserName(false)">Salvar</button>
         </div>
       </div>
     </div>
@@ -183,11 +194,11 @@
 
 </template>
 <script>
-import draggable from "vuedraggable";
 import {Modal} from 'bootstrap';
 import Parse from 'parse/dist/parse.min.js';
 import {useRoute} from 'vue-router'
 import uniqueId from "@/utils/uuid.js";
+import {validateEmail} from "@/utils/validate.js";
 
 Parse.initialize(import.meta.env.VITE_PARSE_APP_ID);
 Parse.serverURL = import.meta.env.VITE_BACKEND_URL
@@ -196,9 +207,7 @@ const board = new Boards();
 const query = new Parse.Query(Boards);
 
 export default {
-  components: {
-    draggable,
-  },
+  components: {},
   data() {
     return {
       boardName: "",
@@ -216,20 +225,17 @@ export default {
         columns: [],
         _created_at: null,
       },
-      userName: null,
+      user: {
+        name: null,
+        id: null,
+        email: null
+      },
       modalUserName: null,
       modalColumnName: null,
       modalCardName: null,
       modalEditColumnName: null,
       modalBoardName: null,
       modalCardDescription: null,
-      list1: [
-        {
-          name: "John",
-          id: 1,
-          description: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy"
-        },
-      ]
     };
   },
   methods: {
@@ -264,17 +270,43 @@ export default {
       })
 
     },
-    saveUserName() {
-      if (!this.userName) {
+    saveUserName(anonymous = false) {
+
+      if (anonymous) {
+        this.user.name = 'Anônimo'
+        this.user.email = 'anonymous@anonymous.com'
+      }
+
+      if (!this.user.name) {
         return this.$swal.fire({
           icon: "error",
           title: "Oops...",
           text: "Você precisa informar o seu nome!",
         });
       }
-      localStorage.setItem("user", JSON.stringify({'user': this.userName}))
-      this.modalUserName.hide()
 
+
+      if (!this.user.email) {
+        return this.$swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: "Você precisa informar um email válido!",
+        });
+      }
+
+
+      if (!validateEmail(this.user.email)) {
+        return this.$swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: "Você precisa informar um email válido!",
+        });
+      }
+
+      const id = uniqueId()
+      this.user.id = id
+      localStorage.setItem("user", JSON.stringify({'name': this.user.name, 'id': id, 'email': this.user.email}))
+      this.modalUserName.hide()
     },
     newCard(id) {
       this.columnSelectedId = id
@@ -318,8 +350,17 @@ export default {
         }
       })
     },
+    checkPermission(idUser = null) {
+      if (this.user.id === this.board.owner_id) {
+        console.log('AQUI')
+        return true
+      } else if (idUser && idUser === this.user.id) {
+        console.log('AQUI 22')
+        return true
+      }
+      return false
+    },
     removeCard(columnId, cardId) {
-      console.log(columnId, cardId, 'IDSSSSSS');
       this.$swal.fire({
         title: "Tem certeza que deseja remover este card?",
         icon: "question",
@@ -452,7 +493,8 @@ export default {
           if (columns[c].id === this.columnSelectedId) {
             retorno.add(`columns.${c}.itens`, {
               id: uniqueId(),
-              name: this.userName,
+              name: this.user.name,
+              user_id: this.user.id,
               description: this.cardName
             });
             retorno.save()
@@ -481,7 +523,8 @@ export default {
           console.log(board.attributes, "BOARD");
           this.board = board.attributes
         }, (error) => {
-          alert('Failed to create new object, with error code: ' + error.message);
+          console.log('Failed to create new object, with error code: ' + error.message);
+          this.$router.push(`/404`)
         });
     }
     ,
@@ -510,9 +553,11 @@ export default {
     this.realTimeBoard();
     this.modalUserName = new Modal(document.getElementById('modalUserName'), {backdrop: 'static', keyboard: false});
     const user = JSON.parse(localStorage.getItem("user"));
-    this.userName = user ? user.user : null;
-    if (!this.userName) {
+    const userLocal = user ? user : null;
+    if (!userLocal) {
       this.modalUserName.show()
+    } else {
+      this.user = userLocal
     }
     this.modalColumnName = new Modal(document.getElementById('modalColumnName'));
     this.modalCardName = new Modal(document.getElementById('modalCardName'));
