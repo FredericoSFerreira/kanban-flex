@@ -1,12 +1,11 @@
 <template>
 
-
   <div class="container-fullscreen">
-
 
     <div class="kanban-header d-flex justify-content-between align-items-center">
       <h2 class="mb-0">{{ board.name }}
-        <button v-if="checkPermission()" class="btn btn-sm btn btn-light edit-column" @click="editBoardName(board.name)"><i
+        <button v-if="checkPermission()" class="btn btn-sm btn btn-light edit-column"
+                @click="editBoardName(board.name)"><i
           class="bi bi-pencil-square"></i></button>
       </h2>
       <button v-if="board.columns.length > 0" type="button" @click="newColumn()" class="btn btn-light"
@@ -47,8 +46,7 @@
             </div>
           </div>
         </div>
-        <button class="btn btn-sm btn btn-light add-task mb-3 mx-2" @click="newCard(column.id)"><i
-          class="bi bi-plus-lg"></i></button>
+        <button class="btn btn-sm btn btn-light-new-card add-task mb-3 mx-2" @click="newCard(column.id)"><i class="bi bi-plus-circle-dotted"></i></button>
         <div class="kanban-card card p-2 mx-2" v-for="card in column.itens">
           <div class="d-flex justify-content-between align-items-center">
             <strong>{{ card.description }}</strong>
@@ -78,9 +76,23 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <label for="exampleInputEmail1" class="form-label">Descrição</label>
-          <textarea rows="5" v-model="cardName" class="form-control" id="exampleInputEmail1"
+          <div class="row">
+            <div class="col-11">
+              <label for="exampleInputEmail1" class="form-label">Descrição: </label>
+            </div>
+            <div class="col-1">
+              <i class="bi bi-emoji-smile" @click="showEmoji = true"></i>
+            </div>
+          </div>
+
+          <EmojiPicker v-if="showEmoji" offset="10000" :text="cardName" class="form-control" :native="false"
+                       @select="onSelectEmoji" pickerType="" :static-texts="{ placeholder: 'Pesquisar emoji...'}"
+                       :hide-group-names="true" :disable-sticky-group-names="true" :disable-skin-tones="true"
+                       :display-recent="true"/>
+
+          <textarea v-if="!showEmoji" rows="5" v-model="cardName" class="form-control" id="exampleInputEmail1"
                     aria-describedby="emailHelp"></textarea>
+
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
@@ -199,6 +211,8 @@ import Parse from 'parse/dist/parse.min.js';
 import {useRoute} from 'vue-router'
 import uniqueId from "@/utils/uuid.js";
 import {validateEmail} from "@/utils/validate.js";
+import EmojiPicker from 'vue3-emoji-picker'
+import 'vue3-emoji-picker/css'
 
 Parse.initialize(import.meta.env.VITE_PARSE_APP_ID);
 Parse.serverURL = import.meta.env.VITE_BACKEND_URL
@@ -207,9 +221,10 @@ const board = new Boards();
 const query = new Parse.Query(Boards);
 
 export default {
-  components: {},
+  components: {EmojiPicker},
   data() {
     return {
+      showEmoji: false,
       boardName: "",
       columnName: "",
       columnEditName: "",
@@ -239,6 +254,10 @@ export default {
     };
   },
   methods: {
+    onSelectEmoji(emoji) {
+      this.cardName += emoji.i
+      this.showEmoji = false
+    },
     editBoardName() {
       this.boardName = this.board.name
       this.modalBoardName.show()
@@ -627,5 +646,16 @@ body, html {
   white-space: normal;
   word-wrap: break-word;
   word-break: break-word;
+}
+
+
+.btn-light-new-card {
+  background-color: #d3d4d5; /* cor do botão */
+  border-color: #d3d4d5; /* borda do botão */
+}
+
+.btn-light-new-card:hover {
+  background-color: #babbbc; /* cor do botão ao passar o mouse */
+  border-color: #babbbc; /* borda ao passar o mouse */
 }
 </style>
