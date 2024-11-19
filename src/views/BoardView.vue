@@ -8,15 +8,14 @@
                 @click="editBoardName(board.name)"><i
           class="bi bi-pencil-square"></i></button>
       </h2>
-      <button v-if="board.columns.length > 0" type="button" @click="newColumn()" class="btn btn-light"
+      <button v-if="board.columns.length > 0 && checkPermission()" type="button" @click="newColumn()" class="btn btn-light"
               data-bs-toggle="modal"
               data-bs-target="#newColumn"><i
         class="bi bi-plus-lg"></i> Nova Coluna
       </button>
     </div>
 
-
-    <section class="py-5 text-center container empty-state" v-if="board.columns.length === 0">
+    <section class="py-5 text-center container empty-state" v-if="board.columns.length === 0 && checkPermission()">
       <div class="row py-lg-5">
         <div class="col-lg-6 col-md-8 mx-auto">
           <h2 class="fw-light">Começe criando as colunas do seu board</h2>
@@ -371,10 +370,8 @@ export default {
     },
     checkPermission(idUser = null) {
       if (this.user.id === this.board.owner_id) {
-        console.log('AQUI')
         return true
       } else if (idUser && idUser === this.user.id) {
-        console.log('AQUI 22')
         return true
       }
       return false
