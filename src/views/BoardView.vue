@@ -116,7 +116,7 @@
           <br>
 
           <label for="email" class="form-label">Email</label>
-          <input type="email" v-model="user.email" class="form-control" id="userName" aria-describedby="email">
+          <input type="email" v-model="user.email" class="form-control" id="userName" aria-describedby="email" @input="(val) => (user.email = user.email.toLowerCase())">
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-danger" @click="saveUserName(true)">Entrar como Anônimo</button>
@@ -558,7 +558,7 @@ export default {
       this.subscriptionBoard.on('update', (object) => {
         setTimeout(() => {
           this.getBoard()
-        }, 3000)
+        }, 1)
       })
 
       this.subscriptionBoard.on('close', () => {
