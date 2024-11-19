@@ -14,6 +14,7 @@
   },
   "dependencies": {
     "@popperjs/core": "^2.11.8",
+    "axios": "^1.7.7",
     "bootstrap": "^5.3.3",
     "bootstrap-icons": "^1.11.3",
     "parse": "^5.3.0",
@@ -23,6 +24,7 @@
     "vue-router": "^4.4.5",
     "vue-sweetalert2": "^5.0.11",
     "vue3-emoji-picker": "^1.1.8",
+    "vue3-otp-input": "^0.5.21",
     "vuedraggable": "^4.1.0"
   },
   "devDependencies": {

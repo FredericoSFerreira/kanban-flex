@@ -14,9 +14,9 @@
           <li class="nav-item">
             <a class="nav-link active" href="/">Home</a>
           </li>
-<!--          <li class="nav-item">-->
-<!--            <a class="nav-link" href="#">Sobre</a>-->
-<!--          </li>-->
+          <li class="nav-item">
+            <a class="nav-link" href="/my-boards">Meus Boards</a>
+          </li>
           <li class="nav-item">
             <a class="nav-link" target="_blank" href="https://stats.uptimerobot.com/aeBUanxj9O">Status</a>
           </li>

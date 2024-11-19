@@ -26,7 +26,7 @@
           <input type="text" v-model="user" class="form-control" id="columnName" aria-describedby="columnName">
           <br>
           <label for="userName" class="form-label">Qual o seu email?</label>
-          <input type="email" v-model="email" class="form-control" id="columnEmail" aria-describedby="columnEmail">
+          <input type="email" v-model="email" class="form-control" id="columnEmail" aria-describedby="columnEmail"  @input="(val) => (email = email.toLowerCase())">
           <br>
           <label for="userName" class="form-label">Qual será o nome do board?</label>
           <input type="text" v-model="boardName" class="form-control" id="columnBoardName"
@@ -52,6 +52,11 @@ Parse.initialize(import.meta.env.VITE_PARSE_APP_ID);
 Parse.serverURL = import.meta.env.VITE_BACKEND_URL
 const Boards = Parse.Object.extend("boards");
 const board = new Boards();
+
+const OTP = Parse.Object.extend("otp");
+const otp = new OTP();
+const otpQuery = new Parse.Query(OTP);
+
 export default {
   data() {
     return {
@@ -66,7 +71,7 @@ export default {
     newBoard() {
       this.modalNewBoard.show()
     },
-    saveBoard() {
+    async saveBoard() {
       if (!this.user) {
         return this.$swal.fire({
           icon: "error",
@@ -107,7 +112,17 @@ export default {
         slug: this.boardName.replace(" ", "-").toLowerCase(),
         columns: []
       })
-        .then((boardDatabase) => {
+        .then(async (boardDatabase) => {
+          otpQuery.equalTo("email", this.email);
+          const otpResult = await otpQuery.first();
+          console.log(otpResult);
+          if (!otpResult) {
+            otp.save({
+              name: this.user,
+              email: this.email,
+              code: null
+            })
+          }
           localStorage.setItem("user", JSON.stringify({'name': this.user, 'id': this.owner_id, 'email': this.email}))
           this.modalNewBoard.hide()
           this.$swal.fire({
