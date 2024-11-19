@@ -200,7 +200,7 @@ export default {
             retorno.destroy()
             setTimeout(() => {
               this.getBoards()
-            }, 100)
+            }, 3000)
           }).catch((error) => {
             console.error('Erro ao salvar documento: ' + error)
           })
