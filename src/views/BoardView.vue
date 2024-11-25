@@ -3,16 +3,44 @@
   <div class="container-fullscreen">
 
     <div class="kanban-header d-flex justify-content-between align-items-center">
-      <h2 class="mb-0">{{ board.name }}
-        <button v-if="checkPermission()" class="btn btn-sm btn btn-light edit-column"
-                @click="editBoardName(board.name)"><i
-          class="bi bi-pencil-square"></i></button>
-      </h2>
-      <button v-if="board.columns.length > 0 && checkPermission()" type="button" @click="newColumn()" class="btn btn-light"
-              data-bs-toggle="modal"
-              data-bs-target="#newColumn"><i
-        class="bi bi-plus-lg"></i> Nova Coluna
-      </button>
+      <div class="d-flex flex-row">
+        <h2 class="mb-0">{{ board.name }}
+          <button v-if="checkPermission()" class="btn btn-sm btn btn-light edit-column"
+                  @click="editBoardName(board.name)"><i
+            class="bi bi-pencil-square"></i></button>
+        </h2>
+      </div>
+
+
+      <div class="d-flex flex-row-reverse justify-content-end">
+
+        <div class="p-1" v-if="board.columns.length > 0 && checkPermission()">
+          <button type="button" @click="newColumn()"
+                  class="btn btn-light"
+                  data-bs-toggle="modal"
+                  data-bs-target="#newColumn"><i
+            class="bi bi-plus-lg"></i> Nova Coluna
+          </button>
+        </div>
+
+        <div class="p-1" v-if="checkPermission()" @click="setVisibility()">
+          <button type="button" class="btn btn-light">
+            <i class="bi bi-eye" v-if="board.visibility"></i>
+            <i class="bi bi-eye-slash" v-if="!board.visibility"></i>
+          </button>
+
+        </div>
+
+        <div class="p-1">
+
+          <select class="form-select" aria-label="Ordenação" v-model="orderBy" @change="orderByOnChange($event)">
+            <option value="default">Ordenação padrão</option>
+            <option value="up_vote">Ordenação por likes</option>
+            <option value="down_vote">Ordenação por dislikes</option>
+          </select>
+        </div>
+
+      </div>
     </div>
 
     <section class="py-5 text-center container empty-state" v-if="board.columns.length === 0 && checkPermission()">
@@ -45,10 +73,39 @@
             </div>
           </div>
         </div>
-        <button class="btn btn-sm btn btn-light-new-card add-task mb-3 mx-2" @click="newCard(column.id)"><i class="bi bi-plus-circle-dotted"></i></button>
+        <button class="btn btn-sm btn btn-light-new-card add-task mb-3 mx-2" @click="newCard(column.id)"><i
+          class="bi bi-plus-circle-dotted"></i></button>
+
+
+<!--        <div style="filter: blur(3px)" class="kanban-card card p-2 mx-2" v-for="card in column.itens" v-if="!board.visibility">-->
+<!--          <div class="d-flex justify-content-between align-items-center">-->
+<!--            <strong>{{ cardHideText.repeat(Math.floor(Math.random() * 10)) }}</strong>-->
+<!--            <div>-->
+<!--              <div class="btn-group" role="group" aria-label="actions" v-if="checkPermission(card.user_id)">-->
+<!--                <button class="btn btn-sm btn btn-light edit-column"><i-->
+<!--                  class="bi bi-pencil-square"></i></button>-->
+<!--                <button class="btn btn-sm tn-sm btn btn-light remove-task"><i-->
+<!--                  class="bi bi-trash-fill"></i></button>-->
+<!--              </div>-->
+<!--            </div>-->
+<!--          </div>-->
+<!--          <small>Nome oculto</small>-->
+<!--          <div class="text-end">-->
+<!--            <div class="btn-group" role="group" aria-label="actions">-->
+<!--              <button class="btn btn-sm tn-sm btn btn-light"><i-->
+<!--                class="bi bi-hand-thumbs-down"></i> {{ card.down_vote || 0 }}-->
+<!--              </button>-->
+<!--              <button class="btn btn-sm tn-sm btn btn-light">-->
+<!--                <i class="bi bi-hand-thumbs-up"></i> {{ card.up_vote || 0 }}-->
+<!--              </button>-->
+<!--            </div>-->
+<!--          </div>-->
+<!--        </div>-->
+
+
         <div class="kanban-card card p-2 mx-2" v-for="card in column.itens">
-          <div class="d-flex justify-content-between align-items-center">
-            <strong>{{ card.description }}</strong>
+          <div class="d-flex justify-content-between align-items-center" :class="{'blur-kanban-card': !checkPermission(card.user_id) && !board.visibility}">
+            <strong>{{ !checkPermission(card.user_id) && !board.visibility ? cardHideText.repeat(1)  : card.description}}</strong>
             <div>
               <div class="btn-group" role="group" aria-label="actions" v-if="checkPermission(card.user_id)">
                 <button class="btn btn-sm btn btn-light edit-column"
@@ -59,7 +116,18 @@
               </div>
             </div>
           </div>
-          <small>{{ card.name }}</small>
+          <small :class="{'blur-kanban-card': !checkPermission(card.user_id) && !board.visibility}">{{ card.name }}</small>
+          <div class="text-end" :class="{'blur-kanban-card': !checkPermission(card.user_id) && !board.visibility}">
+            <div class="btn-group" role="group" aria-label="actions">
+              <button class="btn btn-sm tn-sm btn btn-light"
+                      @click="saveCardVotes(column.id, card.id, false, true)"><i
+                class="bi bi-hand-thumbs-down"></i> {{ card.down_vote || 0 }}
+              </button>
+              <button class="btn btn-sm tn-sm btn btn-light" @click="saveCardVotes(column.id, card.id ,true, false)">
+                <i class="bi bi-hand-thumbs-up"></i> {{ card.up_vote || 0 }}
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -83,8 +151,7 @@
               <i class="bi bi-emoji-smile" @click="showEmoji = true"></i>
             </div>
           </div>
-
-          <EmojiPicker v-if="showEmoji" offset="10000" :text="cardName" class="form-control" :native="false"
+          <EmojiPicker v-if="showEmoji" offset="10000" :tdext="cardName" class="form-control" :native="false"
                        @select="onSelectEmoji" pickerType="" :static-texts="{ placeholder: 'Pesquisar emoji...'}"
                        :hide-group-names="true" :disable-sticky-group-names="true" :disable-skin-tones="true"
                        :display-recent="true"/>
@@ -115,7 +182,8 @@
           <br>
 
           <label for="email" class="form-label">Email</label>
-          <input type="email" v-model="user.email" class="form-control" id="userName" aria-describedby="email" @input="(val) => (user.email = user.email.toLowerCase())">
+          <input type="email" v-model="user.email" class="form-control" id="userName" aria-describedby="email"
+                 @input="(val) => (user.email = user.email.toLowerCase())">
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-danger" @click="saveUserName(true)">Entrar como Anônimo</button>
@@ -212,6 +280,8 @@ import uniqueId from "@/utils/uuid.js";
 import {validateEmail} from "@/utils/validate.js";
 import EmojiPicker from 'vue3-emoji-picker'
 import 'vue3-emoji-picker/css'
+import {toast} from "vue3-toastify";
+import "vue3-toastify/dist/index.css";
 
 Parse.initialize(import.meta.env.VITE_PARSE_APP_ID);
 Parse.serverURL = import.meta.env.VITE_BACKEND_URL
@@ -223,6 +293,9 @@ export default {
   components: {EmojiPicker},
   data() {
     return {
+      orderBy: "default",
+      cardHideText: "Calma ai curioso o conteúdo do card está oculto. E lembre-se de que a curiosidade matou o gato.",
+      isVisible: true,
       showEmoji: false,
       boardName: "",
       columnName: "",
@@ -235,6 +308,7 @@ export default {
         _id: "",
         name: null,
         owner: null,
+        visibility: true,
         slug: "",
         columns: [],
         _created_at: null,
@@ -253,6 +327,10 @@ export default {
     };
   },
   methods: {
+    orderByOnChange(event) {
+      console.log(event.target.value)
+      this.getBoard()
+    },
     onSelectEmoji(emoji) {
       this.cardName += emoji.i
       this.showEmoji = false
@@ -338,6 +416,45 @@ export default {
       this.columnSelectedId = id
       this.modalEditColumnName.show()
     },
+    saveCardVotes(idColumn, idCard, upVote = false, downVote = false) {
+      query.equalTo('objectId', this.$route.params.id)
+      query.first().then((retorno) => {
+        const columns = retorno.attributes.columns
+        for (const c in columns) {
+          if (columns[c].id === idColumn) {
+            for (const i in columns[c].itens) {
+              if (columns[c].itens[i].id === idCard) {
+
+                retorno.addUnique(`columns.${c}.itens.${i}.up_vote_users`, this.user.id)
+                if (upVote) {
+                  if (columns[c].itens[i].up_vote_users?.includes(this.user.id)) {
+                    toast.error("Você já deu like neste card !", {
+                      position: toast.POSITION.TOP_CENTER,
+                    });
+                    break
+                  }
+                  retorno.addUnique(`columns.${c}.itens.${i}.up_vote_users`, this.user.id)
+                  retorno.increment(`columns.${c}.itens.${i}.up_vote`)
+                }
+                if (downVote) {
+                  if (columns[c].itens[i].down_vote_users?.includes(this.user.id)) {
+                    toast.error("Você já deu dislike neste card !", {
+                      position: toast.POSITION.TOP_CENTER,
+                    });
+                    break
+                  }
+                  retorno.addUnique(`columns.${c}.itens.${i}.down_vote_users`, this.user.id)
+                  retorno.increment(`columns.${c}.itens.${i}.down_vote`)
+                }
+                retorno.save()
+                this.getBoard()
+                break;
+              }
+            }
+          }
+        }
+      })
+    },
     saveEditCard() {
       if (!this.cardEditDescription) {
         return this.$swal.fire({
@@ -367,6 +484,22 @@ export default {
           }
         }
       })
+    },
+    setVisibility() {
+      this.isVisible = !this.isVisible
+
+      query.equalTo('objectId', this.$route.params.id)
+      query.first().then((retorno) => {
+        retorno.set('visibility', this.isVisible)
+        retorno.save()
+        this.getBoard()
+        this.boardName = ""
+        this.modalBoardName.hide()
+      }).catch((error) => {
+        console.error('Erro ao salvar documento: ' + error)
+      })
+
+
     },
     checkPermission(idUser = null) {
       if (this.user.id === this.board.owner_id) {
@@ -511,7 +644,9 @@ export default {
               id: uniqueId(),
               name: this.user.name,
               user_id: this.user.id,
-              description: this.cardName
+              description: this.cardName,
+              up_vote: 0,
+              down_vote: 0
             });
             retorno.save()
             this.columnSelectedId = ""
@@ -526,18 +661,26 @@ export default {
       })
 
 
-    }
-    ,
-    log(evt) {
-      window.console.log(evt);
-    }
-    ,
+    },
+    sortItemsByLike() {
+      console.log(this.orderBy)
+      this.board.columns.forEach(column => {
+        if (this.orderBy === "up_vote") {
+          column.itens.sort((a, b) => b.up_vote - a.up_vote);
+        } else {
+          column.itens.sort((a, b) => b.down_vote - a.down_vote);
+        }
+      });
+    },
     getBoard() {
-      const route = useRoute()
       query.get(this.$route.params.id)
         .then((board) => {
           console.log(board.attributes, "BOARD");
-          this.board = board.attributes
+          const visibility = board.attributes.visibility ?? true
+          this.board = {...board.attributes, visibility: visibility}
+          if (this.orderBy !== 'default') {
+            this.sortItemsByLike()
+          }
         }, (error) => {
           console.log('Failed to create new object, with error code: ' + error.message);
           this.$router.push(`/404`)
@@ -546,6 +689,7 @@ export default {
     ,
     async realTimeBoard() {
       const queryBoard = new Parse.Query('boards');
+      queryBoard.equalTo('objectId', this.$route.params.id)
       this.subscriptionBoard = await queryBoard.subscribe()
 
       this.subscriptionBoard.on('open', () => {
@@ -590,6 +734,11 @@ body, html {
   margin: 0;
   padding: 0;
   overflow: hidden;
+}
+
+
+.blur-kanban-card {
+  filter: blur(3px);
 }
 
 .icon-big {

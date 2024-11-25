@@ -107,6 +107,7 @@ export default {
       board.save({
         name: this.boardName,
         owner: this.user,
+        visibility: true,
         owner_id: this.owner_id,
         owner_email: this.email,
         slug: this.boardName.replace(" ", "-").toLowerCase(),
