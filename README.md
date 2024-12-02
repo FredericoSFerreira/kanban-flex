@@ -1,4 +1,35 @@
-# open-sprint-retro [![Netlify Status](https://api.netlify.com/api/v1/badges/08200383-b16d-4391-a914-37fe41309b3c/deploy-status)](https://app.netlify.com/sites/open-sprint-retro/deploys)
+# # Open sprint Retro [![Netlify Status](https://api.netlify.com/api/v1/badges/08200383-b16d-4391-a914-37fe41309b3c/deploy-status)](https://app.netlify.com/sites/open-sprint-retro/deploys)
+
+
+
+
+
+[**Open sprint Retro**](https://open-sprint-retro.netlify.app/) is a web modern board, open-source application for sprint retrospective based in columns and cards.
+
+---
+
+## ✨ Features
+
+- 🌠 **Management Boards**: Create and management boards yours sprints.
+- 🛰 **Anonymous**: Support anonymous user access your board.
+- 🖼 **Likes e Dislikes Cards**: All users can vote in cards.
+- 🎨 **Hide Mode**: The creator board can control hide cards in board for all user.
+
+---
+
+## 🚀 Technologies Used
+
+Open sprint Retro is built using cutting-edge technologies to ensure both performance and developer productivity:
+
+<div align="center">
+  <img src="https://skillicons.dev/icons?i=nodejs,html,css,vuejs,typescript,mongodb">
+  <br/>
+  <br/>
+</div>
+
+---
+
+## 🛠️ Installation
 
 This template should help get you started developing with Vue 3 in Vite.
 
@@ -44,3 +75,57 @@ npm run test:unit
 npm run lint
 
 ```
+
+## 🤝 Contributing
+
+We welcome contributions from the open-source community! Here's how you can get started:
+
+1. **Fork the repository** on GitHub.
+2. **Clone your forked repo** locally:
+
+   ```bash
+   git clone https://github.com/FredericoSFerreira/Open-Sprint-Retro.git or ssh git@github.com:FredericoSFerreira/Open-Sprint-Retro.git
+   ```
+
+3. **Create a new branch** for your feature or bug fix:
+
+   ```bash
+   git checkout -b feature/your-feature-name
+   ```
+
+4. **Make your changes**, ensuring your code follows best practices.
+5. **Test your changes** locally to make sure everything works as expected.
+6. **Commit and push** your changes to your forked repository:
+
+   ```bash
+   git commit -m "Add feature: your-feature-name"
+   git push origin feature/your-feature-name
+   ```
+
+7. Submit a **pull request** to the main repository with a clear description of your changes.
+
+---
+
+## 🪐 Future Plans
+
+- Drag and Drop options
+- Implement multi language, now suport only pt-br
+- Group and ungroup cards
+- Improve OTP login system
+
+---
+
+## 💬 Get in Touch
+
+If you have any questions, feel free to reach out via [GitHub Issues](https://github.com/FredericoSFerreira/Open-Sprint-Retro/issues). We’d love to hear your thoughts or ideas for future improvements!
+
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License. See the [LICENSE](./LICENSE) file for more details.
+
+
+
+
