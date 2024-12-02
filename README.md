@@ -10,10 +10,10 @@
 
 ## ✨ Features
 
-- 🌠 **Management Boards**: Create and management boards yours sprints.
-- 🛰 **Anonymous**: Support anonymous user access your board.
-- 🖼 **Likes e Dislikes Cards**: All users can vote in cards.
-- 🎨 **Hide Mode**: The creator board can control hide cards in board for all user.
+- **Management Boards**: Create and management boards yours sprints.
+- **Anonymous**: Support anonymous user access your board.
+- **Likes e Dislikes Cards**: All users can vote in cards.
+- **Hide Mode**: The creator board can control hide cards in board for all user.
 
 ---
 
