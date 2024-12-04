@@ -32,3 +32,5 @@ coverage
 .env
 
 /backend/.env
+
+/backend/mongo_data

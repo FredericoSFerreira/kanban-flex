@@ -45,7 +45,7 @@ TypeScript cannot handle type information for `.vue` imports by default, so we r
 
 See [Vite Configuration Reference](https://vite.dev/config/).
 
-## Project Setup
+## Project Setup Front
 
 ```sh
 npm install
@@ -74,6 +74,37 @@ npm run test:unit
 ```sh
 npm run lint
 
+```
+
+
+## Project Setup Backend
+
+
+
+
+```sh
+cd backend/
+npm install
+```
+
+## Up docker database
+
+```sh
+docker-compose up
+```
+
+### Execute migrations
+
+```sh
+npm install -g migrate-mongo
+npm run migrate
+```
+
+
+### Start backend
+
+```sh
+npm run start
 ```
 
 ## 🤝 Contributing
@@ -109,9 +140,10 @@ We welcome contributions from the open-source community! Here's how you can get 
 ## 🪐 Future Plans
 
 - Drag and Drop options
-- Implement multi language, now suport only pt-br
+- Implement multi-language, now suport only pt-br
 - Group and ungroup cards
 - Improve OTP login system
+- Implement comments in card
 
 ---
 
