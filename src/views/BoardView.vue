@@ -58,7 +58,7 @@
     <div class="kanban-board" id="kanban-board">
       <!-- Coluna de exemplo -->
       <div
-        class="kanban-column drop-zone"
+        class="kanban-column"
         v-for="column in board.columns"
         :key="column.id"
         @drop="onDrop($event, column.id)"
@@ -105,7 +105,7 @@
         <!--          </div>-->
         <!--        </div>-->
           <div
-            class="kanban-card card drag-el p-2 mx-2"
+            class="kanban-card card p-2 mx-2"
             v-for="card in column.itens"
             :key="card.id"
             draggable="true"
@@ -285,7 +285,6 @@
 <script>
 import { Modal } from 'bootstrap';
 import Parse from 'parse/dist/parse.min.js';
-import { useRoute } from 'vue-router'
 import uniqueId from "@/utils/uuid.js";
 import { validateEmail } from "@/utils/validate.js";
 import EmojiPicker from 'vue3-emoji-picker'
@@ -296,7 +295,6 @@ import "vue3-toastify/dist/index.css";
 Parse.initialize(import.meta.env.VITE_PARSE_APP_ID);
 Parse.serverURL = import.meta.env.VITE_BACKEND_URL
 const Boards = Parse.Object.extend("boards");
-const board = new Boards();
 const query = new Parse.Query(Boards);
 
 export default {
@@ -694,6 +692,26 @@ export default {
           this.$router.push(`/404`)
         });
     },
+    findColumn(columns, collumnId) {
+      for (const collumnIndex in columns) {
+        if (columns[collumnIndex].id === collumnId) {
+          return [columns[collumnIndex], collumnIndex]
+        }
+      }
+
+      return [null, -1]
+    }
+    ,
+    findCard(column, cardId) {
+      for (const cardIndex in column.itens) {
+        const cardItem = column.itens[cardIndex]
+        if (cardItem.id === cardId) {
+          return [cardItem, cardIndex]
+        }
+      }
+
+      return [null, -1]
+    },
     async realTimeBoard() {
       const queryBoard = new Parse.Query('boards');
       queryBoard.equalTo('objectId', this.$route.params.id)
@@ -703,7 +721,7 @@ export default {
         console.log('board opened')
       })
 
-      this.subscriptionBoard.on('update', (object) => {
+      this.subscriptionBoard.on('update', (_object) => {
         setTimeout(() => {
           this.getBoard()
         }, 1)
@@ -714,53 +732,43 @@ export default {
       })
     },
     startDrag(evt, cardId, columnId) {
-      console.log("DRAG", cardId, columnId)
       evt.dataTransfer.dropEffect = 'move'
       evt.dataTransfer.effectAllowed = 'move'
       evt.dataTransfer.setData('cardDragId', cardId)
-      this.columnSelectedId = columnId
+      evt.dataTransfer.setData('collumnDragId', columnId)
     },
-    onDrop(evt, columnId) {
-      const cardId = evt.dataTransfer.getData('cardDragId')
+    onDrop(evt, columnDropId) {
+      const cardDragId = evt.dataTransfer.getData('cardDragId')
+      const columnDragId = evt.dataTransfer.getData('collumnDragId')
+
       query.equalTo('objectId', this.$route.params.id)
-      console.log("DROP", cardId, columnId)
 
       query.first().then((boardDataCursor) => {
         const columns = boardDataCursor.attributes.columns;
-        let columnDraggedPosition = null
-        let cardDraggedPosition = null
-        let cardDragged = null
+        const [columnDrag, columnDragIndex] = this.findColumn(columns, columnDragId)
+        const [cardDrag, cardDragIndex] = this.findCard(columnDrag, cardDragId)
+        const [_collumnDrop, collumnDropIndex] = this.findColumn(columns, columnDropId)
 
-        for (const columnIndex in columns) {
-          if (columns[columnIndex].id === this.columnSelectedId) {
-            console.log("coluna", columns[columnIndex])
-            for (const itemIndex in columns[columnIndex].itens) {
-              console.log("itemIndex", columns[columnIndex].itens[itemIndex].id, cardId)
-
-              if (columns[columnIndex].itens[itemIndex].id === cardId) {
-                columnDraggedPosition = columnIndex
-                cardDraggedPosition = itemIndex
-                cardDragged = columns[columnIndex].itens[itemIndex]
-              }
-            }
-          }
+        if (!collumnDropIndex || !cardDragIndex) {
+          return this.$swal.fire({
+            icon: "warning",
+            title: "Oops...",
+            text: "Houve alterações no card ou na coluna destino!",
+          });
         }
 
-        for (const columnIndex in columns) {
-          if (columns[columnIndex].id === columnId) {
-            boardDataCursor.add(
-              `columns.${columnIndex}.itens`,
-              {...cardDragged })
-
-            boardDataCursor.remove(
-              `columns.${columnDraggedPosition}.itens`,
-              columns[columnDraggedPosition].itens[cardDraggedPosition]
-            );
-            boardDataCursor.save()
-          }
-        }
+        boardDataCursor.add(
+          `columns.${collumnDropIndex}.itens`,
+          { ...cardDrag }
+        )
+        boardDataCursor.remove(
+          `columns.${columnDragIndex}.itens`,
+          columns[columnDragIndex].itens[cardDragIndex]
+        )
+        boardDataCursor.save()
 
         this.getBoard()
+        evt.dataTransfer.clearData()
       })
     },
   },
@@ -866,15 +874,4 @@ html {
   /* borda ao passar o mouse */
 }
 
-.drop-zone {
-  background-color: #eee;
-  margin-bottom: 10px;
-  padding: 10px;
-}
-
-.drag-el {
-  background-color: #fff;
-  margin-bottom: 10px;
-  padding: 5px;
-}
 </style>
