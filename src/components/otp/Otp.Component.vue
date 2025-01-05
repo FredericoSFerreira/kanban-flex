@@ -68,7 +68,7 @@ export default defineComponent({
 
         const parsedPastedText = pastedText.replace(/\D/g, "");
 
-        let newDigits = Array(this.count).fill("");
+        const newDigits = Array(this.count).fill("");
 
         if (this.digits.length <= parsedPastedText?.length) {
           this.errro = true;

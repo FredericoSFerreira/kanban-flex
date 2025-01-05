@@ -6,8 +6,7 @@
       <div class="d-flex flex-row">
         <h2 class="mb-0">{{ board.name }}
           <button v-if="checkPermission()" class="btn btn-sm btn btn-light edit-column"
-                  @click="editBoardName(board.name)"><i
-            class="bi bi-pencil-square"></i></button>
+            @click="editBoardName(board.name)"><i class="bi bi-pencil-square"></i></button>
         </h2>
       </div>
 
@@ -15,11 +14,8 @@
       <div class="d-flex flex-row-reverse justify-content-end">
 
         <div class="p-1" v-if="board.columns.length > 0 && checkPermission()">
-          <button type="button" @click="newColumn()"
-                  class="btn btn-light"
-                  data-bs-toggle="modal"
-                  data-bs-target="#newColumn"><i
-            class="bi bi-plus-lg"></i> Nova Coluna
+          <button type="button" @click="newColumn()" class="btn btn-light" data-bs-toggle="modal"
+            data-bs-target="#newColumn"><i class="bi bi-plus-lg"></i> Nova Coluna
           </button>
         </div>
 
@@ -61,75 +57,89 @@
 
     <div class="kanban-board" id="kanban-board">
       <!-- Coluna de exemplo -->
-      <div class="kanban-column" v-for="column in board.columns">
+      <div
+        class="kanban-column drop-zone"
+        v-for="column in board.columns"
+        :key="column.id"
+        @drop="onDrop($event, column.id)"
+        @dragover.prevent
+        @dragenter.prevent
+      >
         <div class="d-flex justify-content-between align-items-center mb-2 p-2">
           <h4 class="column-title">{{ column.name }}</h4>
           <div>
             <div class="btn-group" role="group" aria-label="actionsCollun" v-if="checkPermission()">
               <button class="btn btn-sm btn btn-light edit-column" @click="editColumn(column.id, column.name)"><i
-                class="bi bi-pencil-square"></i></button>
+                  class="bi bi-pencil-square"></i></button>
               <button class="btn btn-sm btn btn-light remove-column" @click="removeColumn(column.id)"><i
-                class="bi bi-trash-fill"></i></button>
+                  class="bi bi-trash-fill"></i></button>
             </div>
           </div>
         </div>
         <button class="btn btn-sm btn btn-light-new-card add-task mb-3 mx-2" @click="newCard(column.id)"><i
-          class="bi bi-plus-circle-dotted"></i></button>
+            class="bi bi-plus-circle-dotted"></i></button>
 
 
-<!--        <div style="filter: blur(3px)" class="kanban-card card p-2 mx-2" v-for="card in column.itens" v-if="!board.visibility">-->
-<!--          <div class="d-flex justify-content-between align-items-center">-->
-<!--            <strong>{{ cardHideText.repeat(Math.floor(Math.random() * 10)) }}</strong>-->
-<!--            <div>-->
-<!--              <div class="btn-group" role="group" aria-label="actions" v-if="checkPermission(card.user_id)">-->
-<!--                <button class="btn btn-sm btn btn-light edit-column"><i-->
-<!--                  class="bi bi-pencil-square"></i></button>-->
-<!--                <button class="btn btn-sm tn-sm btn btn-light remove-task"><i-->
-<!--                  class="bi bi-trash-fill"></i></button>-->
-<!--              </div>-->
-<!--            </div>-->
-<!--          </div>-->
-<!--          <small>Nome oculto</small>-->
-<!--          <div class="text-end">-->
-<!--            <div class="btn-group" role="group" aria-label="actions">-->
-<!--              <button class="btn btn-sm tn-sm btn btn-light"><i-->
-<!--                class="bi bi-hand-thumbs-down"></i> {{ card.down_vote || 0 }}-->
-<!--              </button>-->
-<!--              <button class="btn btn-sm tn-sm btn btn-light">-->
-<!--                <i class="bi bi-hand-thumbs-up"></i> {{ card.up_vote || 0 }}-->
-<!--              </button>-->
-<!--            </div>-->
-<!--          </div>-->
-<!--        </div>-->
-
-
-        <div class="kanban-card card p-2 mx-2" v-for="card in column.itens">
-          <div class="d-flex justify-content-between align-items-center" :class="{'blur-kanban-card': !checkPermission(card.user_id) && !board.visibility}">
-            <strong>{{ !checkPermission(card.user_id) && !board.visibility ? cardHideText.repeat(1)  : card.description}}</strong>
-            <div>
-              <div class="btn-group" role="group" aria-label="actions" v-if="checkPermission(card.user_id)">
-                <button class="btn btn-sm btn btn-light edit-column"
-                        @click="editCardDescription(column.id, card.id, card.description)"><i
-                  class="bi bi-pencil-square"></i></button>
-                <button class="btn btn-sm tn-sm btn btn-light remove-task" @click="removeCard(column.id, card.id)"><i
-                  class="bi bi-trash-fill"></i></button>
+        <!--        <div style="filter: blur(3px)" class="kanban-card card p-2 mx-2" v-for="card in column.itens" v-if="!board.visibility">-->
+        <!--          <div class="d-flex justify-content-between align-items-center">-->
+        <!--            <strong>{{ cardHideText.repeat(Math.floor(Math.random() * 10)) }}</strong>-->
+        <!--            <div>-->
+        <!--              <div class="btn-group" role="group" aria-label="actions" v-if="checkPermission(card.user_id)">-->
+        <!--                <button class="btn btn-sm btn btn-light edit-column"><i-->
+        <!--                  class="bi bi-pencil-square"></i></button>-->
+        <!--                <button class="btn btn-sm tn-sm btn btn-light remove-task"><i-->
+        <!--                  class="bi bi-trash-fill"></i></button>-->
+        <!--              </div>-->
+        <!--            </div>-->
+        <!--          </div>-->
+        <!--          <small>Nome oculto</small>-->
+        <!--          <div class="text-end">-->
+        <!--            <div class="btn-group" role="group" aria-label="actions">-->
+        <!--              <button class="btn btn-sm tn-sm btn btn-light"><i-->
+        <!--                class="bi bi-hand-thumbs-down"></i> {{ card.down_vote || 0 }}-->
+        <!--              </button>-->
+        <!--              <button class="btn btn-sm tn-sm btn btn-light">-->
+        <!--                <i class="bi bi-hand-thumbs-up"></i> {{ card.up_vote || 0 }}-->
+        <!--              </button>-->
+        <!--            </div>-->
+        <!--          </div>-->
+        <!--        </div>-->
+          <div
+            class="kanban-card card drag-el p-2 mx-2"
+            v-for="card in column.itens"
+            :key="card.id"
+            draggable="true"
+            @dragstart="startDrag($event, card.id, column.id)"
+          >
+            <div class="d-flex justify-content-between align-items-center"
+              :class="{ 'blur-kanban-card': !checkPermission(card.user_id) && !board.visibility }">
+              <strong>{{ !checkPermission(card.user_id) && !board.visibility ? cardHideText.repeat(1) :
+                card.description }}</strong>
+              <div>
+                <div class="btn-group" role="group" aria-label="actions" v-if="checkPermission(card.user_id)">
+                  <button class="btn btn-sm btn btn-light edit-column"
+                    @click="editCardDescription(column.id, card.id, card.description)"><i
+                      class="bi bi-pencil-square"></i></button>
+                  <button class="btn btn-sm tn-sm btn btn-light remove-task" @click="removeCard(column.id, card.id)"><i
+                      class="bi bi-trash-fill"></i></button>
+                </div>
+              </div>
+            </div>
+            <small :class="{ 'blur-kanban-card': !checkPermission(card.user_id) && !board.visibility }">{{ card.name
+              }}</small>
+            <div class="text-end" :class="{ 'blur-kanban-card': !checkPermission(card.user_id) && !board.visibility }">
+              <div class="btn-group" role="group" aria-label="actions">
+                <button class="btn btn-sm tn-sm btn btn-light"
+                  @click="saveCardVotes(column.id, card.id, false, true)"><i class="bi bi-hand-thumbs-down"></i> {{
+                    card.down_vote || 0 }}
+                </button>
+                <button class="btn btn-sm tn-sm btn btn-light" @click="saveCardVotes(column.id, card.id, true, false)">
+                  <i class="bi bi-hand-thumbs-up"></i> {{ card.up_vote || 0 }}
+                </button>
               </div>
             </div>
           </div>
-          <small :class="{'blur-kanban-card': !checkPermission(card.user_id) && !board.visibility}">{{ card.name }}</small>
-          <div class="text-end" :class="{'blur-kanban-card': !checkPermission(card.user_id) && !board.visibility}">
-            <div class="btn-group" role="group" aria-label="actions">
-              <button class="btn btn-sm tn-sm btn btn-light"
-                      @click="saveCardVotes(column.id, card.id, false, true)"><i
-                class="bi bi-hand-thumbs-down"></i> {{ card.down_vote || 0 }}
-              </button>
-              <button class="btn btn-sm tn-sm btn btn-light" @click="saveCardVotes(column.id, card.id ,true, false)">
-                <i class="bi bi-hand-thumbs-up"></i> {{ card.up_vote || 0 }}
-              </button>
-            </div>
-          </div>
         </div>
-      </div>
     </div>
   </div>
 
@@ -152,12 +162,12 @@
             </div>
           </div>
           <EmojiPicker v-if="showEmoji" offset="10000" :tdext="cardName" class="form-control" :native="false"
-                       @select="onSelectEmoji" pickerType="" :static-texts="{ placeholder: 'Pesquisar emoji...'}"
-                       :hide-group-names="true" :disable-sticky-group-names="true" :disable-skin-tones="true"
-                       :display-recent="true"/>
+            @select="onSelectEmoji" pickerType="" :static-texts="{ placeholder: 'Pesquisar emoji...' }"
+            :hide-group-names="true" :disable-sticky-group-names="true" :disable-skin-tones="true"
+            :display-recent="true" />
 
           <textarea v-if="!showEmoji" rows="5" v-model="cardName" class="form-control" id="exampleInputEmail1"
-                    aria-describedby="emailHelp"></textarea>
+            aria-describedby="emailHelp"></textarea>
 
         </div>
         <div class="modal-footer">
@@ -183,7 +193,7 @@
 
           <label for="email" class="form-label">Email</label>
           <input type="email" v-model="user.email" class="form-control" id="userName" aria-describedby="email"
-                 @input="(val) => (user.email = user.email.toLowerCase())">
+            @input="(val) => (user.email = user.email.toLowerCase())">
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-danger" @click="saveUserName(true)">Entrar como Anônimo</button>
@@ -241,7 +251,7 @@
         <div class="modal-body">
           <label for="userName" class="form-label">Nome da coluna</label>
           <input type="text" v-model="columnEditName" class="form-control" id="editColumnName"
-                 aria-describedby="editColumnName">
+            aria-describedby="editColumnName">
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-primary" @click="saveEditColumn()">Salvar</button>
@@ -252,7 +262,7 @@
 
 
   <div class="modal fade" id="modalCardDescription" tabindex="-1" aria-labelledby="exampleModalLabel"
-       aria-hidden="true">
+    aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
@@ -262,7 +272,7 @@
         <div class="modal-body">
           <label for="exampleInputEmail1" class="form-label">Descrição</label>
           <textarea rows="5" v-model="cardEditDescription" class="form-control" id="exampleInputEmail1"
-                    aria-describedby="emailHelp"></textarea>
+            aria-describedby="emailHelp"></textarea>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-primary" @click="saveEditCard()">Salvar</button>
@@ -273,14 +283,14 @@
 
 </template>
 <script>
-import {Modal} from 'bootstrap';
+import { Modal } from 'bootstrap';
 import Parse from 'parse/dist/parse.min.js';
-import {useRoute} from 'vue-router'
+import { useRoute } from 'vue-router'
 import uniqueId from "@/utils/uuid.js";
-import {validateEmail} from "@/utils/validate.js";
+import { validateEmail } from "@/utils/validate.js";
 import EmojiPicker from 'vue3-emoji-picker'
 import 'vue3-emoji-picker/css'
-import {toast} from "vue3-toastify";
+import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
 
 Parse.initialize(import.meta.env.VITE_PARSE_APP_ID);
@@ -290,7 +300,7 @@ const board = new Boards();
 const query = new Parse.Query(Boards);
 
 export default {
-  components: {EmojiPicker},
+  components: { EmojiPicker },
   data() {
     return {
       orderBy: "default",
@@ -401,7 +411,7 @@ export default {
 
       const id = uniqueId()
       this.user.id = id
-      localStorage.setItem("user", JSON.stringify({'name': this.user.name, 'id': id, 'email': this.user.email}))
+      localStorage.setItem("user", JSON.stringify({ 'name': this.user.name, 'id': id, 'email': this.user.email }))
       this.modalUserName.hide()
     },
     newCard(id) {
@@ -498,8 +508,6 @@ export default {
       }).catch((error) => {
         console.error('Erro ao salvar documento: ' + error)
       })
-
-
     },
     checkPermission(idUser = null) {
       if (this.user.id === this.board.owner_id) {
@@ -677,7 +685,7 @@ export default {
         .then((board) => {
           console.log(board.attributes, "BOARD");
           const visibility = board.attributes.visibility ?? true
-          this.board = {...board.attributes, visibility: visibility}
+          this.board = { ...board.attributes, visibility: visibility }
           if (this.orderBy !== 'default') {
             this.sortItemsByLike()
           }
@@ -685,8 +693,7 @@ export default {
           console.log('Failed to create new object, with error code: ' + error.message);
           this.$router.push(`/404`)
         });
-    }
-    ,
+    },
     async realTimeBoard() {
       const queryBoard = new Parse.Query('boards');
       queryBoard.equalTo('objectId', this.$route.params.id)
@@ -705,13 +712,62 @@ export default {
       this.subscriptionBoard.on('close', () => {
         console.log('board edit subscription closed');
       })
-    }
-    ,
+    },
+    startDrag(evt, cardId, columnId) {
+      console.log("DRAG", cardId, columnId)
+      evt.dataTransfer.dropEffect = 'move'
+      evt.dataTransfer.effectAllowed = 'move'
+      evt.dataTransfer.setData('cardDragId', cardId)
+      this.columnSelectedId = columnId
+    },
+    onDrop(evt, columnId) {
+      const cardId = evt.dataTransfer.getData('cardDragId')
+      query.equalTo('objectId', this.$route.params.id)
+      console.log("DROP", cardId, columnId)
+
+      query.first().then((boardDataCursor) => {
+        const columns = boardDataCursor.attributes.columns;
+        let columnDraggedPosition = null
+        let cardDraggedPosition = null
+        let cardDragged = null
+
+        for (const columnIndex in columns) {
+          if (columns[columnIndex].id === this.columnSelectedId) {
+            console.log("coluna", columns[columnIndex])
+            for (const itemIndex in columns[columnIndex].itens) {
+              console.log("itemIndex", columns[columnIndex].itens[itemIndex].id, cardId)
+
+              if (columns[columnIndex].itens[itemIndex].id === cardId) {
+                columnDraggedPosition = columnIndex
+                cardDraggedPosition = itemIndex
+                cardDragged = columns[columnIndex].itens[itemIndex]
+              }
+            }
+          }
+        }
+
+        for (const columnIndex in columns) {
+          if (columns[columnIndex].id === columnId) {
+            boardDataCursor.add(
+              `columns.${columnIndex}.itens`,
+              {...cardDragged })
+
+            boardDataCursor.remove(
+              `columns.${columnDraggedPosition}.itens`,
+              columns[columnDraggedPosition].itens[cardDraggedPosition]
+            );
+            boardDataCursor.save()
+          }
+        }
+
+        this.getBoard()
+      })
+    },
   },
   mounted() {
     this.getBoard();
     this.realTimeBoard();
-    this.modalUserName = new Modal(document.getElementById('modalUserName'), {backdrop: 'static', keyboard: false});
+    this.modalUserName = new Modal(document.getElementById('modalUserName'), { backdrop: 'static', keyboard: false });
     const user = JSON.parse(localStorage.getItem("user"));
     const userLocal = user ? user : null;
     if (!userLocal) {
@@ -729,7 +785,8 @@ export default {
 </script>
 <style scoped>
 /* Ocupação total da tela */
-body, html {
+body,
+html {
   height: 100%;
   margin: 0;
   padding: 0;
@@ -796,12 +853,28 @@ body, html {
 
 
 .btn-light-new-card {
-  background-color: #d3d4d5; /* cor do botão */
-  border-color: #d3d4d5; /* borda do botão */
+  background-color: #d3d4d5;
+  /* cor do botão */
+  border-color: #d3d4d5;
+  /* borda do botão */
 }
 
 .btn-light-new-card:hover {
-  background-color: #babbbc; /* cor do botão ao passar o mouse */
-  border-color: #babbbc; /* borda ao passar o mouse */
+  background-color: #babbbc;
+  /* cor do botão ao passar o mouse */
+  border-color: #babbbc;
+  /* borda ao passar o mouse */
+}
+
+.drop-zone {
+  background-color: #eee;
+  margin-bottom: 10px;
+  padding: 10px;
+}
+
+.drag-el {
+  background-color: #fff;
+  margin-bottom: 10px;
+  padding: 5px;
 }
 </style>
