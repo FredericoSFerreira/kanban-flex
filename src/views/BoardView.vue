@@ -722,9 +722,7 @@ export default {
       })
 
       this.subscriptionBoard.on('update', (_object) => {
-        setTimeout(() => {
-          this.getBoard()
-        }, 1)
+        this.getBoard()
       })
 
       this.subscriptionBoard.on('close', () => {
@@ -732,24 +730,26 @@ export default {
       })
     },
     startDrag(evt, cardId, columnId) {
-      evt.dataTransfer.dropEffect = 'move'
-      evt.dataTransfer.effectAllowed = 'move'
-      evt.dataTransfer.setData('cardDragId', cardId)
-      evt.dataTransfer.setData('collumnDragId', columnId)
+      evt.dataTransfer.dropEffect = 'move';
+      evt.dataTransfer.effectAllowed = 'move';
+      evt.dataTransfer.setData('cardDragId', cardId);
+      evt.dataTransfer.setData('collumnDragId', columnId);
     },
     onDrop(evt, columnDropId) {
-      const cardDragId = evt.dataTransfer.getData('cardDragId')
-      const columnDragId = evt.dataTransfer.getData('collumnDragId')
-
-      query.equalTo('objectId', this.$route.params.id)
+      const cardDragId = evt.dataTransfer.getData('cardDragId');
+      const columnToRemoveId = evt.dataTransfer.getData('collumnDragId');
+      evt.preventDefault();
 
       query.first().then((boardDataCursor) => {
         const columns = boardDataCursor.attributes.columns;
-        const [columnDrag, columnDragIndex] = this.findColumn(columns, columnDragId)
-        const [cardDrag, cardDragIndex] = this.findCard(columnDrag, cardDragId)
-        const [_collumnDrop, collumnDropIndex] = this.findColumn(columns, columnDropId)
+        const [columnToRemove, columnToRemoveIndex] = this.findColumn(columns, columnToRemoveId)
+        const [cardDrag, cardDragIndex] = this.findCard(columnToRemove, cardDragId)
+        const [_collumnToAdd, collumnToAddIndex] = this.findColumn(columns, columnDropId)
 
-        if (!collumnDropIndex || !cardDragIndex) {
+        const addCollumnKey = `columns.${collumnToAddIndex}.itens`
+        const removeCollumnKey = `columns.${columnToRemoveIndex}.itens`
+
+        if (boardDataCursor.dirty(removeCollumnKey)) {
           return this.$swal.fire({
             icon: "warning",
             title: "Oops...",
@@ -757,18 +757,23 @@ export default {
           });
         }
 
-        boardDataCursor.add(
-          `columns.${collumnDropIndex}.itens`,
-          { ...cardDrag }
+        boardDataCursor.addUnique(
+          addCollumnKey,
+          cardDrag
         )
         boardDataCursor.remove(
-          `columns.${columnDragIndex}.itens`,
-          columns[columnDragIndex].itens[cardDragIndex]
+          removeCollumnKey,
+          columns[columnToRemoveIndex].itens[cardDragIndex]
         )
-        boardDataCursor.save()
 
-        this.getBoard()
-        evt.dataTransfer.clearData()
+        boardDataCursor.save().then((result) => {
+          console.log("drag'n drop result ->", result);
+        }).catch((error) => {
+          console.error("Error in drag'n drop", error);
+          boardDataCursor.revert();
+        }).finally(() => {
+          this.getBoard();
+        })
       })
     },
   },
