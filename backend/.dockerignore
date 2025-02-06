@@ -1,0 +1,4 @@
+.env.sample
+node_modules/
+logs/
+mongo_data/
