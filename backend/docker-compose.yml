@@ -1,15 +1,20 @@
-version: '3.8'
+version: "3.8"
 
 services:
-  database:
-    image: mongo:latest
-    hostname: mongo
-    restart: on-failure
-    ports:
-      - 27018:27017
-    volumes:
-      - ./mongo_data:/data/db
-    healthcheck:
-      test: test $$(echo "rs.initiate().ok || rs.status().ok" | mongo -port 27017 --quiet) -eq 1
-      interval: 10s
-      start_period: 30s
+    app:
+        image: app:latest
+        depends_on:
+            - database
+        ports:
+            - 3000:3000
+        entrypoint: bash -c "npm run migrate && npm run start"
+    database:
+        image: mongo:latest
+        hostname: mongo
+        restart: on-failure
+        volumes:
+            - ./mongo_data:/data/db
+        healthcheck:
+            test: test $$(echo "rs.initiate().ok || rs.status().ok" | mongo -port 27017 --quiet) -eq 1
+            interval: 10s
+            start_period: 30s
