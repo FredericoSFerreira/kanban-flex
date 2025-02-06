@@ -78,64 +78,39 @@
         </div>
         <button class="btn btn-sm btn btn-light-new-card add-task mb-3 mx-2" @click="newCard(column.id)"><i
             class="bi bi-plus-circle-dotted"></i></button>
-
-
-        <!--        <div style="filter: blur(3px)" class="kanban-card card p-2 mx-2" v-for="card in column.itens" v-if="!board.visibility">-->
-        <!--          <div class="d-flex justify-content-between align-items-center">-->
-        <!--            <strong>{{ cardHideText.repeat(Math.floor(Math.random() * 10)) }}</strong>-->
-        <!--            <div>-->
-        <!--              <div class="btn-group" role="group" aria-label="actions" v-if="checkPermission(card.user_id)">-->
-        <!--                <button class="btn btn-sm btn btn-light edit-column"><i-->
-        <!--                  class="bi bi-pencil-square"></i></button>-->
-        <!--                <button class="btn btn-sm tn-sm btn btn-light remove-task"><i-->
-        <!--                  class="bi bi-trash-fill"></i></button>-->
-        <!--              </div>-->
-        <!--            </div>-->
-        <!--          </div>-->
-        <!--          <small>Nome oculto</small>-->
-        <!--          <div class="text-end">-->
-        <!--            <div class="btn-group" role="group" aria-label="actions">-->
-        <!--              <button class="btn btn-sm tn-sm btn btn-light"><i-->
-        <!--                class="bi bi-hand-thumbs-down"></i> {{ card.down_vote || 0 }}-->
-        <!--              </button>-->
-        <!--              <button class="btn btn-sm tn-sm btn btn-light">-->
-        <!--                <i class="bi bi-hand-thumbs-up"></i> {{ card.up_vote || 0 }}-->
-        <!--              </button>-->
-        <!--            </div>-->
-        <!--          </div>-->
-        <!--        </div>-->
-          <div
-            class="kanban-card card p-2 mx-2"
-            v-for="card in column.itens"
-            :key="card.id"
-            draggable="true"
-            @dragstart="startDrag($event, card.id, column.id)"
-          >
-            <div class="d-flex justify-content-between align-items-center"
-              :class="{ 'blur-kanban-card': !checkPermission(card.user_id) && !board.visibility }">
-              <strong>{{ !checkPermission(card.user_id) && !board.visibility ? cardHideText.repeat(1) :
-                card.description }}</strong>
-              <div>
-                <div class="btn-group" role="group" aria-label="actions" v-if="checkPermission(card.user_id)">
-                  <button class="btn btn-sm btn btn-light edit-column"
-                    @click="editCardDescription(column.id, card.id, card.description)"><i
-                      class="bi bi-pencil-square"></i></button>
-                  <button class="btn btn-sm tn-sm btn btn-light remove-task" @click="removeCard(column.id, card.id)"><i
-                      class="bi bi-trash-fill"></i></button>
+          <div v-for="card in column.itens" :key="getCardId(card)">
+            <div
+              v-if="card !== null"
+              class="kanban-card card p-2 mx-2"
+              draggable="true"
+              @dragstart="startDrag($event, card.id, column.id)"
+            >
+              <div class="d-flex justify-content-between align-items-center"
+                :class="{ 'blur-kanban-card': !checkPermission(card.user_id) && !board.visibility }">
+                <strong>{{ !checkPermission(card.user_id) && !board.visibility ? cardHideText.repeat(1) :
+                  card.description }}</strong>
+                <div>
+                  <div class="btn-group" role="group" aria-label="actions" v-if="checkPermission(card.user_id)">
+                    <button class="btn btn-sm btn btn-light edit-column"
+                      @click="editCardDescription(column.id, card.id, card.description)"><i
+                        class="bi bi-pencil-square"></i></button>
+                    <button class="btn btn-sm tn-sm btn btn-light remove-task" @click="removeCard(column.id, card.id)"><i
+                        class="bi bi-trash-fill"></i></button>
+                  </div>
                 </div>
               </div>
-            </div>
-            <small :class="{ 'blur-kanban-card': !checkPermission(card.user_id) && !board.visibility }">{{ card.name
-              }}</small>
-            <div class="text-end" :class="{ 'blur-kanban-card': !checkPermission(card.user_id) && !board.visibility }">
-              <div class="btn-group" role="group" aria-label="actions">
-                <button class="btn btn-sm tn-sm btn btn-light"
-                  @click="saveCardVotes(column.id, card.id, false, true)"><i class="bi bi-hand-thumbs-down"></i> {{
-                    card.down_vote || 0 }}
-                </button>
-                <button class="btn btn-sm tn-sm btn btn-light" @click="saveCardVotes(column.id, card.id, true, false)">
-                  <i class="bi bi-hand-thumbs-up"></i> {{ card.up_vote || 0 }}
-                </button>
+              <small :class="{ 'blur-kanban-card': !checkPermission(card.user_id) && !board.visibility }">{{ card.name
+                }}</small>
+              <div class="text-end" :class="{ 'blur-kanban-card': !checkPermission(card.user_id) && !board.visibility }">
+                <div class="btn-group" role="group" aria-label="actions">
+                  <button class="btn btn-sm tn-sm btn btn-light"
+                    @click="saveCardVotes(column.id, card.id, false, true)"><i class="bi bi-hand-thumbs-down"></i> {{
+                      card.down_vote || 0 }}
+                  </button>
+                  <button class="btn btn-sm tn-sm btn btn-light" @click="saveCardVotes(column.id, card.id, true, false)">
+                    <i class="bi bi-hand-thumbs-up"></i> {{ card.up_vote || 0 }}
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -353,6 +328,12 @@ export default {
       this.cardSelectedId = cardId
       this.modalCardDescription.show()
     },
+    getCardId(card) {
+      return card?.id ?? uniqueId()
+    },
+    getQueryBoard() {
+      return new Parse.Query('boards');
+    },
     saveBoardName() {
       if (!this.boardName) {
         return this.$swal.fire({
@@ -425,13 +406,14 @@ export default {
       this.modalEditColumnName.show()
     },
     saveCardVotes(idColumn, idCard, upVote = false, downVote = false) {
+      console.log("saving card vote to: ", idColumn, idCard)
       query.equalTo('objectId', this.$route.params.id)
       query.first().then((retorno) => {
         const columns = retorno.attributes.columns
         for (const c in columns) {
           if (columns[c].id === idColumn) {
             for (const i in columns[c].itens) {
-              if (columns[c].itens[i].id === idCard) {
+              if (columns[c].itens[i]?.id === idCard) {
 
                 retorno.addUnique(`columns.${c}.itens.${i}.up_vote_users`, this.user.id)
                 if (upVote) {
@@ -478,7 +460,7 @@ export default {
         for (const c in columns) {
           if (columns[c].id === this.columnSelectedId) {
             for (const i in columns[c].itens) {
-              if (columns[c].itens[i].id === this.cardSelectedId) {
+              if (columns[c].itens[i]?.id === this.cardSelectedId) {
                 retorno.set(`columns.${c}.itens.${i}.description`, this.cardEditDescription);
                 retorno.save()
                 this.columnSelectedId = null
@@ -531,7 +513,7 @@ export default {
             for (const c in columns) {
               if (columns[c].id === columnId) {
                 for (const i in columns[c].itens) {
-                  if (columns[c].itens[i].id === cardId) {
+                  if (columns[c].itens[i]?.id === cardId) {
                     retorno.remove(`columns.${c}.itens`, columns[c].itens[i]);
                     retorno.save()
                     this.getBoard()
@@ -669,7 +651,7 @@ export default {
 
     },
     sortItemsByLike() {
-      console.log(this.orderBy)
+      console.log(this.orderBy, this.board)
       this.board.columns.forEach(column => {
         if (this.orderBy === "up_vote") {
           column.itens.sort((a, b) => b.up_vote - a.up_vote);
@@ -681,16 +663,33 @@ export default {
     getBoard() {
       query.get(this.$route.params.id)
         .then((board) => {
-          console.log(board.attributes, "BOARD");
-          const visibility = board.attributes.visibility ?? true
-          this.board = { ...board.attributes, visibility: visibility }
-          if (this.orderBy !== 'default') {
-            this.sortItemsByLike()
-          }
+          this.setBoard(board)
         }, (error) => {
           console.log('Failed to create new object, with error code: ' + error.message);
           this.$router.push(`/404`)
         });
+    },
+    setBoard(boardAttr) {
+      console.log("SET BOARD", boardAttr.attributes, );
+      const visibility = boardAttr.attributes.visibility ?? true
+      const columns = boardAttr.attributes.columns.map((column) => {
+        return {
+          ...column,
+          itens: column.itens.filter((item) => item !== null)
+        }
+      })
+
+      this.board = {
+        ...boardAttr.attributes,
+        columns,
+        visibility: visibility
+      }
+
+      console.log("NOVO BOARD", this.board)
+
+      if (this.orderBy !== 'default') {
+        this.sortItemsByLike()
+      }
     },
     findColumn(columns, collumnId) {
       for (const collumnIndex in columns) {
@@ -705,7 +704,7 @@ export default {
     findCard(column, cardId) {
       for (const cardIndex in column.itens) {
         const cardItem = column.itens[cardIndex]
-        if (cardItem.id === cardId) {
+        if (cardItem?.id === cardId) {
           return [cardItem, cardIndex]
         }
       }
@@ -721,8 +720,9 @@ export default {
         console.log('board opened')
       })
 
-      this.subscriptionBoard.on('update', (_object) => {
-        this.getBoard()
+      this.subscriptionBoard.on('update', (board) => {
+        console.log("update attr", board)
+        this.setBoard(board)
       })
 
       this.subscriptionBoard.on('close', () => {
@@ -740,7 +740,10 @@ export default {
       const columnToRemoveId = evt.dataTransfer.getData('collumnDragId');
       evt.preventDefault();
 
-      query.first().then((boardDataCursor) => {
+      const queryBoard = this.getQueryBoard()
+      queryBoard.equalTo('objectId', this.$route.params.id)
+
+      queryBoard.first().then((boardDataCursor) => {
         const columns = boardDataCursor.attributes.columns;
         const [columnToRemove, columnToRemoveIndex] = this.findColumn(columns, columnToRemoveId)
         const [cardDrag, cardDragIndex] = this.findCard(columnToRemove, cardDragId)
@@ -760,11 +763,11 @@ export default {
         boardDataCursor.addUnique(
           addCollumnKey,
           cardDrag
-        )
+        );
         boardDataCursor.remove(
           removeCollumnKey,
           columns[columnToRemoveIndex].itens[cardDragIndex]
-        )
+        );
 
         boardDataCursor.save().then((result) => {
           console.log("drag'n drop result ->", result);
