@@ -108,12 +108,11 @@ import Parse from 'parse/dist/parse.min.js';
 import {validateEmail} from "@/utils/validate.js";
 import axios from 'axios';
 import {removePathFromUrl} from "@/utils/utils.js";
-import {Otp, OtpGroup, OtpGroupInput, OtpErrorMessage} from "@/components/otp";
+import {Otp, OtpGroup, OtpGroupInput} from "@/components/otp";
 
 Parse.initialize(import.meta.env.VITE_PARSE_APP_ID);
 Parse.serverURL = import.meta.env.VITE_BACKEND_URL
 const Boards = Parse.Object.extend("boards");
-const board = new Boards();
 const query = new Parse.Query(Boards);
 
 
@@ -126,7 +125,6 @@ export default {
     Otp,
     OtpGroup,
     OtpGroupInput,
-    OtpErrorMessage,
   },
   data() {
     return {

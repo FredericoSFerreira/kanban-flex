@@ -20,16 +20,7 @@
           <li class="nav-item">
             <a class="nav-link" target="_blank" href="https://stats.uptimerobot.com/aeBUanxj9O/798023901">Status</a>
           </li>
-<!--          <li class="nav-item dropdown">-->
-<!--            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown"-->
-<!--               aria-expanded="false">-->
-<!--              <i class="fas fa-user"></i> Frederico Ferreira-->
-<!--            </a>-->
-<!--            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">-->
-<!--              <li><a class="dropdown-item" href="#">Sair</a></li>-->
-<!--            </ul>-->
-<!--          </li>-->
-        </ul>
+       </ul>
       </div>
     </div>
   </nav>
