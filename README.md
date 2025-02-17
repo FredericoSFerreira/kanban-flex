@@ -139,7 +139,6 @@ We welcome contributions from the open-source community! Here's how you can get 
 
 ## 🪐 Future Plans
 
-- Drag and Drop options
 - Implement multi-language, now suport only pt-br
 - Group and ungroup cards
 - Improve OTP login system
