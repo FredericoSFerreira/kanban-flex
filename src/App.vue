@@ -18,7 +18,7 @@
             <a class="nav-link" href="/my-boards">Meus Boards</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" target="_blank" href="https://stats.uptimerobot.com/aeBUanxj9O">Status</a>
+            <a class="nav-link" target="_blank" href="https://stats.uptimerobot.com/aeBUanxj9O/798023901">Status</a>
           </li>
 <!--          <li class="nav-item dropdown">-->
 <!--            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown"-->
