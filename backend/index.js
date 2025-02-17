@@ -8,6 +8,20 @@ const host = process.env.APP_HOST || 'localhost'
 const port = process.env.APP_PORT || 3000
 const sendEmail = require('./email')
 const {generateOtp} = require("./utils");
+const fs = require('fs');
+const environment = process.env.NODE_ENV
+
+let httpServer = require('http')
+let SSL_OPTIONS = null
+
+if (environment === 'production') {
+  httpServer = require('https')
+  SSL_OPTIONS = {
+    key: fs.readFileSync(process.env.SSL_KEY),
+    cert: fs.readFileSync(process.env.SSL_CERT)
+  };
+}
+
 
 const api = new ParseServer({
   cloud: './cloud/main.js',
@@ -74,11 +88,12 @@ app.post('/check-otp', async (req, res) => {
   }
 })
 
+const server = environment === 'production' ? httpServer.createServer(SSL_OPTIONS, app) : httpServer.createServer(app);
 
-const httpServer = require('http').createServer(app);
-httpServer.listen(port, () => {
+
+server.listen(port, () => {
   try {
-    ParseServer.createLiveQueryServer(httpServer);
+    ParseServer.createLiveQueryServer(server);
   } catch (e) {
     console.log("Occurred error in start parse server")
   }
