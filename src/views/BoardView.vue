@@ -6,7 +6,7 @@
       <div class="d-flex flex-row">
         <h2 class="mb-0">{{ board.name }}
           <button v-if="checkPermission()" class="btn btn-sm btn btn-light edit-column"
-            @click="editBoardName(board.name)"><i class="bi bi-pencil-square"></i></button>
+                  @click="editBoardName(board.name)"><i class="bi bi-pencil-square"></i></button>
         </h2>
       </div>
 
@@ -15,7 +15,7 @@
 
         <div class="p-1" v-if="board.columns.length > 0 && checkPermission()">
           <button type="button" @click="newColumn()" class="btn btn-light" data-bs-toggle="modal"
-            data-bs-target="#newColumn"><i class="bi bi-plus-lg"></i> Nova Coluna
+                  data-bs-target="#newColumn"><i class="bi bi-plus-lg"></i> Nova Coluna
           </button>
         </div>
 
@@ -70,51 +70,56 @@
           <div>
             <div class="btn-group" role="group" aria-label="actionsCollun" v-if="checkPermission()">
               <button class="btn btn-sm btn btn-light edit-column" @click="editColumn(column.id, column.name)"><i
-                  class="bi bi-pencil-square"></i></button>
+                class="bi bi-pencil-square"></i></button>
               <button class="btn btn-sm btn btn-light remove-column" @click="removeColumn(column.id)"><i
-                  class="bi bi-trash-fill"></i></button>
+                class="bi bi-trash-fill"></i></button>
             </div>
           </div>
         </div>
         <button class="btn btn-sm btn btn-light-new-card add-task mb-3 mx-2" @click="newCard(column.id)"><i
-            class="bi bi-plus-circle-dotted"></i></button>
-          <div v-for="card in column.itens" :key="getCardId(card)">
-            <div
-              v-if="card !== null"
-              class="kanban-card card p-2 mx-2"
-              draggable="true"
-              @dragstart="startDrag($event, card.id, column.id)"
-            >
-              <div class="d-flex justify-content-between align-items-center"
-                :class="{ 'blur-kanban-card': !checkPermission(card.user_id) && !board.visibility }">
-                <strong>{{ !checkPermission(card.user_id) && !board.visibility ? cardHideText.repeat(1) :
-                  card.description }}</strong>
-                <div>
-                  <div class="btn-group" role="group" aria-label="actions" v-if="checkPermission(card.user_id)">
-                    <button class="btn btn-sm btn btn-light edit-column"
-                      @click="editCardDescription(column.id, card.id, card.description)"><i
-                        class="bi bi-pencil-square"></i></button>
-                    <button class="btn btn-sm tn-sm btn btn-light remove-task" @click="removeCard(column.id, card.id)"><i
-                        class="bi bi-trash-fill"></i></button>
-                  </div>
+          class="bi bi-plus-circle-dotted"></i></button>
+        <div v-for="card in column.itens" :key="getCardId(card)">
+          <div
+            v-if="card !== null"
+            class="kanban-card card p-2 mx-2"
+            draggable="true"
+            @dragstart="startDrag($event, card.id, column.id)"
+          >
+            <div class="d-flex justify-content-between align-items-center"
+                 :class="{ 'blur-kanban-card': !checkPermission(card.user_id) && !board.visibility }">
+              <strong>{{
+                  !checkPermission(card.user_id) && !board.visibility ? cardHideText.repeat(1) :
+                    card.description
+                }}</strong>
+              <div>
+                <div class="btn-group" role="group" aria-label="actions" v-if="checkPermission(card.user_id)">
+                  <button class="btn btn-sm btn btn-light edit-column"
+                          @click="editCardDescription(column.id, card.id, card.description)"><i
+                    class="bi bi-pencil-square"></i></button>
+                  <button class="btn btn-sm tn-sm btn btn-light remove-task" @click="removeCard(column.id, card.id)"><i
+                    class="bi bi-trash-fill"></i></button>
                 </div>
               </div>
-              <small :class="{ 'blur-kanban-card': !checkPermission(card.user_id) && !board.visibility }">{{ card.name
-                }}</small>
-              <div class="text-end" :class="{ 'blur-kanban-card': !checkPermission(card.user_id) && !board.visibility }">
-                <div class="btn-group" role="group" aria-label="actions">
-                  <button class="btn btn-sm tn-sm btn btn-light"
-                    @click="saveCardVotes(column.id, card.id, false, true)"><i class="bi bi-hand-thumbs-down"></i> {{
-                      card.down_vote || 0 }}
-                  </button>
-                  <button class="btn btn-sm tn-sm btn btn-light" @click="saveCardVotes(column.id, card.id, true, false)">
-                    <i class="bi bi-hand-thumbs-up"></i> {{ card.up_vote || 0 }}
-                  </button>
-                </div>
+            </div>
+            <small :class="{ 'blur-kanban-card': !checkPermission(card.user_id) && !board.visibility }">{{
+                card.name
+              }}</small>
+            <div class="text-end" :class="{ 'blur-kanban-card': !checkPermission(card.user_id) && !board.visibility }">
+              <div class="btn-group" role="group" aria-label="actions">
+                <button class="btn btn-sm tn-sm btn btn-light"
+                        @click="saveCardVotes(column.id, card.id, false, true)"><i class="bi bi-hand-thumbs-down"></i>
+                  {{
+                    card.down_vote || 0
+                  }}
+                </button>
+                <button class="btn btn-sm tn-sm btn btn-light" @click="saveCardVotes(column.id, card.id, true, false)">
+                  <i class="bi bi-hand-thumbs-up"></i> {{ card.up_vote || 0 }}
+                </button>
               </div>
             </div>
           </div>
         </div>
+      </div>
     </div>
   </div>
 
@@ -137,12 +142,12 @@
             </div>
           </div>
           <EmojiPicker v-if="showEmoji" offset="10000" :tdext="cardName" class="form-control" :native="false"
-            @select="onSelectEmoji" pickerType="" :static-texts="{ placeholder: 'Pesquisar emoji...' }"
-            :hide-group-names="true" :disable-sticky-group-names="true" :disable-skin-tones="true"
-            :display-recent="true" />
+                       @select="onSelectEmoji" pickerType="" :static-texts="{ placeholder: 'Pesquisar emoji...' }"
+                       :hide-group-names="true" :disable-sticky-group-names="true" :disable-skin-tones="true"
+                       :display-recent="true"/>
 
           <textarea v-if="!showEmoji" rows="5" v-model="cardName" class="form-control" id="exampleInputEmail1"
-            aria-describedby="emailHelp"></textarea>
+                    aria-describedby="emailHelp"></textarea>
 
         </div>
         <div class="modal-footer">
@@ -168,7 +173,7 @@
 
           <label for="email" class="form-label">Email</label>
           <input type="email" v-model="user.email" class="form-control" id="userName" aria-describedby="email"
-            @input="(val) => (user.email = user.email.toLowerCase())">
+                 @input="(val) => (user.email = user.email.toLowerCase())">
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-danger" @click="saveUserName(true)">Entrar como Anônimo</button>
@@ -226,7 +231,7 @@
         <div class="modal-body">
           <label for="userName" class="form-label">Nome da coluna</label>
           <input type="text" v-model="columnEditName" class="form-control" id="editColumnName"
-            aria-describedby="editColumnName">
+                 aria-describedby="editColumnName">
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-primary" @click="saveEditColumn()">Salvar</button>
@@ -237,7 +242,7 @@
 
 
   <div class="modal fade" id="modalCardDescription" tabindex="-1" aria-labelledby="exampleModalLabel"
-    aria-hidden="true">
+       aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
@@ -247,7 +252,7 @@
         <div class="modal-body">
           <label for="exampleInputEmail1" class="form-label">Descrição</label>
           <textarea rows="5" v-model="cardEditDescription" class="form-control" id="exampleInputEmail1"
-            aria-describedby="emailHelp"></textarea>
+                    aria-describedby="emailHelp"></textarea>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-primary" @click="saveEditCard()">Salvar</button>
@@ -258,13 +263,13 @@
 
 </template>
 <script>
-import { Modal } from 'bootstrap';
+import {Modal} from 'bootstrap';
 import Parse from 'parse/dist/parse.min.js';
 import uniqueId from "@/utils/uuid.js";
-import { validateEmail } from "@/utils/validate.js";
+import {validateEmail} from "@/utils/validate.js";
 import EmojiPicker from 'vue3-emoji-picker'
 import 'vue3-emoji-picker/css'
-import { toast } from "vue3-toastify";
+import {toast} from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
 
 Parse.initialize(import.meta.env.VITE_PARSE_APP_ID);
@@ -273,7 +278,7 @@ const Boards = Parse.Object.extend("boards");
 const query = new Parse.Query(Boards);
 
 export default {
-  components: { EmojiPicker },
+  components: {EmojiPicker},
   data() {
     return {
       orderBy: "default",
@@ -390,7 +395,7 @@ export default {
 
       const id = uniqueId()
       this.user.id = id
-      localStorage.setItem("user", JSON.stringify({ 'name': this.user.name, 'id': id, 'email': this.user.email }))
+      localStorage.setItem("user", JSON.stringify({'name': this.user.name, 'id': id, 'email': this.user.email}))
       this.modalUserName.hide()
     },
     newCard(id) {
@@ -670,7 +675,7 @@ export default {
         });
     },
     setBoard(boardAttr) {
-      console.log("SET BOARD", boardAttr.attributes, );
+      console.log("SET BOARD", boardAttr.attributes,);
       const visibility = boardAttr.attributes.visibility ?? true
       const columns = boardAttr.attributes.columns.map((column) => {
         return {
@@ -722,7 +727,9 @@ export default {
 
       this.subscriptionBoard.on('update', (board) => {
         console.log("update attr", board)
-        this.setBoard(board)
+        setTimeout(() => {
+          this.getBoard()
+        }, 1)
       })
 
       this.subscriptionBoard.on('close', () => {
@@ -783,7 +790,7 @@ export default {
   mounted() {
     this.getBoard();
     this.realTimeBoard();
-    this.modalUserName = new Modal(document.getElementById('modalUserName'), { backdrop: 'static', keyboard: false });
+    this.modalUserName = new Modal(document.getElementById('modalUserName'), {backdrop: 'static', keyboard: false});
     const user = JSON.parse(localStorage.getItem("user"));
     const userLocal = user ? user : null;
     if (!userLocal) {
