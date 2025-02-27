@@ -5,8 +5,8 @@ const {compile} = require("handlebars");
 
 const transporter = nodemailer.createTransport({
   host: process.env.EMAIL_HOST,
-  port: 465,
-  secure: true, // true for port 465, false for other ports
+  port: process.env.EMAIL_PORT || 465,
+  secure: process.env.EMAIL_SECURE || true, // true for port 465, false for other ports
   auth: {
     user: process.env.EMAIL_USERNAME,
     pass: process.env.EMAIL_PASSWORD,
