@@ -14,13 +14,6 @@ const transporter = nodemailer.createTransport({
 });
 
 
-console.log(process.env.EMAIL_USERNAME);
-console.log(process.env.EMAIL_PASSWORD);
-console.log(process.env.EMAIL_HOST);
-console.log(process.env.EMAIL_PORT);
-console.log(process.env.EMAIL_SECURE);
-console.log(process.env.FRONT_HOST);
-
 async function sendEmail(emailTo, name, otpCode) {
   const filePath = path.join(__dirname, './templates/emails/index.html');
   const source = fs.readFileSync(filePath, 'utf-8').toString();
