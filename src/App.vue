@@ -1,82 +1,403 @@
 <template>
-  <!-- Navbar Fixa no Topo -->
-  <nav class="navbar navbar-expand-lg">
-    <div class="container-fluid px-3">
-      <a class="navbar-brand" href="/">
-        <i class="bi bi-layout-three-columns"></i>
-        <strong> Open Sprint Retro</strong></a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-              aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav ms-auto">
-          <li class="nav-item">
-            <a class="nav-link active" href="/">Home</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/my-boards">Meus Boards</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" target="_blank" href="https://stats.uptimerobot.com/aeBUanxj9O/798023901">Status</a>
-          </li>
-       </ul>
+  <div :class="{ 'dark-mode': isDarkMode }">
+    <!-- Navigation - Hidden on admin route -->
+    <nav class="navbar navbar-expand-md"
+         :class="isDarkMode ? 'navbar-dark bg-dark' : 'navbar-light bg-white shadow-sm'">
+      <div class="container">
+        <router-link class="navbar-brand d-flex align-items-center" to="/">
+          <Trello class="text-primary" size="32"/>
+          <span class="ms-2 fw-bold">Open Sprint Retro</span>
+        </router-link>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav mx-auto">
+            <li class="nav-item">
+              <router-link class="nav-link" to="/">{{ $t('nav.home') }}</router-link>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/my-boards">{{ $t('nav.myBoards') }}</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" @click.prevent="navigateToSection('features')" href="#features">{{
+                  $t('nav.features')
+                }}</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" @click.prevent="navigateToSection('pricing')" href="#pricing">{{
+                  $t('nav.pricing')
+                }}</a>
+            </li>
+          </ul>
+          <div class="d-flex align-items-center">
+            <div class="dropdown me-3">
+              <button
+                class="btn btn-link text-decoration-none dropdown-toggle"
+                :class="isDarkMode ? 'text-light' : 'text-dark'"
+                type="button"
+                id="languageDropdown"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+                ref="languageDropdownBtn"
+              >
+                {{ $t(`language.${currentLocale}`) }}
+              </button>
+              <ul class="dropdown-menu" aria-labelledby="languageDropdown">
+                <li v-for="locale in availableLocales" :key="locale">
+                  <button
+                    class="dropdown-item"
+                    :class="{ active: currentLocale === locale }"
+                    @click="changeLocale(locale)"
+                  >
+                    {{ $t(`language.${locale}`) }}
+                  </button>
+                </li>
+              </ul>
+            </div>
+            <button
+              class="btn btn-link p-0 me-3"
+              :class="isDarkMode ? 'text-light' : 'text-dark'"
+              @click="toggleTheme"
+            >
+              <Sun v-if="isDarkMode" size="20"/>
+              <Moon v-else size="20"/>
+            </button>
+            <!--            <router-link to="/login" class="btn btn-link text-decoration-none me-3"-->
+            <!--                         :class="isDarkMode ? 'text-light' : 'text-dark'">{{ $t('nav.login') }}-->
+            <!--            </router-link>-->
+            <!--            <router-link to="/register" class="btn btn-primary">{{ $t('nav.signUp') }}</router-link>-->
+          </div>
+        </div>
       </div>
-    </div>
-  </nav>
-  <RouterView/>
+    </nav>
 
-  <!-- Rodapé Fixo -->
-  <footer class="text-center py-3 fixed-bottom">
-    <p class="mb-0">© 2024 Open Sprint Retro. Licensed under MIT License. Create by <a
-      href="https://github.com/FredericoSFerreira/Open-Sprint-Retro" class=""><i class="bi bi-github"></i> Frederico Ferreira </a></p>
-  </footer>
+    <router-view/>
 
+    <!-- Footer - Hidden on admin route -->
+    <footer class="bg-dark text-white">
+      <div class="container py-5">
+        <div class="row g-4">
+          <div class="col-lg-6 col-md-6">
+            <div class="d-flex align-items-center mb-3">
+              <Trello class="text-primary" size="32"/>
+              <span class="ms-2 h5 fw-bold mb-0">Open Sprint Retro</span>
+            </div>
+            <p class="text-light">
+              {{ $t('hero.subtitle_footer') }}
+            </p>
+          </div>
+
+          <div v-for="(column, index) in footerColumns" :key="index" class="col-lg-3 col-md-3">
+            <h3 class="h5 fw-bold mb-3 text-light">{{ $t(`footer.${column.key}.title`) }}</h3>
+            <ul class="list-unstyled">
+              <li v-for="(link, linkIndex) in column.links" :key="linkIndex" class="mb-2">
+                <a :href="`${link.path}`" :target="link.target || '_self'"
+                   class="text-light text-decoration-none hover-opacity">{{ $t(`footer.${column.key}.${link.label}`) }}</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="border-top border-secondary mt-3 pt-4 text-center text-light">
+          <p>{{ $t('footer.copyright') }}</p>       <a href="https://github.com/FredericoSFerreira/Open-Sprint-Retro"
+                                                       class="text-light hover-opacity">
+          <Github size="24"/>
+        </a>
+        </div>
+      </div>
+    </footer>
+  </div>
 </template>
 
+<script setup lang="ts">
+import {ref, computed, watchEffect, onMounted} from 'vue';
+import {useI18n} from 'vue-i18n';
+import {useRouter, useRoute} from 'vue-router';
+import {Dropdown} from 'bootstrap';
+import {
+  Trello,
+  Github,
+  Twitter,
+  Linkedin,
+  Sun,
+  Moon
+} from 'lucide-vue-next';
+
+const {locale, t} = useI18n();
+const router = useRouter();
+const route = useRoute();
+const currentLocale = computed({
+  get: () => locale.value,
+  set: (val) => {
+    locale.value = val;
+    localStorage.setItem('user-locale', val);
+    document.querySelector('html')?.setAttribute('lang', val);
+  }
+});
+const availableLocales = ['en', 'pt-BR'];
+const languageDropdownBtn = ref(null);
+
+const isDarkMode = ref(localStorage.getItem('theme') === 'dark');
+
+onMounted(() => {
+  // Initialize the language dropdown
+  if (languageDropdownBtn.value) {
+    new Dropdown(languageDropdownBtn.value);
+  }
+});
+
+const toggleTheme = () => {
+  isDarkMode.value = !isDarkMode.value;
+  localStorage.setItem('theme', isDarkMode.value ? 'dark' : 'light');
+};
+
+const changeLocale = (newLocale: string) => {
+  if (locale.value !== newLocale) {
+    locale.value = newLocale;
+    localStorage.setItem('user-locale', newLocale);
+    document.querySelector('html')?.setAttribute('lang', newLocale);
+  }
+};
+
+// Watch for locale changes and update HTML lang attribute
+watchEffect(() => {
+  document.querySelector('html')?.setAttribute('lang', locale.value);
+});
+
+
+const navigateToSection = async (sectionId: string) => {
+  // If we're not on the home page, navigate there first
+  if (route.path !== '/') {
+    await router.push('/');
+    // Wait for the navigation to complete
+    await new Promise(resolve => setTimeout(resolve, 100));
+  }
+
+  const element = document.getElementById(sectionId);
+  if (element) {
+    element.scrollIntoView({behavior: 'smooth'});
+  }
+};
+
+const footerColumns = [
+  {
+    key: 'boards',
+    links: [{
+      path: '/my-boards',
+      label: 'link1',
+    },
+    {
+      path: '#',
+      label: 'link2',
+    }]
+  },
+  // {
+  //   key: 'account',
+  //   links: [{
+  //     path: '/login',
+  //     label: 'Login'
+  //   }, {
+  //     path: '/register',
+  //     label: 'Register'
+  //   }]
+  // },
+  {
+    key: 'status',
+    links: [
+      {
+        target: '_blank',
+        path: 'https://github.com/FredericoSFerreira/Open-Sprint-Retro/issues/new',
+        label: 'link1'
+      },
+      {
+        target: '_blank',
+        path: 'https://stats.uptimerobot.com/aeBUanxj9O/798023901',
+        label: 'link2'
+      },
+    ]
+  },
+];
+</script>
 
 <style>
-/* Estilo claro padrão */
-body {
-  //background-color: #f8f9fa; /* fundo claro */
-  color: #212529; /* texto escuro */
+/* Dark mode styles */
+.dark-mode {
+  background-color: #121212;
+  color: #ffffff;
 }
 
-.navbar {
-  background-color: #212529; /* fundo branco para a navbar */
-  border-bottom: 1px solid #dee2e6; /* linha de separação da navbar */
+.dark-mode .card {
+  background-color: #1e1e1e;
+  border-color: #2d2d2d;
+  color: #ffffff;
 }
 
-.navbar-brand, .nav-link {
-  color: #ffffff !important; /* texto escuro para o menu */
+.dark-mode .card-header {
+  background-color: #2d2d2d;
+  border-bottom-color: #363636;
+  color: #ffffff;
 }
 
-.navbar-nav .nav-link:hover {
-  color: #0056b3 !important; /* cor do texto ao passar o mouse */
+.dark-mode .modal-content {
+  background-color: #1e1e1e;
+  color: #ffffff;
 }
 
-.icon {
-  font-size: 60px;
-  color: #007bff; /* cor do ícone */
+.dark-mode .modal-header {
+  border-bottom-color: #2d2d2d;
+  color: #ffffff;
 }
 
-.btn-primary {
-  background-color: #007bff; /* cor do botão */
-  border-color: #007bff; /* borda do botão */
+.dark-mode .modal-footer {
+  border-top-color: #2d2d2d;
 }
 
-.btn-primary:hover {
-  background-color: #0056b3; /* cor do botão ao passar o mouse */
-  border-color: #004085; /* borda ao passar o mouse */
+.dark-mode .form-control {
+  background-color: #2d2d2d;
+  border-color: #363636;
+  color: #ffffff;
 }
 
-footer {
-  background-color: #ffffff; /* fundo branco para o rodapé */
-  border-top: 1px solid #dee2e6; /* linha de separação do rodapé */
-  color: #212529; /* texto escuro no rodapé */
+.dark-mode .form-control:focus {
+  background-color: #363636;
+  border-color: #4a4a4a;
+  color: #ffffff;
 }
 
+.dark-mode .form-floating > label {
+  color: #a0a0a0;
+}
 
+.dark-mode .form-floating > .form-control:focus ~ label,
+.dark-mode .form-floating > .form-control:not(:placeholder-shown) ~ label {
+  color: #ffffff;
+}
+
+.dark-mode .form-check-input {
+  background-color: #2d2d2d;
+  border-color: #363636;
+}
+
+.dark-mode .form-check-input:checked {
+  background-color: var(--bs-primary);
+  border-color: var(--bs-primary);
+}
+
+.dark-mode .form-check-label {
+  color: #ffffff;
+}
+
+.dark-mode .dropdown-menu {
+  background-color: #1e1e1e;
+  border-color: #2d2d2d;
+}
+
+.dark-mode .dropdown-item {
+  color: #ffffff;
+}
+
+.dark-mode .dropdown-item:hover {
+  background-color: #2d2d2d;
+  color: #ffffff;
+}
+
+.dark-mode .dropdown-item.active {
+  background-color: var(--bs-primary);
+  color: #ffffff;
+}
+
+.dark-mode .bg-light {
+  background-color: #121212 !important;
+  color: #ffffff !important;
+}
+
+.dark-mode .bg-white {
+  background-color: #1e1e1e !important;
+  color: #ffffff !important;
+}
+
+.dark-mode .text-muted {
+  color: #a0a0a0 !important;
+}
+
+.dark-mode .text-dark {
+  color: #ffffff !important;
+}
+
+.dark-mode .lead {
+  color: #ffffff;
+}
+
+.dark-mode h1,
+.dark-mode h2,
+.dark-mode h3,
+.dark-mode h4,
+.dark-mode h5,
+.dark-mode h6,
+.dark-mode .h1,
+.dark-mode .h2,
+.dark-mode .h3,
+.dark-mode .h4,
+.dark-mode .h5,
+.dark-mode .h6 {
+  color: #ffffff;
+}
+
+.dark-mode .btn-light {
+  background-color: #2d2d2d;
+  border-color: #363636;
+  color: #ffffff;
+}
+
+.dark-mode .btn-light:hover {
+  background-color: #363636;
+  border-color: #404040;
+  color: #ffffff;
+}
+
+.dark-mode .btn-outline-secondary {
+  color: #ffffff;
+  border-color: #404040;
+}
+
+.dark-mode .btn-outline-secondary:hover {
+  background-color: #2d2d2d;
+  color: #ffffff;
+}
+
+.dark-mode .btn-close {
+  filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+.dark-mode .border-top {
+  border-color: #2d2d2d !important;
+}
+
+.dark-mode .shadow-sm {
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Navigation link cursor */
+.nav-link {
+  cursor: pointer;
+}
+
+/* Dropdown styles */
+.dropdown-menu {
+  margin-top: 0.5rem;
+}
+
+.dropdown-toggle::after {
+  vertical-align: middle;
+}
+
+.dropdown-item {
+  padding: 0.5rem 1rem;
+}
+
+.dropdown-item:active,
+.dropdown-item:focus {
+  outline: none;
+}
 </style>
-<script setup>
-</script>

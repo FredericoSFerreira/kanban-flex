@@ -26,7 +26,9 @@
     "vue3-emoji-picker": "^1.1.8",
     "vue3-otp-input": "^0.5.21",
     "vue3-toastify": "^0.2.8",
-    "vuedraggable": "^4.1.0"
+    "vuedraggable": "^4.1.0",
+    "lucide-vue-next": "^0.344.0",
+    "vue-i18n": "^9.9.1"
   },
   "devDependencies": {
     "@tsconfig/node22": "^22.0.0",

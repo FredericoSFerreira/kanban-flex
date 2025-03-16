@@ -1,36 +1,71 @@
 <template>
-
-  <div class="container mt-4" v-if="showMyBoards">
-    <div class="card-body d-flex justify-content-between align-items-center">
-      <h2 class="mb-3">Meus Boards</h2>
-      <button @click="logout()" class="btn btn-light btn-md me-2"><i class="bi bi-box-arrow-right"></i> Sair</button>
+  <div class="container py-5" v-if="showMyBoards">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h1 class="h2 mb-0">{{ $t('myBoards.title') }}</h1>
+      <router-link to="/board" class="btn btn-primary">
+        <Plus size="18" class="me-2"/>
+        {{ $t('myBoards.createBoard') }}
+      </router-link>
     </div>
-    <div class="row g-3">
 
-      <div class="col-12" v-if="boards.length === 0">
-        <h4 class="text-center">Nenhum board foi encontrado...</h4>
-      </div>
+    <!-- Empty State -->
+    <div v-if="boards.length === 0" class="text-center py-5">
+      <Layout size="48" class="text-primary mb-3"/>
+      <h2 class="h4 mb-3">{{ $t('myBoards.emptyState.title') }}</h2>
+      <p class="text-muted mb-4">{{ $t('myBoards.emptyState.description') }}</p>
+      <router-link to="/board" class="btn btn-primary">
+        {{ $t('myBoards.emptyState.cta') }}
+      </router-link>
+    </div>
 
-      <!-- Card 1 -->
-      <div class="col-12" v-for="(board, index) in boards" :key="index">
-        <div class="card">
-          <div class="card-body d-flex justify-content-between align-items-center">
-            <div>
-              <h5 class="card-title mb-0">{{ board.name }}</h5>
-              <small class="text-muted">{{ board.createdAt }}</small>
+    <!-- Boards Grid -->
+    <div v-else class="row g-4">
+      <div v-for="board in boards" :key="board.id" class="col-md-6 col-lg-4">
+        <div class="card h-100 board-card">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+              <h3 class="h5 mb-0">{{ board.name }}</h3>
+              <div class="dropdown">
+                <button
+                  class="btn btn-link p-0"
+                  type="button"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                >
+                  <MoreVertical size="18"/>
+                </button>
+                <ul class="dropdown-menu">
+                  <li>
+                    <router-link :to="`/board/${board.id}`" class="dropdown-item">
+                      <Eye size="16" class="me-2"/>
+                      {{ $t('myBoards.actions.view') }}
+                    </router-link>
+                  </li>
+                  <li>
+                    <button class="dropdown-item text-danger" @click="removeBoard(board.id)">
+                      <Trash2 size="16" class="me-2"/>
+                      {{ $t('myBoards.actions.delete') }}
+                    </button>
+                  </li>
+                </ul>
+              </div>
             </div>
-            <div>
-              <button @click="removeBoard(board.id)" class="btn btn-danger btn-sm me-2"><i class="bi bi-trash"></i>
-              </button>
-              <a :href="`/board/${board.id}`" class="btn btn-light btn-sm me-2"><i class="bi bi-box-arrow-up-right"></i></a>
+
+            <p class="text-muted mb-3">{{ board.description || '' }}</p>
+
+            <div class="d-flex align-items-center text-muted small">
+              <Calendar size="14" class="me-2"/>
+              {{ formatDate(board.createdAt) }}
+              <Users size="14" class="ms-3 me-2"/>
+                            {{ board.members || 10 }} {{ $t('myBoards.members') }}
             </div>
           </div>
         </div>
       </div>
-
     </div>
-  </div>
 
+
+  </div>
 
   <div class="content">
     <section class="container-fluid d-block">
@@ -109,6 +144,7 @@ import {validateEmail} from "@/utils/validate.js";
 import axios from 'axios';
 import {removePathFromUrl} from "@/utils/utils.js";
 import {Otp, OtpGroup, OtpGroupInput} from "@/components/otp";
+import {Plus, Layout, MoreVertical, Eye, Trash2, Calendar, Users} from 'lucide-vue-next';
 
 Parse.initialize(import.meta.env.VITE_PARSE_APP_ID);
 Parse.serverURL = import.meta.env.VITE_BACKEND_URL
@@ -125,6 +161,7 @@ export default {
     Otp,
     OtpGroup,
     OtpGroupInput,
+    Plus, Layout, MoreVertical, Eye, Trash2, Calendar, Users
   },
   data() {
     return {
@@ -138,6 +175,9 @@ export default {
     }
   },
   methods: {
+    formatDate(dateString) {
+      return new Date(dateString).toLocaleDateString();
+    },
     async realTimeMyBoards() {
 
 
