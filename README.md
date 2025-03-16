@@ -139,7 +139,7 @@ We welcome contributions from the open-source community! Here's how you can get 
 
 ## 🪐 Future Plans
 
-- Implement multi-language, now suport only pt-br
+- Analitycs and report
 - Group and ungroup cards
 - Improve OTP login system
 - Implement comments in card
