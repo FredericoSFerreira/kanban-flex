@@ -106,14 +106,14 @@
               }}</small>
             <div class="text-end" :class="{ 'blur-kanban-card': !checkPermission(card.user_id) && !board.visibility }">
               <div class="btn-group" role="group" aria-label="actions">
+                <button class="btn btn-sm tn-sm btn btn-light" @click="saveCardVotes(column.id, card.id, true, false)">
+                  <i class="bi bi-hand-thumbs-up"></i> {{ card.up_vote || 0 }}
+                </button>
                 <button class="btn btn-sm tn-sm btn btn-light"
                         @click="saveCardVotes(column.id, card.id, false, true)"><i class="bi bi-hand-thumbs-down"></i>
                   {{
                     card.down_vote || 0
                   }}
-                </button>
-                <button class="btn btn-sm tn-sm btn btn-light" @click="saveCardVotes(column.id, card.id, true, false)">
-                  <i class="bi bi-hand-thumbs-up"></i> {{ card.up_vote || 0 }}
                 </button>
               </div>
             </div>
