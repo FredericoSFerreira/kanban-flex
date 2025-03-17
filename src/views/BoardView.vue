@@ -12,19 +12,16 @@
 
 
       <div class="d-flex flex-row-reverse justify-content-end">
-
         <div class="p-1" v-if="board.columns.length > 0 && checkPermission()">
           <button type="button" @click="newColumn()" class="btn btn-light" data-bs-toggle="modal"
                   data-bs-target="#newColumn"><i class="bi bi-plus-lg"></i> Nova Coluna
           </button>
         </div>
-
         <div class="p-1" v-if="checkPermission()" @click="setVisibility()">
           <button type="button" class="btn btn-light">
             <i class="bi bi-eye" v-if="board.visibility"></i>
             <i class="bi bi-eye-slash" v-if="!board.visibility"></i>
           </button>
-
         </div>
 
         <div class="p-1">
@@ -39,17 +36,18 @@
       </div>
     </div>
 
-    <section class="py-5 text-center container empty-state" v-if="board.columns.length === 0 && checkPermission()">
-      <div class="row py-lg-5">
-        <div class="col-lg-6 col-md-8 mx-auto">
-          <h2 class="fw-light">Começe criando as colunas do seu board</h2>
-          <i class="bi bi-layout-three-columns icon-big"></i>
-          <br>
-          <i class="bi bi-arrow-down" style="font-size: 50px"></i>
-          <br>
-          <br>
-          <button type="button" @click="newColumn()" class="btn btn-light btn-lg"><i class="bi bi-plus-lg"></i> Nova
-            Coluna
+    <section class="py-5 text-center container" v-if="board.columns.length === 0 && checkPermission()">
+      <div class="empty-state text-center py-5">
+        <div class="empty-state-content mx-auto">
+          <div class="empty-state-icon mb-4">
+            <Trello size="64" class="text-primary"/>
+          </div>
+          <h2 class="h3 mb-3">{{ $t('board.emptyState.title') }}</h2>
+          <p class="text-muted mb-4">{{ $t('board.emptyState.description') }}</p>
+
+          <button class="btn btn-primary btn-lg" @click="newColumn()">
+            <Plus size="20" class="me-2"/>
+            {{ $t('board.emptyState.cta') }}
           </button>
         </div>
       </div>
@@ -69,15 +67,31 @@
           <h4 class="column-title">{{ column.name }}</h4>
           <div>
             <div class="btn-group" role="group" aria-label="actionsCollun" v-if="checkPermission()">
-              <button class="btn btn-sm btn btn-light edit-column" @click="editColumn(column.id, column.name)"><i
-                class="bi bi-pencil-square"></i></button>
-              <button class="btn btn-sm btn btn-light remove-column" @click="removeColumn(column.id)"><i
-                class="bi bi-trash-fill"></i></button>
+
+              <button
+                class="btn btn-sm btn-outline-primary"
+                @click="editColumn(column.id, column.name)"
+                :title="$t('board.editCard')"
+              >
+                <Edit2 size="16"/>
+              </button>
+
+              <button
+                class="btn btn-sm btn-outline-danger"
+                @click="removeColumn(column.id)"
+                :title="$t('board.deleteColumn')"
+              >
+                <Trash2 size="16"/>
+              </button>
+
             </div>
           </div>
         </div>
-        <button class="btn btn-sm btn btn-light-new-card add-task mb-3 mx-2" @click="newCard(column.id)"><i
-          class="bi bi-plus-circle-dotted"></i></button>
+        <button class="btn btn-sm btn btn-light-new-card add-task mb-3 mx-2" @click="newCard(column.id)">
+          <Plus size="16" class="me-1"/>
+          {{ $t('board.addCard') }}
+        </button>
+
         <div v-for="card in column.itens" :key="getCardId(card)">
           <div
             v-if="card !== null"
@@ -92,12 +106,22 @@
                     card.description
                 }}</strong>
               <div>
-                <div class="btn-group" role="group" aria-label="actions" v-if="checkPermission(card.user_id)">
-                  <button class="btn btn-sm btn btn-light edit-column"
-                          @click="editCardDescription(column.id, card.id, card.description)"><i
-                    class="bi bi-pencil-square"></i></button>
-                  <button class="btn btn-sm tn-sm btn btn-light remove-task" @click="removeCard(column.id, card.id)"><i
-                    class="bi bi-trash-fill"></i></button>
+                <div class="d-flex gap-2" v-if="checkPermission(card.user_id)">
+                  <button
+                    class="btn btn-sm btn-outline-primary p-1"
+                    @click="editCardDescription(column.id, card.id, card.description)"
+                    :title="$t('board.editCard')"
+                  >
+                    <Edit2 size="14"/>
+                  </button>
+                  <button
+                    class="btn btn-sm btn-outline-danger p-1"
+                    @click="removeCard(column.id, card.id)"
+                    :title="$t('board.deleteCard')"
+                  >
+                    <Trash2 size="14"/>
+                  </button>
+
                 </div>
               </div>
             </div>
@@ -105,16 +129,25 @@
                 card.name
               }}</small>
             <div class="text-end" :class="{ 'blur-kanban-card': !checkPermission(card.user_id) && !board.visibility }">
-              <div class="btn-group" role="group" aria-label="actions">
-                <button class="btn btn-sm tn-sm btn btn-light" @click="saveCardVotes(column.id, card.id, true, false)">
-                  <i class="bi bi-hand-thumbs-up"></i> {{ card.up_vote || 0 }}
+              <div class="d-flex align-items-center mt-3 pt-2 border-top">
+
+                <button
+                  class="btn btn-sm btn-outline-success me-2 d-flex align-items-center gap-1"
+                  @click="saveCardVotes(column.id, card.id, true, false)"
+                  :class="{ 'active': card.up_vote }"
+                >
+                  <ThumbsUp size="14"/>
+                  <span>{{ card.up_vote || 0 }}</span>
                 </button>
-                <button class="btn btn-sm tn-sm btn btn-light"
-                        @click="saveCardVotes(column.id, card.id, false, true)"><i class="bi bi-hand-thumbs-down"></i>
-                  {{
-                    card.down_vote || 0
-                  }}
+                <button
+                  class="btn btn-sm btn-outline-danger d-flex align-items-center gap-1"
+                  @click="saveCardVotes(column.id, card.id, false, true)"
+                  :class="{ 'active': card.down_vote }"
+                >
+                  <ThumbsDown size="14"/>
+                  <span>{{ card.down_vote || 0 }}</span>
                 </button>
+
               </div>
             </div>
           </div>
@@ -271,6 +304,15 @@ import EmojiPicker from 'vue3-emoji-picker'
 import 'vue3-emoji-picker/css'
 import {toast} from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
+import {
+  Trello,
+  ThumbsUp,
+  ThumbsDown,
+  Plus,
+  MessageSquare,
+  Trash2,
+  Edit2
+} from 'lucide-vue-next';
 
 Parse.initialize(import.meta.env.VITE_PARSE_APP_ID);
 Parse.serverURL = import.meta.env.VITE_BACKEND_URL
@@ -278,7 +320,7 @@ const Boards = Parse.Object.extend("boards");
 const query = new Parse.Query(Boards);
 
 export default {
-  components: {EmojiPicker},
+  components: {EmojiPicker, Trello, Plus, ThumbsUp, ThumbsDown, MessageSquare, Trash2, Edit2},
   data() {
     return {
       orderBy: "default",
@@ -887,6 +929,22 @@ html {
   /* cor do botão ao passar o mouse */
   border-color: #babbbc;
   /* borda ao passar o mouse */
+}
+
+
+.empty-state {
+  min-height: 60vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.empty-state-content {
+  max-width: 600px;
+}
+
+.empty-state-icon {
+  animation: float 3s ease-in-out infinite;
 }
 
 </style>
