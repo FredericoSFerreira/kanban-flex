@@ -3,6 +3,7 @@ import "bootstrap"
 import VueSweetalert2 from 'vue-sweetalert2';
 import 'sweetalert2/dist/sweetalert2.min.css';
 import "bootstrap-icons/font/bootstrap-icons.css"
+import CountryFlag from 'vue-country-flag-next'
 import './assets/main.css'
 import { i18n } from './i18n'
 
@@ -20,5 +21,6 @@ app.use(createPinia())
 app.use(router)
 app.use(VueSweetalert2)
 app.component('v-otp-input', VOtpInput)
+app.component('country-flag', CountryFlag)
 app.use(i18n)
 app.mount('#app')

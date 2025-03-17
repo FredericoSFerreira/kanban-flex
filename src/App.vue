@@ -41,6 +41,8 @@
                 aria-expanded="false"
                 ref="languageDropdownBtn"
               >
+                <country-flag :country="currentLocale === 'en' ? 'usa' : 'bra'" size='small' rounded="true"/>
+
                 {{ $t(`language.${currentLocale}`) }}
               </button>
               <ul class="dropdown-menu" aria-labelledby="languageDropdown">
@@ -50,6 +52,7 @@
                     :class="{ active: currentLocale === locale }"
                     @click="changeLocale(locale)"
                   >
+                    <country-flag :country="locale === 'en' ? 'usa' : 'bra'" size='small' rounded="true"/>
                     {{ $t(`language.${locale}`) }}
                   </button>
                 </li>
