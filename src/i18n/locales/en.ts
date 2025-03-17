@@ -141,9 +141,9 @@ export default {
     settingsCardLimit: 'Cards per Column Limit',
     settingsShowCardCount: 'Show Card Count',
     emptyState: {
-      title: 'Start Your Kanban Journey',
-      description: 'Create your first column and begin organizing your tasks visually. Drag and drop cards, track progress, and boost your productivity.',
-      cta: 'Create First Column'
+      title: "Time to get started",
+      description: "Start by creating the columns for your board",
+      cta: "Create First Column"
     }
   },
   footer: {

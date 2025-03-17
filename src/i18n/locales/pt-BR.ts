@@ -141,8 +141,8 @@ export default {
     settingsCardLimit: 'Limite de Cartões por Coluna',
     settingsShowCardCount: 'Mostrar Contagem de Cartões',
     emptyState: {
-      title: 'Comece Sua Jornada Kanban',
-      description: 'Crie sua primeira coluna e comece a organizar suas tarefas visualmente. Arraste e solte cartões, acompanhe o progresso e aumente sua produtividade.',
+      title: 'Hora de começar',
+      description: 'Começe criando as colunas do seu board',
       cta: 'Criar Primeira Coluna'
     }
   },
