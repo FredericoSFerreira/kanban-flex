@@ -1,7 +1,13 @@
-const nodemailer = require("nodemailer");
-const fs = require('node:fs');
-const path = require('node:path');
-const {compile} = require("handlebars");
+import nodemailer from "nodemailer";
+import fs from 'node:fs';
+import path from 'node:path';
+import pkg from 'handlebars';
+const { compile } = pkg;
+
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const transporter = nodemailer.createTransport({
   host: process.env.EMAIL_HOST,
@@ -32,7 +38,6 @@ async function sendEmail(emailTo, name, otpCode) {
       });
 
       console.log("Message sent: %s", info.messageId);
-      }
+}
 
-
-module.exports = sendEmail
+export default sendEmail;
