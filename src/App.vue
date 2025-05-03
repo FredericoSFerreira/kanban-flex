@@ -66,10 +66,10 @@
               <Sun v-if="isDarkMode" size="20"/>
               <Moon v-else size="20"/>
             </button>
-            <!--            <router-link to="/login" class="btn btn-link text-decoration-none me-3"-->
-            <!--                         :class="isDarkMode ? 'text-light' : 'text-dark'">{{ $t('nav.login') }}-->
-            <!--            </router-link>-->
-            <!--            <router-link to="/register" class="btn btn-primary">{{ $t('nav.signUp') }}</router-link>-->
+            <router-link to="/login" class="btn btn-link text-decoration-none me-3"
+                         :class="isDarkMode ? 'text-light' : 'text-dark'">{{ $t('nav.login') }}
+            </router-link>
+            <router-link to="/register" class="btn btn-primary">{{ $t('nav.signUp') }}</router-link>
           </div>
         </div>
       </div>
@@ -81,7 +81,7 @@
     <footer class="bg-dark text-white">
       <div class="container py-5">
         <div class="row g-4">
-          <div class="col-lg-6 col-md-6">
+          <div class="col-lg-4 col-md-4">
             <div class="d-flex align-items-center mb-3">
               <Trello class="text-primary" size="32"/>
               <span class="ms-2 h5 fw-bold mb-0">Open Sprint Retro</span>
@@ -91,12 +91,14 @@
             </p>
           </div>
 
-          <div v-for="(column, index) in footerColumns" :key="index" class="col-lg-3 col-md-3">
+          <div v-for="(column, index) in footerColumns" :key="index" class="col-lg-2 col-md-2">
             <h3 class="h5 fw-bold mb-3 text-light">{{ $t(`footer.${column.key}.title`) }}</h3>
             <ul class="list-unstyled">
               <li v-for="(link, linkIndex) in column.links" :key="linkIndex" class="mb-2">
                 <a :href="`${link.path}`" :target="link.target || '_self'"
-                   class="text-light text-decoration-none hover-opacity">{{ $t(`footer.${column.key}.${link.label}`) }}</a>
+                   class="text-light text-decoration-none hover-opacity">{{
+                    $t(`footer.${column.key}.${link.label}`)
+                  }}</a>
               </li>
             </ul>
           </div>
@@ -111,9 +113,11 @@
       </div>
     </footer>
   </div>
+  <CookieConsent />
 </template>
 
 <script setup lang="ts">
+import CookieConsent from './components/Lgdp.vue';
 import {ref, computed, watchEffect, onMounted} from 'vue';
 import {useI18n} from 'vue-i18n';
 import {useRouter, useRoute} from 'vue-router';
@@ -190,21 +194,31 @@ const footerColumns = [
       path: '/my-boards',
       label: 'link1',
     },
+      {
+        path: '#',
+        label: 'link2',
+      }]
+  },
     {
-      path: '#',
-      label: 'link2',
+    key: 'account',
+    links: [{
+      path: '/login',
+      label: 'link1'
+    }, {
+      path: '/register',
+      label: 'link2'
     }]
   },
-  // {
-  //   key: 'account',
-  //   links: [{
-  //     path: '/login',
-  //     label: 'Login'
-  //   }, {
-  //     path: '/register',
-  //     label: 'Register'
-  //   }]
-  // },
+  {
+    key: 'terms',
+    links: [{
+      path: '/terms',
+      label: 'link1'
+    }, {
+      path: '/privacy-policy',
+      label: 'link2'
+    }]
+  },
   {
     key: 'status',
     links: [

@@ -6,7 +6,7 @@
           <div class="card border-0 shadow-sm">
             <div class="card-body p-4 p-md-5">
               <div class="text-center mb-4">
-                <Trello class="text-primary" size="48" />
+                <Trello class="text-primary" size="48"/>
                 <h2 class="h3 mt-3 mb-4">{{ $t('auth.welcomeBack') }}</h2>
               </div>
 
@@ -91,7 +91,7 @@
                     class="btn btn-link text-decoration-none p-0"
                     @click="step = 1"
                   >
-                    <ArrowLeft size="16" class="me-1" />
+                    <ArrowLeft size="16" class="me-1"/>
                     {{ $t('auth.changeEmail') }}
                   </button>
                 </div>
@@ -105,11 +105,15 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
-import { useI18n } from 'vue-i18n';
-import { Trello, ArrowLeft } from 'lucide-vue-next';
+import {ref, computed} from 'vue';
+import {useI18n} from 'vue-i18n';
+import {Trello, ArrowLeft} from 'lucide-vue-next';
+import api from "@/utils/api";
+import {useSwal} from "@/utils/swal";
 
-const { t } = useI18n();
+
+const {t} = useI18n();
+const Swal = useSwal();
 const step = ref(1);
 const email = ref('');
 const otpDigits = ref(Array(6).fill(''));
@@ -127,19 +131,49 @@ const isValidOTP = computed(() => {
 
 const requestOTP = () => {
   if (!isValidEmail.value) return;
-  step.value = 2;
-  startResendTimer();
+
+  api.post('/send-otp', {email: email.value})
+    .then((response) => {
+      console.log(response);
+      step.value = 2;
+      startResendTimer();
+    })
+    .catch((error) => {
+      console.log(error)
+      return Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Ocorreu um erro ao enviar o código de autorização. Tente novamente.",
+      })
+    })
 };
 
 const verifyOTP = () => {
   if (!isValidOTP.value) return;
   const otp = otpDigits.value.join('');
-  console.log('Verifying OTP:', otp);
+
+  api.post('/check-otp', { email: email.value, code: otp })
+    .then((response) => {
+      if (response.data.isValid) {
+        // Salvar token e redirecionar
+        localStorage.setItem('token', response.data.token);
+        // Aqui você pode adicionar redirecionamento após login bem-sucedido
+      }
+    })
+    .catch((error) => {
+      console.log(error);
+      return Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Código inválido ou expirado. Tente novamente.",
+      });
+    });
 };
 
 const resendOTP = () => {
   if (resendTimer.value > 0) return;
   otpDigits.value = Array(6).fill('');
+  requestOTP()
   startResendTimer();
 };
 

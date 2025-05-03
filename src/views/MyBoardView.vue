@@ -1,5 +1,5 @@
 <template>
-  <div class="container py-5" v-if="showMyBoards">
+  <div class="container py-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
       <h1 class="h2 mb-0">{{ $t('myBoards.title') }}</h1>
       <router-link to="/board" class="btn btn-primary">
@@ -9,10 +9,10 @@
     </div>
 
     <!-- Empty State -->
-    <div v-if="boards.length === 0" class="text-center py-5">
+    <div v-if="boards.length === 0" class="text-center py-5 mb-5">
       <Layout size="48" class="text-primary mb-3"/>
-      <h2 class="h4 mb-3">{{ $t('myBoards.emptyState.title') }}</h2>
-      <p class="text-muted mb-4">{{ $t('myBoards.emptyState.description') }}</p>
+      <h2 class="h4 mb-4">{{ $t('myBoards.emptyState.title') }}</h2>
+      <p class="text-muted mb-5">{{ $t('myBoards.emptyState.description') }}</p>
       <router-link to="/board" class="btn btn-primary">
         {{ $t('myBoards.emptyState.cta') }}
       </router-link>
@@ -57,92 +57,17 @@
               <Calendar size="14" class="me-2"/>
               {{ formatDate(board.createdAt) }}
               <Users size="14" class="ms-3 me-2"/>
-                            {{ board.members || 10 }} {{ $t('myBoards.members') }}
+              {{ board.members || 10 }} {{ $t('myBoards.members') }}
             </div>
           </div>
         </div>
       </div>
     </div>
-
-
-  </div>
-
-  <div class="content">
-    <section class="container-fluid d-block">
-      <div class="row justify-content-center">
-        <div class="col-12 col-md-6 col-lg-4" style="min-width: 500px;">
-          <div class="card bg-white mb-5 mt-5 border-0" style="box-shadow: 0 12px 15px rgba(0, 0, 0, 0.08);">
-
-            <div class="card-body p-5 text-center" v-if="showEmail">
-              <i class="bi bi-envelope" style="font-size: 50px"></i>
-              <h4>Infome seu e-mail</h4>
-              <p>Um código de autorização será enviado no seu e-mail</p>
-
-              <input type="email" v-model="email" class="form-control" id="userEmail" aria-describedby="email">
-              <br>
-              <button class="btn btn-primary mb-3" @click="sendCode()" v-if="!showLoading">
-                Enviar
-              </button>
-
-              <div class="text-center" v-if="showLoading">
-                <div class="spinner-border" role="status">
-                  <span class="visually-hidden">Loading...</span>
-                </div>
-              </div>
-
-            </div>
-
-            <div class="card-body p-5 text-center" v-if="showVerify">
-              <i class="bi bi-key" style="font-size: 50px"></i>
-              <h4>Verifique seu e-mail</h4>
-              <p>Um código de autorização foi enviado para o seu e-mail</p>
-              <p>{{ email }}</p>
-              <p><a href="#" @click="changeEmail()"> Alterar email</a></p>
-
-              <otp v-model="code" :count="6" ref="otpComponent">
-                <template v-slot="{ digits, onInput, onPaste, onBlur }">
-                  <div class="">
-                    <otp-group class="otp-field mb-4">
-                      <template v-slot="{ focusNext, focusPrev }">
-                        <otp-group-input
-                          v-for="(digit, index) in digits"
-                          :key="index"
-                          :value="digit"
-                          autofocus
-                          placeholder=""
-                          @blur="onBlur"
-                          @next="focusNext(index)"
-                          @prev="focusPrev(index)"
-                          @paste="onPaste(index, $event)"
-                          @input="onInput(index, $event)"
-                          class=""
-                        />
-                      </template>
-                    </otp-group>
-                  </div>
-                </template>
-              </otp>
-
-              <button class="btn btn-primary mb-3" @click="verifyCode()">
-                Verificar
-              </button>
-
-              <p class="resend text-muted mb-0">
-                Não recebeu o código? <a href="">Reenviar código</a>
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
   </div>
 
 </template>
 <script>
 import Parse from 'parse/dist/parse.min.js';
-import {validateEmail} from "@/utils/validate.js";
-import axios from 'axios';
-import {removePathFromUrl} from "@/utils/utils.js";
 import {Otp, OtpGroup, OtpGroupInput} from "@/components/otp";
 import {Plus, Layout, MoreVertical, Eye, Trash2, Calendar, Users} from 'lucide-vue-next';
 
@@ -150,11 +75,6 @@ Parse.initialize(import.meta.env.VITE_PARSE_APP_ID);
 Parse.serverURL = import.meta.env.VITE_BACKEND_URL
 const Boards = Parse.Object.extend("boards");
 const query = new Parse.Query(Boards);
-
-
-const request = axios.create({
-  baseURL: removePathFromUrl(import.meta.env.VITE_BACKEND_URL),
-});
 
 export default {
   components: {
@@ -170,7 +90,6 @@ export default {
       email: null,
       showVerify: false,
       showMyBoards: false,
-      showEmail: true,
       boards: [],
     }
   },
@@ -178,52 +97,8 @@ export default {
     formatDate(dateString) {
       return new Date(dateString).toLocaleDateString();
     },
-    async realTimeMyBoards() {
-
-
-    },
-    logout() {
-      this.$router.push(`/`)
-    },
-    verifyCode() {
-      request.post('/check-otp', {email: this.email, code: this.code})
-        .then((response) => {
-          console.log(response);
-          this.$swal.fire({
-            icon: "success",
-            title: "Autenticado com sucesso!",
-            showConfirmButton: true,
-          }).then(() => {
-            this.showMyBoards = true
-            this.showVerify = false
-            this.showEmail = false
-            this.getBoards()
-          });
-
-        })
-        .catch((error) => {
-          this.showVerify = true
-          this.showEmail = false
-          this.showMyBoards = false
-          if (error.status === 403) {
-            return this.$swal.fire({
-              icon: "error",
-              title: "Oops...",
-              text: "Código de autorização inválido. Tente novamente",
-            })
-          } else {
-            return this.$swal.fire({
-              icon: "error",
-              title: "Oops...",
-              text: "Ocorreu um erro ao validar o codigo. Tente novamente",
-            })
-          }
-
-        })
-
-    },
+    async realTimeMyBoards() {},
     removeBoard(idBoard) {
-
       this.$swal.fire({
         title: "Tem certeza que deseja remover este board?",
         icon: "question",
@@ -247,56 +122,30 @@ export default {
     },
     async getBoards() {
       try {
-        const Boards = Parse.Object.extend("boards");
-        const query = new Parse.Query(Boards);
-        query.equalTo({'owner_email': this.email})
-        query.descending('_created_at')
-        const boards = await query.find();
-        console.log(boards, "BOARD");
+
+      const sessionToken = Parse.User.current() ? Parse.User.current().getSessionToken() : null;
+      const appId = import.meta.env.VITE_PARSE_APP_ID;
+      const serverURL = import.meta.env.VITE_BACKEND_URL;
+
+      const response = await fetch(`${serverURL}/classes/boards?where=${encodeURIComponent(JSON.stringify({"owner_email": this.email}))}&order=-createdAt`, {
+        method: 'GET',
+        headers: {
+          'X-Parse-Application-Id': appId,
+          'X-Parse-Session-Token': sessionToken,
+          // Header personalizado de exemplo:
+          'Meu-Cabecalho': 'valor-do-header'
+        }
+      });
+
+
         this.boards = boards.map((b) => ({'id': b.id, ...b.attributes}));
       } catch (error) {
         console.log('Failed to create new object, with error code: ' + error.message);
       }
-
     },
-    changeEmail() {
-      this.showEmail = true
-      this.showVerify = false
-    },
-    sendCode() {
-      if (!validateEmail(this.email)) {
-        return this.$swal.fire({
-          icon: "error",
-          title: "Oops...",
-          text: "Você precisa informar um email válido!",
-        });
-      }
-
-      this.showLoading = true
-
-      request.post('/send-otp', {email: this.email})
-        .then((response) => {
-          console.log(response);
-          this.showEmail = false
-          this.showVerify = true
-          this.showLoading = false
-        })
-        .catch((error) => {
-          console.log(error)
-          this.showVerify = false
-          this.showEmail = true
-          this.showMyBoards = false
-          this.showLoading = false
-          return this.$swal.fire({
-            icon: "error",
-            title: "Oops...",
-            text: "Ocorreu um erro ao enviar o código de autorização. Tente novamente.",
-          })
-        })
-    }
   },
   async mounted() {
-    await this.realTimeMyBoards()
+    await this.getBoards()
   }
 }
 </script>

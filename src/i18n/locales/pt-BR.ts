@@ -112,6 +112,12 @@ export default {
     subtitle: 'Identifique desafios, alinhe expectativas e evolua constantemente.',
     button: 'Comece Gratuitamente'
   },
+  cookies: {
+    message: 'Utilizamos cookies para melhorar sua experiência. Ao continuar navegando, você concorda com o uso de cookies.',
+    privacyPolicy: 'Política de Privacidade',
+    accept: 'Aceitar',
+    reject: 'Rejeitar'
+  },
   board: {
     title: 'Quadro Kanban',
     addColumn: 'Adicionar Coluna',
@@ -156,6 +162,11 @@ export default {
       title: 'Conta',
       link1: 'Login',
       link2: 'Criar Conta',
+    },
+    terms: {
+      title: 'Termos',
+      link1: 'Termos de Uso',
+      link2: 'Política de Privacidade',
     },
     status: {
       title: 'Status/Ajuda',

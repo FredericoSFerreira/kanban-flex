@@ -112,6 +112,12 @@ export default {
     subtitle: 'Identify challenges, align expectations and constantly evolve.',
     button: 'Get Started for Free'
   },
+  cookies: {
+    message: 'We use cookies to enhance your experience. By continuing to visit this site, you agree to our use of cookies.',
+    privacyPolicy: 'Privacy Policy',
+    accept: 'Accept',
+    reject: 'Reject'
+  },
   board: {
     title: 'Kanban Board',
     addColumn: 'Add Column',
@@ -152,6 +158,11 @@ export default {
       link1: "My Boards",
       link2: "New Board"
     },
+    terms: {
+      title: 'Terms',
+      link1: 'Privacy Policy',
+      link2: 'Terms of Use',
+    },
     account: {
       title: "Account",
       link1: "Login",
@@ -159,8 +170,8 @@ export default {
     },
     status: {
       title: "Status/Help",
-      link1: "Having an issue?",
-      link2: "API Status"
+      link1: "API Status",
+      link2: "Having an issue?"
     },
     "copyright": "© 2025 Open Sprint Retro.",
   },

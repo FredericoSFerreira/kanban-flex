@@ -36,7 +36,7 @@
           <div v-for="(feature, index) in features" :key="index" class="col-md-6 col-lg-4">
             <div class="card h-100 border-0 shadow-sm coming-soon-card">
               <div class="card-body p-4">
-                <div class="coming-soon-badge" v-if="feature.is_coming">{{$t('features.coming')}}</div>
+                <div class="coming-soon-badge" v-if="feature.is_coming">{{ $t('features.coming') }}</div>
                 <component :is="feature.icon" class="text-primary mb-3" size="40"/>
                 <h3 class="h4 fw-bold">{{ $t(`features.${feature.title}.title`) }}</h3>
                 <p class="text-muted">
@@ -69,20 +69,20 @@
                 <h3 class="h4 fw-bold">{{ $t(`pricing.${plan.name}.name`) }}</h3>
                 <p class="text-muted">{{ $t(`pricing.${plan.name}.description`) }}</p>
                 <div class="my-4">
-                  <span class="display-5 fw-bold">{{ $t(`pricing.${plan.name}.price`)}}</span>
-                  <span class="text-muted">{{ $t(`pricing.${plan.name}.period`)}}</span>
+                  <span class="display-5 fw-bold">{{ $t(`pricing.${plan.name}.price`) }}</span>
+                  <span class="text-muted">{{ $t(`pricing.${plan.name}.period`) }}</span>
                 </div>
                 <ul class="list-unstyled mb-4">
                   <li v-for="(feature, featureIndex) in plan.features" :key="featureIndex"
                       class="mb-2 d-flex align-items-center">
                     <component :is="plan.icon" class="text-success me-2" size="20"/>
-                    <span>{{ $t(`pricing.features.${feature}`)}}</span>
+                    <span>{{ $t(`pricing.features.${feature}`) }}</span>
                   </li>
                 </ul>
                 <a :href="plan.link"
                    class="btn w-100"
                    :class="plan.popular ? 'btn-primary' : 'btn-outline-primary'">
-                  {{ $t(`pricing.${plan.name}.button`)}}
+                  {{ $t(`pricing.${plan.name}.button`) }}
                 </a>
               </div>
             </div>
@@ -106,8 +106,7 @@
   </div>
 
 
-
-    <div class="modal fade" id="modalNewBoard" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal fade" id="modalNewBoard" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
@@ -119,7 +118,8 @@
           <input type="text" v-model="user" class="form-control" id="columnName" aria-describedby="columnName">
           <br>
           <label for="userName" class="form-label">Qual o seu email?</label>
-          <input type="email" v-model="email" class="form-control" id="columnEmail" aria-describedby="columnEmail"  @input="(val) => (email = email.toLowerCase())">
+          <input type="email" v-model="email" class="form-control" id="columnEmail" aria-describedby="columnEmail"
+                 @input="(val) => (email = email.toLowerCase())">
           <br>
           <label for="userName" class="form-label">Qual será o nome do board?</label>
           <input type="text" v-model="boardName" class="form-control" id="columnBoardName"
@@ -131,7 +131,14 @@
       </div>
     </div>
   </div>
-
+  <button
+    class="btn btn-primary scroll-to-top"
+    :class="{ 'show': showScrollTop }"
+    @click="scrollToTop()"
+    aria-label="Scroll to top"
+  >
+    <ArrowUp size="20"/>
+  </button>
 </template>
 
 <script>
@@ -146,7 +153,8 @@ import {
   ThumbsUp,
   Shield,
   Trello,
-  ArrowRight
+  ArrowRight,
+  ArrowUp
 } from 'lucide-vue-next';
 
 Parse.initialize(import.meta.env.VITE_PARSE_APP_ID);
@@ -159,9 +167,10 @@ const otp = new OTP();
 const otpQuery = new Parse.Query(OTP);
 
 export default {
-  components: {ArrowRight},
+  components: {ArrowRight, ArrowUp},
   data() {
     return {
+      showScrollTop: false,
       features: [
         {
           icon: CheckSquare,
@@ -216,6 +225,12 @@ export default {
     }
   },
   methods: {
+    scrollToTop() {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      })
+    },
     newBoard() {
       this.modalNewBoard.show()
     },
@@ -290,10 +305,18 @@ export default {
             text: "Ocorreu um erro ao criar o board!",
           })
         })
+    },
+    handleScroll() {
+      this.showScrollTop = window.scrollY > 100;
     }
   },
   mounted() {
+    console.log(window.scrollY)
+    window.addEventListener('scroll', this.handleScroll);
     this.modalNewBoard = new Modal(document.getElementById('modalNewBoard'))
+  },
+  unmounted() {
+    window.removeEventListener('scroll', this.handleScroll);
   }
 }
 </script>
@@ -353,5 +376,34 @@ export default {
   .coming-soon-card {
     border-color: #2d2d2d !important;
   }
+}
+
+
+/* Scroll to Top Button */
+.scroll-to-top {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  z-index: 1000;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.scroll-to-top.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+.scroll-to-top:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 </style>
