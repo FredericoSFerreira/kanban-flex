@@ -41,13 +41,15 @@ export default {
     newUser: 'New user?',
     signUp: 'Sign up',
     signIn: 'Sign in',
-    alreadyHaveAccount: 'Already have an account?',
+    alreadyHaveAccount: 'Do You is already have account, please proceed to login.',
     otpSent: 'We sent a verification code to',
     resendCode: 'Resend code',
     resendIn: 'Resend code in',
     changeEmail: 'Change email',
     invalidOTP: 'Invalid verification code',
-    verificationSuccess: 'Verification successful'
+    verificationSuccess: 'Verification successful',
+    phone: 'Phone number',
+    invalidPhone: 'Please enter a valid phone number',
   },
   hero: {
     title: 'Manage your sprint retrospectives with',
@@ -173,10 +175,52 @@ export default {
       link1: "API Status",
       link2: "Having an issue?"
     },
-    "copyright": "© 2025 Open Sprint Retro.",
+    "copyright": "© 2025 KanbanFlex.",
   },
   language: {
     en: 'English',
     'pt-BR': 'Português (BR)'
-  }
+  },
+  templates: {
+    chooseStart: 'Choose how to start',
+    blankBoard: {
+      title: 'Start from Scratch',
+      description: 'Create a blank board and customize it to your needs'
+    },
+    useTemplate: {
+      title: 'Use a Template',
+      description: 'Choose from our pre-built templates to get started quickly'
+    },
+    popularTemplates: 'Popular Templates',
+    types: {
+      sprintRetrospective: {
+        name: 'Sprint Retrospective',
+        description: 'Plan and execute sprint retrospectives'
+      },
+      projectManagement: {
+        name: 'Project Management',
+        description: 'Track tasks, milestones, and team progress'
+      },
+      developmentSprint: {
+        name: 'Development Sprint',
+        description: 'Manage software development sprints'
+      },
+      okrTracking: {
+        name: 'OKR Tracking',
+        description: 'Track objectives and key results'
+      },
+      contentCalendar: {
+        name: 'Content Calendar',
+        description: 'Plan and schedule content creation'
+      },
+      bugTracking: {
+        name: 'Bug Tracking',
+        description: 'Track and manage software issues'
+      },
+      productLaunch: {
+        name: 'Product Launch',
+        description: 'Plan and execute product launches'
+      }
+    }
+  },
 };

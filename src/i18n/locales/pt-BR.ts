@@ -41,13 +41,15 @@ export default {
     newUser: 'Novo usuário?',
     signUp: 'Cadastre-se',
     signIn: 'Entrar',
-    alreadyHaveAccount: 'Já tem uma conta?',
+    alreadyHaveAccount: 'Você já possui uma conta. Por favor realize o login.',
     otpSent: 'Enviamos um código de verificação para',
     resendCode: 'Reenviar código',
     resendIn: 'Reenviar código em',
     changeEmail: 'Alterar email',
     invalidOTP: 'Código de verificação inválido',
-    verificationSuccess: 'Verificação bem-sucedida'
+    verificationSuccess: 'Verificação bem-sucedida',
+    phone: 'Número de telefone',
+    invalidPhone: 'Por favor, insira um número de telefone válido',
   },
   hero: {
     title: 'Gerencie as retrospectivas de suas sprints com o',
@@ -173,10 +175,52 @@ export default {
       link1: 'Algum problema?',
       link2: 'API Status'
     },
-    copyright: '© 2025 Open Sprint Retro.'
+    copyright: '© 2025 KanbanFlex.'
   },
   language: {
     en: 'English',
-    'pt-BR': 'Português (BR)'
-  }
+    'pt-BR': 'Português'
+  },
+  templates: {
+    chooseStart: 'Escolha como começar',
+    blankBoard: {
+      title: 'Começar do Zero',
+      description: 'Crie um quadro em branco e personalize conforme suas necessidades'
+    },
+    useTemplate: {
+      title: 'Usar um Modelo',
+      description: 'Escolha entre nossos modelos pré-construídos para começar rapidamente'
+    },
+    popularTemplates: 'Modelos Populares',
+    types: {
+      sprintRetrospective: {
+        name: 'Retrospectiva de Sprint',
+        description: 'Planeje e execute retrospectivas de sprint'
+      },
+      projectManagement: {
+        name: 'Gestão de Projetos',
+        description: 'Acompanhe tarefas, marcos e progresso da equipe'
+      },
+      developmentSprint: {
+        name: 'Sprint de Desenvolvimento',
+        description: 'Gerencie sprints de desenvolvimento de software'
+      },
+      okrTracking: {
+        name: 'Acompanhamento de OKRs',
+        description: 'Acompanhe objetivos e resultados-chave'
+      },
+      contentCalendar: {
+        name: 'Calendário de Conteúdo',
+        description: 'Planeje e agende a criação de conteúdo'
+      },
+      bugTracking: {
+        name: 'Rastreamento de Bugs',
+        description: 'Acompanhe e gerencie problemas de software'
+      },
+      productLaunch: {
+        name: 'Lançamento de Produto',
+        description: 'Planeje e execute lançamentos de produtos'
+      }
+    }
+  },
 };

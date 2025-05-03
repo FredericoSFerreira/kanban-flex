@@ -6,13 +6,13 @@
         <div class="row justify-content-center text-center">
           <div class="col-lg-8">
             <h1 class="display-3 fw-bold mb-4">
-              {{ $t('hero.title') }} <span class="text-primary">Open Sprint Retro</span>
+              {{ $t('hero.title') }} <span class="text-primary">KanbanFlex</span>
             </h1>
             <p class="lead mb-5 text-muted">
               {{ $t('hero.subtitle') }}
             </p>
             <div class="d-flex justify-content-center gap-3">
-              <button class="btn btn-primary btn-lg d-inline-flex align-items-center" @click="newBoard()">
+              <button class="btn btn-primary btn-lg d-inline-flex align-items-center" @click="openCreateBoardModal()">
                 {{ $t('hero.getStarted') }}
                 <ArrowRight class="ms-2" size="20"/>
               </button>
@@ -98,39 +98,13 @@
         <p class="lead opacity-75 mb-5">
           {{ $t('cta.subtitle') }}
         </p>
-        <button @click="newBoard()" class="btn btn-light btn-lg text-primary px-5">
+        <button @click="openCreateBoardModal()" class="btn btn-light btn-lg text-primary px-5">
           {{ $t('cta.button') }}
         </button>
       </div>
     </section>
   </div>
 
-
-  <div class="modal fade" id="modalNewBoard" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLabel">Novo board</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <label for="userName" class="form-label">Qual o seu nome?</label>
-          <input type="text" v-model="user" class="form-control" id="columnName" aria-describedby="columnName">
-          <br>
-          <label for="userName" class="form-label">Qual o seu email?</label>
-          <input type="email" v-model="email" class="form-control" id="columnEmail" aria-describedby="columnEmail"
-                 @input="(val) => (email = email.toLowerCase())">
-          <br>
-          <label for="userName" class="form-label">Qual será o nome do board?</label>
-          <input type="text" v-model="boardName" class="form-control" id="columnBoardName"
-                 aria-describedby="columnBoardName">
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-primary" @click="saveBoard()">Salvar</button>
-        </div>
-      </div>
-    </div>
-  </div>
   <button
     class="btn btn-primary scroll-to-top"
     :class="{ 'show': showScrollTop }"
@@ -139,13 +113,14 @@
   >
     <ArrowUp size="20"/>
   </button>
+
+  <CreateBoardModal ref="createBoardModalRef"></CreateBoardModal>
+
 </template>
 
-<script>
-import {Modal} from 'bootstrap';
-import Parse from 'parse/dist/parse.min.js';
-import uniqueId from "@/utils/uuid.js";
-import {validateEmail} from "@/utils/validate.js";
+<script setup>
+import { ref, onMounted, onUnmounted } from 'vue';
+import CreateBoardModal from '@/components/CreateBoardModal.vue';
 import {
   CheckSquare,
   Users,
@@ -154,172 +129,84 @@ import {
   Shield,
   Trello,
   ArrowRight,
-  ArrowUp
+  ArrowUp,
 } from 'lucide-vue-next';
 
-Parse.initialize(import.meta.env.VITE_PARSE_APP_ID);
-Parse.serverURL = import.meta.env.VITE_BACKEND_URL
-const Boards = Parse.Object.extend("boards");
-const board = new Boards();
+const createBoardModalRef = ref(null);
+const showScrollTop = ref(false);
 
-const OTP = Parse.Object.extend("otp");
-const otp = new OTP();
-const otpQuery = new Parse.Query(OTP);
-
-export default {
-  components: {ArrowRight, ArrowUp},
-  data() {
-    return {
-      showScrollTop: false,
-      features: [
-        {
-          icon: CheckSquare,
-          title: 'taskManagement',
-          description: 'taskManagement'
-        },
-        {
-          icon: Users,
-          title: 'teamCollaboration',
-          description: 'teamCollaboration'
-        },
-        {
-          icon: Trello,
-          title: 'customization',
-          description: 'customization'
-        },
-        {
-          icon: ThumbsUp,
-          title: 'voting',
-          description: 'voting'
-        },
-        {
-          icon: Shield,
-          title: 'anonymous',
-          description: 'anonymous'
-        },
-        {
-          icon: BarChart3,
-          title: 'analytics',
-          description: 'analytics',
-          is_coming: true
-        },
-
-      ],
-      plans: [
-        {
-          name: 'free',
-          features: [
-            'unlimited',
-            'unlimitedMembers',
-          ],
-          icon: CheckSquare,
-          link: '#',
-          popular: false
-        },
-      ],
-      modalNewBoard: null,
-      user: null,
-      owner_id: uniqueId(),
-      email: null,
-      boardName: null
-    }
+const features = ref([
+  {
+    icon: CheckSquare,
+    title: 'taskManagement',
+    description: 'taskManagement'
   },
-  methods: {
-    scrollToTop() {
-      window.scrollTo({
-        top: 0,
-        behavior: 'smooth'
-      })
-    },
-    newBoard() {
-      this.modalNewBoard.show()
-    },
-    async saveBoard() {
-      if (!this.user) {
-        return this.$swal.fire({
-          icon: "error",
-          title: "Oops...",
-          text: "Você precisa informar o seu nome!",
-        });
-      }
-
-      if (!this.email) {
-        return this.$swal.fire({
-          icon: "error",
-          title: "Oops...",
-          text: "Você precisa informar um email válido!",
-        });
-      }
-
-      if (!validateEmail(this.email)) {
-        return this.$swal.fire({
-          icon: "error",
-          title: "Oops...",
-          text: "Você precisa informar um email válido!",
-        });
-      }
-
-      if (!this.boardName) {
-        return this.$swal.fire({
-          icon: "error",
-          title: "Oops...",
-          text: "Você precisa informar o nome do board!",
-        });
-      }
-
-      board.save({
-        name: this.boardName,
-        owner: this.user,
-        visibility: true,
-        owner_id: this.owner_id,
-        owner_email: this.email,
-        slug: this.boardName.replace(" ", "-").toLowerCase(),
-        columns: []
-      })
-        .then(async (boardDatabase) => {
-          otpQuery.equalTo("email", this.email);
-          const otpResult = await otpQuery.first();
-          console.log(otpResult);
-          if (!otpResult) {
-            otp.save({
-              name: this.user,
-              email: this.email,
-              code: null
-            })
-          }
-          localStorage.setItem("user", JSON.stringify({'name': this.user, 'id': this.owner_id, 'email': this.email}))
-          this.modalNewBoard.hide()
-          this.$swal.fire({
-            icon: "success",
-            title: "Board criado com sucesso!",
-            showConfirmButton: true,
-          }).then(() => {
-            this.$router.push(`/board/${boardDatabase.id}`)
-          });
-
-        }, (error) => {
-          console.log('Failed to create new object, with error code: ' + error.message)
-          return this.$swal.fire({
-            icon: "error",
-            title: "Oops...",
-            text: "Ocorreu um erro ao criar o board!",
-          })
-        })
-    },
-    handleScroll() {
-      this.showScrollTop = window.scrollY > 100;
-    }
+  {
+    icon: Users,
+    title: 'teamCollaboration',
+    description: 'teamCollaboration'
   },
-  mounted() {
-    console.log(window.scrollY)
-    window.addEventListener('scroll', this.handleScroll);
-    this.modalNewBoard = new Modal(document.getElementById('modalNewBoard'))
+  {
+    icon: Trello,
+    title: 'customization',
+    description: 'customization'
   },
-  unmounted() {
-    window.removeEventListener('scroll', this.handleScroll);
-  }
-}
+  {
+    icon: ThumbsUp,
+    title: 'voting',
+    description: 'voting'
+  },
+  {
+    icon: Shield,
+    title: 'anonymous',
+    description: 'anonymous'
+  },
+  {
+    icon: BarChart3,
+    title: 'analytics',
+    description: 'analytics',
+    is_coming: true
+  },
+]);
+
+const plans = ref([
+  {
+    name: 'free',
+    features: [
+      'unlimited',
+      'unlimitedMembers',
+    ],
+    icon: CheckSquare,
+    link: '#',
+    popular: false
+  },
+]);
+
+
+const openCreateBoardModal = () => {
+  createBoardModalRef.value.showTemplateModal();
+};
+
+const scrollToTop = () => {
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth'
+  });
+};
+
+const handleScroll = () => {
+  showScrollTop.value = window.scrollY > 100;
+};
+
+onMounted(() => {
+  window.addEventListener('scroll', handleScroll);
+});
+
+onUnmounted(() => {
+  window.removeEventListener('scroll', handleScroll);
+});
 </script>
+
 <style scoped>
 .coming-soon-card {
   position: relative;
@@ -377,7 +264,6 @@ export default {
     border-color: #2d2d2d !important;
   }
 }
-
 
 /* Scroll to Top Button */
 .scroll-to-top {

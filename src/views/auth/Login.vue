@@ -34,6 +34,12 @@
                   >
                     {{ $t('auth.continue') }}
                   </button>
+
+                  <div class="text-center mt-3" v-if="showSpinner">
+                    <div class="spinner-border" role="status">
+                      <span class="visually-hidden">Loading...</span>
+                    </div>
+                  </div>
                 </form>
 
                 <div class="text-center mt-4">
@@ -75,6 +81,13 @@
                     >
                       {{ $t('auth.verify') }}
                     </button>
+
+                    <div class="text-center mt-3" v-if="showSpinner">
+                      <div class="spinner-border" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                      </div>
+                    </div>
+
                     <button
                       type="button"
                       class="btn btn-link text-decoration-none"
@@ -110,15 +123,30 @@ import {useI18n} from 'vue-i18n';
 import {Trello, ArrowLeft} from 'lucide-vue-next';
 import api from "@/utils/api";
 import {useSwal} from "@/utils/swal";
+import {useAuthStore} from '@/stores/auth'
+import {jwtDecode} from 'jwt-decode';
+import {useRoute, useRouter} from "vue-router";
 
+
+type JwtPayload = {
+  id: string
+  name: string
+  email: string
+  exp: number
+}
 
 const {t} = useI18n();
 const Swal = useSwal();
 const step = ref(1);
 const email = ref('');
+const showSpinner = ref(false);
 const otpDigits = ref(Array(6).fill(''));
 const resendTimer = ref(0);
 const otpInputs = ref<HTMLInputElement[]>([]);
+const auth = useAuthStore()
+const router = useRouter()
+const route = useRoute()
+
 
 const isValidEmail = computed(() => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -131,15 +159,25 @@ const isValidOTP = computed(() => {
 
 const requestOTP = () => {
   if (!isValidEmail.value) return;
-
+  showSpinner.value = true;
   api.post('/send-otp', {email: email.value})
     .then((response) => {
       console.log(response);
       step.value = 2;
       startResendTimer();
+      showSpinner.value = false;
     })
-    .catch((error) => {
-      console.log(error)
+    .catch((error: any) => {
+      showSpinner.value = false;
+      if (error.response.status === 404) {
+        return Swal.fire({
+          icon: "info",
+          title: "Oops...",
+          text: "Email não cadastrado. Realize o cadastro para continuar.",
+        }).then(() =>{
+          router.push('/register')
+        })
+      }
       return Swal.fire({
         icon: "error",
         title: "Oops...",
@@ -151,16 +189,27 @@ const requestOTP = () => {
 const verifyOTP = () => {
   if (!isValidOTP.value) return;
   const otp = otpDigits.value.join('');
-
-  api.post('/check-otp', { email: email.value, code: otp })
+  showSpinner.value = true;
+  api.post('/check-otp', {email: email.value, code: otp})
     .then((response) => {
       if (response.data.isValid) {
         // Salvar token e redirecionar
-        localStorage.setItem('token', response.data.token);
-        // Aqui você pode adicionar redirecionamento após login bem-sucedido
+        const token = response.data.token;
+        localStorage.setItem('token', token);
+        const decoded = jwtDecode<JwtPayload>(token)
+        console.log(decoded, "HERER")
+        auth.login(decoded, token)
+        showSpinner.value = false;
+        const redirectPath = route.query.redirect
+        if (typeof redirectPath === 'string' && redirectPath !== '/login') {
+          router.push(redirectPath)
+        } else {
+          router.push('/my-boards')
+        }
       }
     })
     .catch((error) => {
+      showSpinner.value = false;
       console.log(error);
       return Swal.fire({
         icon: "error",

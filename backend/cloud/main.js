@@ -24,6 +24,9 @@ Parse.Cloud.define("getOtp", async (request) => {
     const query = new Parse.Query("otp");
     query.equalTo({'email': request.params.email})
     const otp = await query.first();
+    if (!otp) {
+      return {notFound: true}
+    }
     console.log(otp.attributes)
     return otp.attributes;
   } catch (error) {

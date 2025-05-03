@@ -5,4 +5,3 @@ function removePathFromUrl(url: string): string {
 
 export { removePathFromUrl }
 
-

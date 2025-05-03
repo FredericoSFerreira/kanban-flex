@@ -1,4 +1,5 @@
 import {createRouter, createWebHistory} from 'vue-router'
+import {useAuthStore} from '@/stores/auth'
 import HomeView from '../views/HomeView.vue'
 import BoardView from '../views/BoardView.vue'
 import ErrorView from '../views/ErrorView.vue'
@@ -24,7 +25,8 @@ const router = createRouter({
     {
       path: "/my-boards",
       name: 'my-board',
-      component: MyBoardView
+      component: MyBoardView,
+      meta: {requiresAuth: true}
     },
     {
       path: '/login',
@@ -52,6 +54,15 @@ const router = createRouter({
       component: ErrorView
     },
   ],
+})
+
+router.beforeEach((to, from, next) => {
+  const auth = useAuthStore()
+  if (to.meta.requiresAuth && !auth.isAuthenticated) {
+    next({path: '/login', query: {redirect: to.fullPath}})
+  } else {
+    next()
+  }
 })
 
 export default router

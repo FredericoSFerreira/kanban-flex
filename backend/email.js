@@ -31,9 +31,9 @@ async function sendEmail(emailTo, name, otpCode) {
   };
   const htmlToSend = template(replacements);
   const info = await transporter.sendMail({
-      from: `Open sprint retro <${process.env.EMAIL_FROM}>`, // sender address
+      from: `KanbanFlex <${process.env.EMAIL_FROM}>`, // sender address
       to: emailTo, // list of receivers
-      subject: "Código de acesso - Open Sprint Retro", // Subject line
+      subject: "Código de acesso - KanbanFlex", // Subject line
       html: htmlToSend,
       });
 

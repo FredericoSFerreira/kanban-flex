@@ -3,9 +3,9 @@
     <div class="container">
       <div class="row justify-content-center policy-text" v-if="currentLocale == 'pt-BR'">
         <h2>Política de Privacidade</h2>
-        <p>A sua privacidade é importante para nós. É política do <strong>Open Sprint Retro</strong> respeitar a sua
+        <p>A sua privacidade é importante para nós. É política do <strong>KanbanFlex</strong> respeitar a sua
           privacidade em relação a qualquer informação sua que possamos coletar no site <a
-            href="https://open-sprint-retro.netlify.app/">Open Sprint Retro</a> e outros sites que possuímos e operamos.
+            href="https://kanbanflex.com/">KanbanFlex</a> e outros sites que possuímos e operamos.
         </p>
 
         <p>Solicitamos informações pessoais apenas quando realmente precisamos delas para lhe fornecer um serviço.
@@ -48,14 +48,14 @@
         </ul>
 
         <h3>Compromisso do Usuário</h3>
-        <p>O usuário se compromete a fazer uso adequado dos conteúdos e informações oferecidos pelo Open Sprint Retro,
+        <p>O usuário se compromete a fazer uso adequado dos conteúdos e informações oferecidos pelo KanbanFlex,
           comprometendo-se a:</p>
         <ul>
           <li>A) Não se envolver em atividades ilegais ou contrárias à boa fé e à ordem pública;</li>
           <li>B) Não divulgar propaganda ou conteúdo de natureza racista, xenofóbica, jogos de azar, pornografia ilegal,
             apologia ao terrorismo ou contra os direitos humanos;
           </li>
-          <li>C) Não causar danos aos sistemas físicos (hardware) e lógicos (software) do Open Sprint Retro, seus
+          <li>C) Não causar danos aos sistemas físicos (hardware) e lógicos (software) do KanbanFlex, seus
             fornecedores ou terceiros, nem introduzir ou disseminar vírus ou outros sistemas maliciosos capazes de
             causar danos.
           </li>
@@ -72,8 +72,8 @@
       <div class="row justify-content-center policy-text" v-else>
         <section>
           <h2>Privacy Policy</h2>
-          <p>Your privacy is important to us. It is Open Sprint Retro's policy to respect your privacy regarding any
-            information we may collect from you across our website, <a href="https://open-sprint-retro.netlify.app/">Open
+          <p>Your privacy is important to us. It is KanbanFlex's policy to respect your privacy regarding any
+            information we may collect from you across our website, <a href="https://kanbanflex.com/">Open
               Sprint Retro</a>, and other sites we own and operate.</p>
 
           <p>We only ask for personal information when we truly need it to provide a service to you. We collect it by
@@ -101,9 +101,9 @@
         </section>
 
         <section>
-          <h2>Cookie Policy for Open Sprint Retro</h2>
-          <p>This is the Cookie Policy for Open Sprint Retro, accessible from <a
-            href="https://open-sprint-retro.netlify.app/">https://open-sprint-retro.netlify.app/</a>.</p>
+          <h2>Cookie Policy for KanbanFlex</h2>
+          <p>This is the Cookie Policy for KanbanFlex, accessible from <a
+            href="https://kanbanflex.com/">https://kanbanflex.com/</a>.</p>
 
           <h3>What Are Cookies</h3>
           <p>As is common practice with almost all professional websites, this site uses cookies, which are tiny files
@@ -141,7 +141,7 @@
             <li>Not spreading propaganda or content that is racist, xenophobic, related to gambling, illegal
               pornography, terrorism, or against human rights.
             </li>
-            <li>Not causing damage to the physical (hardware) and logical (software) systems of Open Sprint Retro, its
+            <li>Not causing damage to the physical (hardware) and logical (software) systems of KanbanFlex, its
               suppliers, or third parties, or introducing or spreading computer viruses or other systems capable of
               causing such damage.
             </li>

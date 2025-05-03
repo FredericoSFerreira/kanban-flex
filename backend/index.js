@@ -57,6 +57,7 @@ app.post('/send-otp', async (req, res) => {
   try {
     const email = req.body.email
     const userData = await Parse.Cloud.run("getOtp", {email});
+    if (userData.notFound) {return res.status(404).send('Email not found')}
     const name = userData.name
     const code = generateOtp()
     await Parse.Cloud.run("updateOtp", {email, code});

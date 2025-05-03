@@ -6,7 +6,7 @@
       <div class="container">
         <router-link class="navbar-brand d-flex align-items-center" to="/">
           <Trello class="text-primary" size="32"/>
-          <span class="ms-2 fw-bold">Open Sprint Retro</span>
+          <span class="ms-2 fw-bold">KanbanFlex</span>
         </router-link>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
           <span class="navbar-toggler-icon"></span>
@@ -66,10 +66,37 @@
               <Sun v-if="isDarkMode" size="20"/>
               <Moon v-else size="20"/>
             </button>
-            <router-link to="/login" class="btn btn-link text-decoration-none me-3"
+            <router-link v-if="!auth.isAuthenticated" to="/login" class="btn btn-link text-decoration-none me-3"
                          :class="isDarkMode ? 'text-light' : 'text-dark'">{{ $t('nav.login') }}
             </router-link>
-            <router-link to="/register" class="btn btn-primary">{{ $t('nav.signUp') }}</router-link>
+            <router-link v-if="!auth.isAuthenticated" to="/register" class="btn btn-primary">{{ $t('nav.signUp') }}</router-link>
+
+
+          <div class="d-flex align-items-center" v-if="auth.isAuthenticated">
+            <div class="dropdown me-3">
+              <button
+                class="btn btn-link text-decoration-none dropdown-toggle"
+                :class="isDarkMode ? 'text-light' : 'text-dark'"
+                type="button"
+                id="languageDropdown"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+                ref="languageDropdownBtn"
+              >
+                {{ auth.user.name }}
+              </button>
+              <ul class="dropdown-menu" aria-labelledby="languageDropdown">
+                <li >
+                  <button
+                    class="dropdown-item"
+                    @click="auth.logout()"
+                  >
+                    Sair
+                  </button>
+                </li>
+              </ul>
+            </div>
+          </div>
           </div>
         </div>
       </div>
@@ -84,14 +111,14 @@
           <div class="col-lg-4 col-md-4">
             <div class="d-flex align-items-center mb-3">
               <Trello class="text-primary" size="32"/>
-              <span class="ms-2 h5 fw-bold mb-0">Open Sprint Retro</span>
+              <span class="ms-2 h5 fw-bold mb-0">KanbanFlex</span>
             </div>
             <p class="text-light">
               {{ $t('hero.subtitle_footer') }}
             </p>
           </div>
 
-          <div v-for="(column, index) in footerColumns" :key="index" class="col-lg-2 col-md-2">
+          <div v-for="(column, index) in footerColumns" :key="index" class="col-lg-2 col-md-2 col-sm-3">
             <h3 class="h5 fw-bold mb-3 text-light">{{ $t(`footer.${column.key}.title`) }}</h3>
             <ul class="list-unstyled">
               <li v-for="(link, linkIndex) in column.links" :key="linkIndex" class="mb-2">
@@ -113,7 +140,7 @@
       </div>
     </footer>
   </div>
-  <CookieConsent />
+  <CookieConsent/>
 </template>
 
 <script setup lang="ts">
@@ -121,6 +148,7 @@ import CookieConsent from './components/Lgdp.vue';
 import {ref, computed, watchEffect, onMounted} from 'vue';
 import {useI18n} from 'vue-i18n';
 import {useRouter, useRoute} from 'vue-router';
+import {useAuthStore} from "@/stores/auth";
 import {Dropdown} from 'bootstrap';
 import {
   Trello,
@@ -131,6 +159,7 @@ import {
   Moon
 } from 'lucide-vue-next';
 
+const auth = useAuthStore()
 const {locale, t} = useI18n();
 const router = useRouter();
 const route = useRoute();
@@ -174,13 +203,10 @@ watchEffect(() => {
 
 
 const navigateToSection = async (sectionId: string) => {
-  // If we're not on the home page, navigate there first
   if (route.path !== '/') {
     await router.push('/');
-    // Wait for the navigation to complete
     await new Promise(resolve => setTimeout(resolve, 100));
   }
-
   const element = document.getElementById(sectionId);
   if (element) {
     element.scrollIntoView({behavior: 'smooth'});
@@ -199,7 +225,7 @@ const footerColumns = [
         label: 'link2',
       }]
   },
-    {
+  {
     key: 'account',
     links: [{
       path: '/login',
@@ -213,10 +239,10 @@ const footerColumns = [
     key: 'terms',
     links: [{
       path: '/terms',
-      label: 'link1'
+      label: 'link2'
     }, {
       path: '/privacy-policy',
-      label: 'link2'
+      label: 'link1'
     }]
   },
   {
