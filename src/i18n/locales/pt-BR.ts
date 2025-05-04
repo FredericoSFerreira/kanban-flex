@@ -53,10 +53,10 @@ export default {
     logout: 'Sair',
   },
   hero: {
-    title: 'Gerencie as retrospectivas de suas sprints com o',
-    subtitle: 'Maximize o potencial da sua equipe com retrospectivas de sprints eficientes utilizando uma ferramenta simples e intuitiva.',
+    title: 'Visualize seu Fluxo de Trabalho com',
+    subtitle: 'A ferramenta de quadro Kanban mais intuitiva para ajudar equipes a visualizar o trabalho, limitar trabalho em andamento e maximizar a eficiência..',
     getStarted: 'Começar Agora',
-    subtitle_footer: 'É um quadro web moderno, aplicativo de código aberto para retrospectiva de sprint baseado em colunas e cartões.'
+    subtitle_footer: 'É um quadro web moderno, aplicativo de código aberto baseado em colunas e cartões.'
   },
   features: {
     title: 'Recursos que tornam seu fluxo de trabalho mais suave',
@@ -111,7 +111,7 @@ export default {
     subtitle: 'Confiado por milhares de equipes em todo o mundo'
   },
   cta: {
-    title: 'O sucesso da próxima sprint começa com uma retrospectiva eficaz.',
+    title: 'Pronto para transformar seu fluxo de trabalho?',
     subtitle: 'Identifique desafios, alinhe expectativas e evolua constantemente.',
     button: 'Comece Gratuitamente'
   },

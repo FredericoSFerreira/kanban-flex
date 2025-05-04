@@ -53,11 +53,11 @@ export default {
     logout: 'Logout',
   },
   hero: {
-    title: 'Manage your sprint retrospectives with',
-    subtitle: 'Maximize your team\'s potential with efficient sprint retrospectives using a simple and intuitive tool.',
+    title: 'Visualize Your Workflow with',
+    subtitle: 'The most intuitive Kanban board tool to help teams visualize work, limit work-in-progress, and maximize efficiency.',
     getStarted: 'Get Started',
     watchDemo: 'Watch Demo',
-    subtitle_footer: 'Is a web modern board, open-source application for sprint retrospective based in columns and cards.',
+    subtitle_footer: 'Is a web modern board, open-source application based in columns and cards.',
   },
   features: {
     title: "Features that make your workflow smoother",
@@ -111,7 +111,7 @@ export default {
     subtitle: 'Trusted by thousands of teams worldwide'
   },
   cta: {
-    title: 'The success of the next sprint starts with an effective retrospective.',
+    title: 'Ready to transform your workflow?',
     subtitle: 'Identify challenges, align expectations and constantly evolve.',
     button: 'Get Started for Free'
   },
