@@ -115,7 +115,7 @@ We welcome contributions from the open-source community! Here's how you can get 
 2. **Clone your forked repo** locally:
 
    ```bash
-   git clone https://github.com/FredericoSFerreira/Open-Sprint-Retro.git or ssh git@github.com:FredericoSFerreira/Open-Sprint-Retro.git
+   git clone https://github.com/FredericoSFerreira/kanban-flex.git or ssh git@github.com:FredericoSFerreira/Open-Sprint-Retro.git
    ```
 
 3. **Create a new branch** for your feature or bug fix:
@@ -148,7 +148,7 @@ We welcome contributions from the open-source community! Here's how you can get 
 
 ## 💬 Get in Touch
 
-If you have any questions, feel free to reach out via [GitHub Issues](https://github.com/FredericoSFerreira/Open-Sprint-Retro/issues). We’d love to hear your thoughts or ideas for future improvements!
+If you have any questions, feel free to reach out via [GitHub Issues](https://github.com/FredericoSFerreira/kanban-flex/issues). We’d love to hear your thoughts or ideas for future improvements!
 
 
 ---

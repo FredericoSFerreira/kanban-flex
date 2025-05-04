@@ -132,7 +132,7 @@
         </div>
 
         <div class="border-top border-secondary mt-3 pt-4 text-center text-light">
-          <p>{{ $t('footer.copyright') }}</p>       <a href="https://github.com/FredericoSFerreira/Open-Sprint-Retro"
+          <p>{{ $t('footer.copyright') }}</p>       <a href="https://github.com/FredericoSFerreira/kanban-flex"
                                                        class="text-light hover-opacity">
           <Github :size="24"/>
         </a>
@@ -254,7 +254,7 @@ const footerColumns = [
     links: [
       {
         target: '_blank',
-        path: 'https://github.com/FredericoSFerreira/Open-Sprint-Retro/issues/new',
+        path: 'https://github.com/FredericoSFerreira/kanban-flex/issues/issues/new',
         label: 'link1'
       },
       {
