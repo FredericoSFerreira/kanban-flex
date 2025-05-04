@@ -3,5 +3,9 @@ function removePathFromUrl(url: string): string {
     return lastSlashIndex !== -1 ? url.substring(0, lastSlashIndex) : url;
 }
 
-export { removePathFromUrl }
+function sleep(ms: number = 2000) {
+  return new Promise(resolve => setTimeout(resolve, ms))
+}
+
+export { removePathFromUrl, sleep }
 

@@ -84,7 +84,7 @@ Parse.Cloud.define("checkOtp", async (request) => {
     const query = new Parse.Query("otp");
     query.equalTo({'email': request.params.email, 'code': request.params.code})
     const otp = await query.first();
-    await saveLog(request, otp.id)
+    if (otp) await saveLog(request, {id: otp.id})
     return {id: otp.id, ...otp.attributes};
   } catch (error) {
     console.log('Failed to checkOtp, with error code: ' + error.message);

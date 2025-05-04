@@ -125,7 +125,7 @@
                     class="btn btn-link text-decoration-none p-0"
                     @click="step = 1"
                   >
-                    <ArrowLeft size="16" class="me-1"/>
+                    <ArrowLeft :size="16" class="me-1"/>
                     {{ $t('auth.changeEmail') }}
                   </button>
                 </div>
@@ -146,10 +146,23 @@ import {VueTelInput} from 'vue-tel-input';
 import 'vue-tel-input/vue-tel-input.css';
 import api from "@/utils/api";
 import {useSwal} from "@/utils/swal";
-import {useRouter} from "vue-router";
+import {useRoute, useRouter} from "vue-router";
+import {jwtDecode} from "jwt-decode";
+import {useAuthStore} from "@/stores/auth";
+import {sleep} from "@/utils/utils";
+
+
+type JwtPayload = {
+  id: string
+  name: string
+  email: string
+  exp: number
+}
 
 const router = useRouter()
+const route = useRoute()
 const {t, locale} = useI18n();
+const auth = useAuthStore()
 const step = ref(1);
 const name = ref('');
 const email = ref('');
@@ -188,7 +201,7 @@ const requestOTP = () => {
       startResendTimer();
       showSpinner.value = false;
     })
-    .catch((error) => {
+    .catch((error: any) => {
       showSpinner.value = false;
       console.log(error)
 
@@ -210,10 +223,39 @@ const requestOTP = () => {
     })
 };
 
-const verifyOTP = () => {
+const verifyOTP = async () => {
   if (!isValidOTP.value) return;
   const otp = otpDigits.value.join('');
   console.log('Verifying OTP:', otp);
+  showSpinner.value = true;
+  api.post('/check-otp', {email: email.value, code: otp})
+    .then(async (response) => {
+      if (response.data.isValid) {
+        // Salvar token e redirecionar
+        const token = response.data.token;
+        localStorage.setItem('token', token);
+        const decoded = jwtDecode<JwtPayload>(token)
+        console.log(decoded, "HERER")
+        auth.login(decoded, token)
+        await sleep()
+        showSpinner.value = false;
+        const redirectPath = route.query.redirect
+        if (typeof redirectPath === 'string' && redirectPath !== '/login') {
+          router.push(redirectPath)
+        } else {
+          router.push('/my-boards')
+        }
+      }
+    })
+    .catch((error) => {
+      showSpinner.value = false;
+      console.log(error);
+      return Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Código inválido ou expirado. Tente novamente.",
+      });
+    });
 };
 
 const resendOTP = () => {

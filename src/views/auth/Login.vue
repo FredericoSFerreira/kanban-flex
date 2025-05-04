@@ -30,7 +30,7 @@
                   <button
                     type="submit"
                     class="btn btn-primary w-100 py-2"
-                    :disabled="!isValidEmail"
+                    :disabled="!isValidEmail || showSpinner"
                   >
                     {{ $t('auth.continue') }}
                   </button>
@@ -77,7 +77,7 @@
                     <button
                       type="submit"
                       class="btn btn-primary py-2"
-                      :disabled="!isValidOTP"
+                      :disabled="!isValidOTP || showSpinner"
                     >
                       {{ $t('auth.verify') }}
                     </button>
@@ -126,6 +126,7 @@ import {useSwal} from "@/utils/swal";
 import {useAuthStore} from '@/stores/auth'
 import {jwtDecode} from 'jwt-decode';
 import {useRoute, useRouter} from "vue-router";
+import {sleep} from "@/utils/utils"
 
 
 type JwtPayload = {
@@ -174,7 +175,7 @@ const requestOTP = () => {
           icon: "info",
           title: "Oops...",
           text: "Email não cadastrado. Realize o cadastro para continuar.",
-        }).then(() =>{
+        }).then(() => {
           router.push('/register')
         })
       }
@@ -186,19 +187,20 @@ const requestOTP = () => {
     })
 };
 
-const verifyOTP = () => {
+
+const verifyOTP = async () => {
   if (!isValidOTP.value) return;
   const otp = otpDigits.value.join('');
   showSpinner.value = true;
   api.post('/check-otp', {email: email.value, code: otp})
-    .then((response) => {
+    .then(async (response) => {
       if (response.data.isValid) {
         // Salvar token e redirecionar
         const token = response.data.token;
         localStorage.setItem('token', token);
         const decoded = jwtDecode<JwtPayload>(token)
-        console.log(decoded, "HERER")
         auth.login(decoded, token)
+        await sleep()
         showSpinner.value = false;
         const redirectPath = route.query.redirect
         if (typeof redirectPath === 'string' && redirectPath !== '/login') {
