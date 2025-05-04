@@ -89,7 +89,7 @@
                 <li >
                   <button
                     class="dropdown-item"
-                    @click="auth.logout()"
+                    @click="logout()"
                   >
                     {{ $t('auth.logout') }}
                   </button>
@@ -134,7 +134,7 @@
         <div class="border-top border-secondary mt-3 pt-4 text-center text-light">
           <p>{{ $t('footer.copyright') }}</p>       <a href="https://github.com/FredericoSFerreira/Open-Sprint-Retro"
                                                        class="text-light hover-opacity">
-          <Github size="24"/>
+          <Github :size="24"/>
         </a>
         </div>
       </div>
@@ -201,6 +201,10 @@ watchEffect(() => {
   document.querySelector('html')?.setAttribute('lang', locale.value);
 });
 
+const logout = () => {
+  router.push('/');
+  auth.logout();
+}
 
 const navigateToSection = async (sectionId: string) => {
   if (route.path !== '/') {
