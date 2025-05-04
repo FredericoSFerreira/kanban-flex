@@ -41,20 +41,23 @@ export default {
     newUser: 'New user?',
     signUp: 'Sign up',
     signIn: 'Sign in',
-    alreadyHaveAccount: 'Already have an account?',
+    alreadyHaveAccount: 'Do You is already have account, please proceed to login.',
     otpSent: 'We sent a verification code to',
     resendCode: 'Resend code',
     resendIn: 'Resend code in',
     changeEmail: 'Change email',
     invalidOTP: 'Invalid verification code',
-    verificationSuccess: 'Verification successful'
+    verificationSuccess: 'Verification successful',
+    phone: 'Phone number',
+    invalidPhone: 'Please enter a valid phone number',
+    logout: 'Logout',
   },
   hero: {
-    title: 'Manage your sprint retrospectives with',
-    subtitle: 'Maximize your team\'s potential with efficient sprint retrospectives using a simple and intuitive tool.',
+    title: 'Visualize Your Workflow with',
+    subtitle: 'The most intuitive Kanban board tool to help teams visualize work, limit work-in-progress, and maximize efficiency.',
     getStarted: 'Get Started',
     watchDemo: 'Watch Demo',
-    subtitle_footer: 'Is a web modern board, open-source application for sprint retrospective based in columns and cards.',
+    subtitle_footer: 'Is a web modern board, open-source application based in columns and cards.',
   },
   features: {
     title: "Features that make your workflow smoother",
@@ -108,9 +111,15 @@ export default {
     subtitle: 'Trusted by thousands of teams worldwide'
   },
   cta: {
-    title: 'The success of the next sprint starts with an effective retrospective.',
+    title: 'Ready to transform your workflow?',
     subtitle: 'Identify challenges, align expectations and constantly evolve.',
     button: 'Get Started for Free'
+  },
+  cookies: {
+    message: 'We use cookies to enhance your experience. By continuing to visit this site, you agree to our use of cookies.',
+    privacyPolicy: 'Privacy Policy',
+    accept: 'Accept',
+    reject: 'Reject'
   },
   board: {
     title: 'Kanban Board',
@@ -152,6 +161,11 @@ export default {
       link1: "My Boards",
       link2: "New Board"
     },
+    terms: {
+      title: 'Terms',
+      link1: 'Privacy Policy',
+      link2: 'Terms of Use',
+    },
     account: {
       title: "Account",
       link1: "Login",
@@ -159,13 +173,106 @@ export default {
     },
     status: {
       title: "Status/Help",
-      link1: "Having an issue?",
-      link2: "API Status"
+      link1: "API Status",
+      link2: "Having an issue?"
     },
-    "copyright": "© 2025 Open Sprint Retro.",
+    "copyright": "© 2025 KanbanFlex.",
   },
   language: {
     en: 'English',
     'pt-BR': 'Português (BR)'
-  }
+  },
+  templates: {
+    name: 'Template',
+    chooseStart: 'Choose how to start',
+    blankBoard: {
+      title: 'Start from Scratch',
+      description: 'Create a blank board and customize it to your needs'
+    },
+    useTemplate: {
+      title: 'Use a Template',
+      description: 'Choose from our pre-built templates to get started quickly'
+    },
+    popularTemplates: 'Popular Templates',
+    types: {
+      blankBoard: {
+        name: 'Board Title',
+        description: 'Board empty'
+      },
+      sprintRetrospective: {
+        name: 'Sprint Retrospective',
+        description: 'Plan and execute sprint retrospectives',
+        columns: {
+          first: 'What went well',
+          second: 'To improve',
+          third: 'Action Items / To do next',
+        }
+      },
+      projectManagement: {
+        name: 'Project Management',
+        description: 'Track tasks, milestones, and team progress',
+        columns: {
+          first: 'Backlog',
+          second: 'To Do',
+          third: 'In Progress',
+          fourth: 'Review',
+          fifth: 'Done',
+        }
+      },
+      developmentSprint: {
+        name: 'Development Sprint',
+        description: 'Manage software development sprints',
+        columns: {
+          first: 'Sprint Backlog',
+          second: 'In Development',
+          third: 'Code Review',
+          fourth: 'QA Testing',
+          fifth: 'Done',
+        }
+      },
+      okrTracking: {
+        name: 'OKR Tracking',
+        description: 'Track objectives and key results',
+        columns: {
+          first: 'Objectives',
+          second: 'Key Results',
+          third: 'Initiatives',
+          fourth: 'Completed',
+        }
+      },
+      contentCalendar: {
+        name: 'Content Calendar',
+        description: 'Plan and schedule content creation',
+        columns: {
+          first: 'Content Ideas',
+          second: 'Writing',
+          third: 'Editing',
+          fourth: 'Review',
+          fifth: 'Published',
+        }
+      },
+      bugTracking: {
+        name: 'Bug Tracking',
+        description: 'Track and manage software issues',
+        columns: {
+          first: 'Reported',
+          second: 'To Reproduce',
+          third: 'In Progress',
+          fourth: 'Testing',
+          fifth: 'Fixed',
+        }
+      },
+      productLaunch: {
+        name: 'Product Launch',
+        description: 'Plan and execute product launches',
+        columns: {
+          first: 'Planning',
+          second: 'In Progress',
+          third: 'Review',
+          fourth: 'Approved',
+          fifth: 'Launched',
+        }
+      }
+    }
+  },
 };

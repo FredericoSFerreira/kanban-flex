@@ -6,7 +6,7 @@
           <div class="card border-0 shadow-sm">
             <div class="card-body p-4 p-md-5">
               <div class="text-center mb-4">
-                <Trello class="text-primary" size="48" />
+                <Trello class="text-primary" size="48"/>
                 <h2 class="h3 mt-3 mb-4">{{ $t('auth.welcomeBack') }}</h2>
               </div>
 
@@ -34,6 +34,12 @@
                   >
                     {{ $t('auth.continue') }}
                   </button>
+
+                  <div class="text-center mt-3" v-if="showSpinner">
+                    <div class="spinner-border" role="status">
+                      <span class="visually-hidden">Loading...</span>
+                    </div>
+                  </div>
                 </form>
 
                 <div class="text-center mt-4">
@@ -75,6 +81,13 @@
                     >
                       {{ $t('auth.verify') }}
                     </button>
+
+                    <div class="text-center mt-3" v-if="showSpinner">
+                      <div class="spinner-border" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                      </div>
+                    </div>
+
                     <button
                       type="button"
                       class="btn btn-link text-decoration-none"
@@ -91,7 +104,7 @@
                     class="btn btn-link text-decoration-none p-0"
                     @click="step = 1"
                   >
-                    <ArrowLeft size="16" class="me-1" />
+                    <ArrowLeft size="16" class="me-1"/>
                     {{ $t('auth.changeEmail') }}
                   </button>
                 </div>
@@ -105,16 +118,35 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
-import { useI18n } from 'vue-i18n';
-import { Trello, ArrowLeft } from 'lucide-vue-next';
+import {ref, computed} from 'vue';
+import {useI18n} from 'vue-i18n';
+import {Trello, ArrowLeft} from 'lucide-vue-next';
+import api from "@/utils/api";
+import {useSwal} from "@/utils/swal";
+import {useAuthStore} from '@/stores/auth'
+import {jwtDecode} from 'jwt-decode';
+import {useRoute, useRouter} from "vue-router";
 
-const { t } = useI18n();
+
+type JwtPayload = {
+  id: string
+  name: string
+  email: string
+  exp: number
+}
+
+const {t} = useI18n();
+const Swal = useSwal();
 const step = ref(1);
 const email = ref('');
+const showSpinner = ref(false);
 const otpDigits = ref(Array(6).fill(''));
 const resendTimer = ref(0);
 const otpInputs = ref<HTMLInputElement[]>([]);
+const auth = useAuthStore()
+const router = useRouter()
+const route = useRoute()
+
 
 const isValidEmail = computed(() => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -127,19 +159,70 @@ const isValidOTP = computed(() => {
 
 const requestOTP = () => {
   if (!isValidEmail.value) return;
-  step.value = 2;
-  startResendTimer();
+  showSpinner.value = true;
+  api.post('/send-otp', {email: email.value})
+    .then((response) => {
+      console.log(response);
+      step.value = 2;
+      startResendTimer();
+      showSpinner.value = false;
+    })
+    .catch((error: any) => {
+      showSpinner.value = false;
+      if (error.response.status === 404) {
+        return Swal.fire({
+          icon: "info",
+          title: "Oops...",
+          text: "Email não cadastrado. Realize o cadastro para continuar.",
+        }).then(() =>{
+          router.push('/register')
+        })
+      }
+      return Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Ocorreu um erro ao enviar o código de autorização. Tente novamente.",
+      })
+    })
 };
 
 const verifyOTP = () => {
   if (!isValidOTP.value) return;
   const otp = otpDigits.value.join('');
-  console.log('Verifying OTP:', otp);
+  showSpinner.value = true;
+  api.post('/check-otp', {email: email.value, code: otp})
+    .then((response) => {
+      if (response.data.isValid) {
+        // Salvar token e redirecionar
+        const token = response.data.token;
+        localStorage.setItem('token', token);
+        const decoded = jwtDecode<JwtPayload>(token)
+        console.log(decoded, "HERER")
+        auth.login(decoded, token)
+        showSpinner.value = false;
+        const redirectPath = route.query.redirect
+        if (typeof redirectPath === 'string' && redirectPath !== '/login') {
+          router.push(redirectPath)
+        } else {
+          router.push('/my-boards')
+        }
+      }
+    })
+    .catch((error) => {
+      showSpinner.value = false;
+      console.log(error);
+      return Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Código inválido ou expirado. Tente novamente.",
+      });
+    });
 };
 
 const resendOTP = () => {
   if (resendTimer.value > 0) return;
   otpDigits.value = Array(6).fill('');
+  requestOTP()
   startResendTimer();
 };
 

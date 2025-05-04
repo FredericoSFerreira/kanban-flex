@@ -1,10 +1,10 @@
-# # Open sprint Retro [![Netlify Status](https://api.netlify.com/api/v1/badges/08200383-b16d-4391-a914-37fe41309b3c/deploy-status)](https://app.netlify.com/sites/open-sprint-retro/deploys)
+# # KanbanFlex [![Netlify Status](https://api.netlify.com/api/v1/badges/08200383-b16d-4391-a914-37fe41309b3c/deploy-status)](https://app.netlify.com/sites/open-sprint-retro/deploys)
 
 
 
 
 
-[**Open sprint Retro**](https://open-sprint-retro.netlify.app/) is a web modern board, open-source application for sprint retrospective based in columns and cards.
+[**KanbanFlex**](https://kanbanflex.com/) is a web modern board, open-source application for sprint retrospective based in columns and cards.
 
 ---
 
@@ -19,7 +19,7 @@
 
 ## 🚀 Technologies Used
 
-Open sprint Retro is built using cutting-edge technologies to ensure both performance and developer productivity:
+KanbanFlex is built using cutting-edge technologies to ensure both performance and developer productivity:
 
 <div align="center">
   <img src="https://skillicons.dev/icons?i=nodejs,html,css,vuejs,typescript,mongodb">

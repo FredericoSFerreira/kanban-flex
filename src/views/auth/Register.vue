@@ -6,7 +6,7 @@
           <div class="card border-0 shadow-sm">
             <div class="card-body p-4 p-md-5">
               <div class="text-center mb-4">
-                <Trello class="text-primary" size="48" />
+                <Trello class="text-primary" size="48"/>
                 <h2 class="h3 mt-3">{{ $t('auth.createAccount') }}</h2>
                 <p class="text-muted">{{ $t('auth.startJourney') }}</p>
               </div>
@@ -38,6 +38,23 @@
                     <label for="email">{{ $t('auth.email') }}</label>
                   </div>
 
+                  <div class="form-floating mb-3">
+                    <vue-tel-input
+                      v-model="phone"
+                      :inputOptions="{placeholder: $t('auth.phone')}"
+                      mode="auto"
+                      :valid-characters-only="true"
+                      :enable-area-codes="true"
+                      :default-country="defaultCountry"
+                      :preferred-countries="['BR', 'US']"
+                      :input-classes="['form-control', 'form-control-lg']"
+                      @validate="validatePhone"
+                    ></vue-tel-input>
+
+                    <div v-if="!isPhoneValid && phone" class="text-danger small mt-1">
+                      {{ $t('auth.invalidPhone') }}
+                    </div>
+                  </div>
                   <button
                     type="submit"
                     class="btn btn-primary w-100 py-2"
@@ -54,6 +71,12 @@
                       {{ $t('auth.signIn') }}
                     </router-link>
                   </p>
+                </div>
+
+                <div class="text-center mt-3" v-if="showSpinner">
+                  <div class="spinner-border" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                  </div>
                 </div>
               </div>
 
@@ -102,7 +125,7 @@
                     class="btn btn-link text-decoration-none p-0"
                     @click="step = 1"
                   >
-                    <ArrowLeft size="16" class="me-1" />
+                    <ArrowLeft size="16" class="me-1"/>
                     {{ $t('auth.changeEmail') }}
                   </button>
                 </div>
@@ -116,17 +139,27 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
-import { useI18n } from 'vue-i18n';
-import { Trello, ArrowLeft } from 'lucide-vue-next';
+import {ref, computed} from 'vue';
+import {useI18n} from 'vue-i18n';
+import {Trello, ArrowLeft} from 'lucide-vue-next';
+import {VueTelInput} from 'vue-tel-input';
+import 'vue-tel-input/vue-tel-input.css';
+import api from "@/utils/api";
+import {useSwal} from "@/utils/swal";
+import {useRouter} from "vue-router";
 
-const { t } = useI18n();
+const router = useRouter()
+const {t, locale} = useI18n();
 const step = ref(1);
 const name = ref('');
 const email = ref('');
 const otpDigits = ref(Array(6).fill(''));
 const resendTimer = ref(0);
 const otpInputs = ref<HTMLInputElement[]>([]);
+const phone = ref(null);
+const isPhoneValid = ref(false);
+const showSpinner = ref(false);
+const Swal = useSwal();
 
 const isValidEmail = computed(() => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -134,17 +167,47 @@ const isValidEmail = computed(() => {
 });
 
 const isValidForm = computed(() => {
-  return name.value.trim().length >= 2 && isValidEmail.value;
+  return name.value.trim().length >= 2 && isValidEmail.value && isPhoneValid.value;
 });
 
 const isValidOTP = computed(() => {
   return otpDigits.value.every(digit => digit !== '');
 });
 
+const defaultCountry = computed(() => {
+  return locale.value === 'pt-BR' ? 'BR' : 'US';
+});
+
 const requestOTP = () => {
   if (!isValidForm.value) return;
-  step.value = 2;
-  startResendTimer();
+  showSpinner.value = true;
+  api.post('/register', {email: email.value, name: name.value, phone: phone.value})
+    .then((response) => {
+      console.log(response);
+      step.value = 2;
+      startResendTimer();
+      showSpinner.value = false;
+    })
+    .catch((error) => {
+      showSpinner.value = false;
+      console.log(error)
+
+      if (error.response.status === 409) {
+        return Swal.fire({
+          icon: "info",
+          title: "Oops...",
+          text: t('auth.alreadyHaveAccount'),
+        }).then(() => {
+          router.push('/login')
+        })
+      }
+
+      return Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Ocorreu um erro ao enviar o código de autorização. Tente novamente.",
+      })
+    })
 };
 
 const verifyOTP = () => {
@@ -204,6 +267,10 @@ const handleOtpPaste = (event: ClipboardEvent) => {
     }
   });
 };
+
+const validatePhone = ({valid}: { valid: boolean }) => {
+  isPhoneValid.value = valid;
+};
 </script>
 
 <style scoped>
@@ -227,4 +294,28 @@ const handleOtpPaste = (event: ClipboardEvent) => {
     height: 2.5rem;
   }
 }
+
+
+/* Vue Tel Input customization */
+:deep(.vti__input) {
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  font-size: 1rem;
+  padding: 1rem 0.75rem;
+}
+
+:deep(.vti__dropdown) {
+  background: transparent;
+  border: none;
+  border-radius: 0;
+}
+
+:deep(.vti__dropdown-list) {
+  background: var(--bs-body-bg);
+  border: 1px solid var(--bs-border-color);
+  border-radius: 0.375rem;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
 </style>
