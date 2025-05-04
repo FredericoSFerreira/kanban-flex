@@ -50,6 +50,7 @@ export default {
     verificationSuccess: 'Verification successful',
     phone: 'Phone number',
     invalidPhone: 'Please enter a valid phone number',
+    logout: 'Logout',
   },
   hero: {
     title: 'Manage your sprint retrospectives with',
@@ -182,6 +183,7 @@ export default {
     'pt-BR': 'Português (BR)'
   },
   templates: {
+    name: 'Template',
     chooseStart: 'Choose how to start',
     blankBoard: {
       title: 'Start from Scratch',
@@ -193,33 +195,83 @@ export default {
     },
     popularTemplates: 'Popular Templates',
     types: {
+      blankBoard: {
+        name: 'Board Title',
+        description: 'Board empty'
+      },
       sprintRetrospective: {
         name: 'Sprint Retrospective',
-        description: 'Plan and execute sprint retrospectives'
+        description: 'Plan and execute sprint retrospectives',
+        columns: {
+          first: 'What went well',
+          second: 'To improve',
+          third: 'Action Items / To do next',
+        }
       },
       projectManagement: {
         name: 'Project Management',
-        description: 'Track tasks, milestones, and team progress'
+        description: 'Track tasks, milestones, and team progress',
+        columns: {
+          first: 'Backlog',
+          second: 'To Do',
+          third: 'In Progress',
+          fourth: 'Review',
+          fifth: 'Done',
+        }
       },
       developmentSprint: {
         name: 'Development Sprint',
-        description: 'Manage software development sprints'
+        description: 'Manage software development sprints',
+        columns: {
+          first: 'Sprint Backlog',
+          second: 'In Development',
+          third: 'Code Review',
+          fourth: 'QA Testing',
+          fifth: 'Done',
+        }
       },
       okrTracking: {
         name: 'OKR Tracking',
-        description: 'Track objectives and key results'
+        description: 'Track objectives and key results',
+        columns: {
+          first: 'Objectives',
+          second: 'Key Results',
+          third: 'Initiatives',
+          fourth: 'Completed',
+        }
       },
       contentCalendar: {
         name: 'Content Calendar',
-        description: 'Plan and schedule content creation'
+        description: 'Plan and schedule content creation',
+        columns: {
+          first: 'Content Ideas',
+          second: 'Writing',
+          third: 'Editing',
+          fourth: 'Review',
+          fifth: 'Published',
+        }
       },
       bugTracking: {
         name: 'Bug Tracking',
-        description: 'Track and manage software issues'
+        description: 'Track and manage software issues',
+        columns: {
+          first: 'Reported',
+          second: 'To Reproduce',
+          third: 'In Progress',
+          fourth: 'Testing',
+          fifth: 'Fixed',
+        }
       },
       productLaunch: {
         name: 'Product Launch',
-        description: 'Plan and execute product launches'
+        description: 'Plan and execute product launches',
+        columns: {
+          first: 'Planning',
+          second: 'In Progress',
+          third: 'Review',
+          fourth: 'Approved',
+          fifth: 'Launched',
+        }
       }
     }
   },

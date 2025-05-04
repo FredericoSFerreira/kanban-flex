@@ -50,6 +50,7 @@ export default {
     verificationSuccess: 'Verificação bem-sucedida',
     phone: 'Número de telefone',
     invalidPhone: 'Por favor, insira um número de telefone válido',
+    logout: 'Sair',
   },
   hero: {
     title: 'Gerencie as retrospectivas de suas sprints com o',
@@ -182,6 +183,7 @@ export default {
     'pt-BR': 'Português'
   },
   templates: {
+    name: 'Modelo',
     chooseStart: 'Escolha como começar',
     blankBoard: {
       title: 'Começar do Zero',
@@ -193,33 +195,83 @@ export default {
     },
     popularTemplates: 'Modelos Populares',
     types: {
+      blankBoard: {
+        name: 'Titulo do Board',
+        description: 'Board em branco'
+      },
       sprintRetrospective: {
         name: 'Retrospectiva de Sprint',
-        description: 'Planeje e execute retrospectivas de sprint'
+        description: 'Planeje e execute retrospectivas de sprint',
+        columns: {
+          first: 'O que foi bem',
+          second: 'O que não foi tão bem',
+          third: 'Ações de melhoria / Faça um Elogio',
+        }
       },
       projectManagement: {
         name: 'Gestão de Projetos',
-        description: 'Acompanhe tarefas, marcos e progresso da equipe'
+        description: 'Acompanhe tarefas, marcos e progresso da equipe',
+        columns: {
+          first: 'Backlog',
+          second: 'A Fazer',
+          third: 'Em Andamento',
+          fourth: 'Revisão',
+          fifth: 'Concluído',
+        }
       },
       developmentSprint: {
         name: 'Sprint de Desenvolvimento',
-        description: 'Gerencie sprints de desenvolvimento de software'
+        description: 'Gerencie sprints de desenvolvimento de software',
+        columns: {
+          first: 'Backlog da Sprint',
+          second: 'Em Desenvolvimento',
+          third: 'Revisão de Código',
+          fourth: 'Teste de QA',
+          fifth: 'Concluído',
+        }
       },
       okrTracking: {
         name: 'Acompanhamento de OKRs',
-        description: 'Acompanhe objetivos e resultados-chave'
+        description: 'Acompanhe objetivos e resultados-chave',
+        columns: {
+          first: 'Objetivos',
+          second: 'Resultados Chave',
+          third: 'Iniciativas',
+          fourth: 'Concluído',
+        }
       },
       contentCalendar: {
         name: 'Calendário de Conteúdo',
-        description: 'Planeje e agende a criação de conteúdo'
+        description: 'Planeje e agende a criação de conteúdo',
+        columns: {
+          first: 'Ideias de Conteúdo',
+          second: 'Escrevendo',
+          third: 'Editando',
+          fourth: 'Revisando',
+          fifth: 'Publicado',
+        }
       },
       bugTracking: {
         name: 'Rastreamento de Bugs',
-        description: 'Acompanhe e gerencie problemas de software'
+        description: 'Acompanhe e gerencie problemas de software',
+        columns: {
+          first: 'Reportado',
+          second: 'Reproduzir',
+          third: 'Em Andamento',
+          fourth: 'Testando',
+          fifth: 'Corrigido',
+        }
       },
       productLaunch: {
         name: 'Lançamento de Produto',
-        description: 'Planeje e execute lançamentos de produtos'
+        description: 'Planeje e execute lançamentos de produtos',
+        columns: {
+          first: 'Planejamento',
+          second: 'Em Andamento',
+          third: 'Revisão',
+          fourth: 'Aprovado',
+          fifth: 'Lançado',
+        }
       }
     }
   },

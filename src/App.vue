@@ -63,8 +63,8 @@
               :class="isDarkMode ? 'text-light' : 'text-dark'"
               @click="toggleTheme"
             >
-              <Sun v-if="isDarkMode" size="20"/>
-              <Moon v-else size="20"/>
+              <Sun v-if="isDarkMode" :size="20"/>
+              <Moon v-else :size="20"/>
             </button>
             <router-link v-if="!auth.isAuthenticated" to="/login" class="btn btn-link text-decoration-none me-3"
                          :class="isDarkMode ? 'text-light' : 'text-dark'">{{ $t('nav.login') }}
@@ -83,7 +83,7 @@
                 aria-expanded="false"
                 ref="languageDropdownBtn"
               >
-                {{ auth.user.name }}
+                {{ getFirstAndLastName() }}
               </button>
               <ul class="dropdown-menu" aria-labelledby="languageDropdown">
                 <li >
@@ -91,7 +91,7 @@
                     class="dropdown-item"
                     @click="auth.logout()"
                   >
-                    Sair
+                    {{ $t('auth.logout') }}
                   </button>
                 </li>
               </ul>
@@ -261,6 +261,17 @@ const footerColumns = [
     ]
   },
 ];
+
+
+const getFirstAndLastName = (): string  => {
+  const parts = auth.user?.name?.trim().split(/\s+/) || '';
+  if (parts.length === 1) {
+    return parts[0];
+  }
+  const first = parts[0];
+  const last = parts[parts.length - 1];
+  return `${first} ${last}`;
+}
 </script>
 
 <style>

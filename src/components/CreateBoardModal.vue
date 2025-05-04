@@ -56,15 +56,8 @@
 <script setup lang="ts">
 import {ref, onMounted} from 'vue';
 import {
-  Briefcase,
-  Calendar,
-  ClipboardList,
-  Code,
   Layout,
-  Rocket,
-  Target,
   BookTemplate as FileTemplate,
-  SquareKanban
 } from "lucide-vue-next";
 import {Modal} from 'bootstrap';
 import {useRouter} from "vue-router";
@@ -72,6 +65,7 @@ import Parse from 'parse/dist/parse.min.js';
 import {useAuthStore} from '@/stores/auth'
 import {useSwal} from "@/utils/swal";
 import {useI18n} from "vue-i18n";
+import {getTemplate, getTemplates} from "@/utils/templates";
 
 Parse.initialize(import.meta.env.VITE_PARSE_APP_ID);
 Parse.serverURL = import.meta.env.VITE_BACKEND_URL
@@ -85,43 +79,7 @@ const showingTemplates = ref(false);
 const router = useRouter()
 const Boards = Parse.Object.extend("boards");
 const board = new Boards();
-const templates = ref([
-  {
-    id: 1,
-    type: 'projectManagement',
-    icon: Briefcase
-  },
-  {
-    id: 2,
-    type: 'developmentSprint',
-    icon: Code
-  },
-  {
-    id: 3,
-    type: 'okrTracking',
-    icon: Target
-  },
-  {
-    id: 4,
-    type: 'contentCalendar',
-    icon: Calendar
-  },
-  {
-    id: 5,
-    type: 'bugTracking',
-    icon: ClipboardList
-  },
-  {
-    id: 6,
-    type: 'productLaunch',
-    icon: Rocket
-  },
-  {
-    id: 11,
-    type: 'sprintRetrospective',
-    icon: SquareKanban
-  },
-])
+const templates = getTemplates()
 
 onMounted(() => {
 });
@@ -147,18 +105,7 @@ const hideTemplateModal = () => {
 
 const createBoard = (type: 'blank' | 'template', template?: any) => {
 
-  const query = template ? {template: template.id} : undefined;
-
-  console.log(query)
-  board.save({
-    name: 'this.boardName',
-    owner: auth.user?.name,
-    visibility: true,
-    owner_id: auth.user?.id,
-    owner_email: auth.user?.email,
-    slug: 'this.boardName'.replace(" ", "-").toLowerCase().trim(),
-    columns: []
-  })
+  board.save(getTemplate(type === 'blank' ? 0 : template.id))
     .then(async (boardDatabase: any) => {
 
       templateModalInstance?.hide();
@@ -185,7 +132,6 @@ const createBoard = (type: 'blank' | 'template', template?: any) => {
       })
     })
 
-  // router.push({path: '/board', query});
 };
 
 const showTemplates = () => {
