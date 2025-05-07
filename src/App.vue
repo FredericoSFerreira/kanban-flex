@@ -17,7 +17,7 @@
               <router-link class="nav-link" to="/">{{ $t('nav.home') }}</router-link>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/my-boards">{{ $t('nav.myBoards') }}</a>
+              <router-link class="nav-link" to="/my-boards">{{ $t('nav.myBoards') }}</router-link>
             </li>
             <li class="nav-item">
               <a class="nav-link" @click.prevent="navigateToSection('features')" href="#features">{{

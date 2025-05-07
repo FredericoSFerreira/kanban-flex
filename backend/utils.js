@@ -9,7 +9,7 @@ function generateOtp() {
 async function generateToken(payload) {
   return await new SignJWT(payload)
     .setProtectedHeader({alg: 'HS256'})
-    .setExpirationTime('72h')
+    .setExpirationTime('720h')
     .sign(SECRET_KEY);
 }
 
