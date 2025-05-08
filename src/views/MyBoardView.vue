@@ -1,14 +1,20 @@
 <template>
   <div class="container py-5" style="padding-bottom: 10rem !important;">
-    <div class="d-flex justify-content-between align-items-center mb-4"  v-if="boards.length > 0">
+    <div class="d-flex justify-content-between align-items-center mb-4" v-if="boards.length > 0">
       <h1 class="h2 mb-0">{{ $t('myBoards.title') }}</h1>
       <button class="btn btn-primary" @click="openCreateBoardModal()">
         {{ $t('myBoards.createBoard') }}
       </button>
     </div>
 
+    <div class="text-center py-5" v-if="showSpinner">
+      <div class="spinner-border" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+
     <!-- Empty State -->
-    <div v-if="boards.length === 0" class="text-center py-5">
+    <div v-if="boards.length === 0 && !showSpinner" class="text-center py-5">
       <Layout :size=70 class="text-primary mb-3"/>
       <h2 class="h3 mb-4">{{ $t('myBoards.emptyState.title') }}</h2>
       <p class="text-muted mb-5">{{ $t('myBoards.emptyState.description') }}</p>
@@ -64,15 +70,15 @@
     </div>
   </div>
 
-   <CreateBoardModal ref="createBoardModalComponent" ></CreateBoardModal>
+  <CreateBoardModal ref="createBoardModalComponent"></CreateBoardModal>
 
 </template>
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import {ref, onMounted} from 'vue';
 import Parse from 'parse/dist/parse.min.js';
-import { Layout, MoreVertical, Eye, Trash2, Calendar, Users } from 'lucide-vue-next';
+import {Layout, MoreVertical, Eye, Trash2, Calendar, Users} from 'lucide-vue-next';
 import api from "@/utils/api";
-import { useSwal } from "@/utils/swal";
+import {useSwal} from "@/utils/swal";
 import CreateBoardModal from "@/components/CreateBoardModal.vue";
 
 Parse.initialize(import.meta.env.VITE_PARSE_APP_ID);
@@ -82,6 +88,7 @@ const query = new Parse.Query(Boards);
 const Swal = useSwal();
 
 const boards = ref([]);
+const showSpinner = ref(false);
 
 const createBoardModalComponent = ref(null);
 
@@ -118,12 +125,15 @@ const removeBoard = async (idBoard: string) => {
 
 const getBoards = async () => {
   try {
+    showSpinner.value = true;
     api.get('/my-boards')
       .then((response) => {
         console.log(response);
         boards.value = response.data.map((b: any) => ({'id': b.objectId, ...b}));
+        showSpinner.value = false;
       })
       .catch((error) => {
+        showSpinner.value = false;
         console.log(error);
         return Swal.fire({
           icon: "error",

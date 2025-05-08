@@ -1,28 +1,16 @@
 <template>
 
-
-  <!-- Conteúdo Principal -->
   <div class="content">
-    <!-- Ícone acima do título -->
     <i class="bi bi-wrench-adjustable icon-logo"></i>
     <h1>404</h1>
-    <p class="mt-3 mb-4">Board ou página não encontrada.</p>
-     <a href="/" class="btn btn-primary btn-lg">Voltar</a>
+    <p class="mt-3 mb-4">{{ $t('error.notFound') }}</p>
+     <a href="/" class="btn btn-primary btn-lg">{{ $t('error.back') }}</a>
   </div>
 
-
 </template>
-<script>
-export default {
-  data() {
-    return {
-    }
-  },
-  methods: {
-  },
-  mounted() {
-  }
-}
+<script setup>
+import { useI18n } from 'vue-i18n';
+const { t } = useI18n();
 </script>
 <style scoped>
     .content {

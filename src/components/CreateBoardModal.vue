@@ -117,7 +117,7 @@ const createBoard = (type: 'blank' | 'template', template?: any) => {
 
       Swal.fire({
         icon: "success",
-        title: "Board criado com sucesso!",
+        title: t('createBoard.success'),
         showConfirmButton: true,
       }).then(() => {
         router.push(`/board/${boardDatabase.id}`)
@@ -127,8 +127,8 @@ const createBoard = (type: 'blank' | 'template', template?: any) => {
       console.log('Failed to create new object, with error code: ' + error.message)
       return Swal.fire({
         icon: "error",
-        title: "Oops...",
-        text: "Ocorreu um erro ao criar o board!",
+        title: t('createBoard.error.title'),
+        text: t('createBoard.error.message'),
       })
     })
 

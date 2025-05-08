@@ -45,7 +45,8 @@
                 <div class="text-center mt-4">
                   <p class="text-muted">
                     {{ $t('auth.newUser') }}
-                    <router-link to="/register" class="text-decoration-none">
+                    <router-link :to="route.query.redirect ? `/register?redirect=${route.query.redirect}`: '/register'"
+                                 class="text-decoration-none">
                       {{ $t('auth.signUp') }}
                     </router-link>
                   </p>
@@ -176,7 +177,7 @@ const requestOTP = () => {
           title: "Oops...",
           text: "Email não cadastrado. Realize o cadastro para continuar.",
         }).then(() => {
-          router.push('/register')
+          router.push(route.query.redirect ? `/register?redirect=${route.query.redirect}` : '/register')
         })
       }
       return Swal.fire({
@@ -195,11 +196,16 @@ const verifyOTP = async () => {
   api.post('/check-otp', {email: email.value, code: otp})
     .then(async (response) => {
       if (response.data.isValid) {
-        // Salvar token e redirecionar
         const token = response.data.token;
         localStorage.setItem('token', token);
         const decoded = jwtDecode<JwtPayload>(token)
         auth.login(decoded, token)
+        // Remove in future due deprecated used only by board v1
+        localStorage.setItem("user", JSON.stringify({
+          'name': auth.user?.name,
+          'id': auth.user?.id,
+          'email': auth.user?.email
+        }))
         await sleep()
         showSpinner.value = false;
         const redirectPath = route.query.redirect
