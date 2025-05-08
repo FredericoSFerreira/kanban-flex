@@ -1,8 +1,9 @@
 import {createRouter, createWebHistory} from 'vue-router'
 import {useAuthStore} from '@/stores/auth'
-import HomeView from '../views/HomeView.vue'
-import BoardView from '../views/BoardView.vue'
-import ErrorView from '../views/ErrorView.vue'
+import HomeView from '@/views/HomeView.vue'
+import BoardView from '@/views/BoardView.vue'
+import BoardV2View from "@/views/BoardV2View.vue";
+import ErrorView from '@/views/ErrorView.vue'
 import MyBoardView from "@/views/MyBoardView.vue";
 import Login from "@/views/auth/Login.vue"
 import Register from "@/views/auth/Register.vue"
@@ -19,6 +20,12 @@ const router = createRouter({
     },
     {
       path: '/board/:id',
+      name: 'boardV2',
+      component: BoardV2View,
+      meta: {requiresAuth: true}
+    },
+    {
+      path: '/boardV1/:id',
       name: 'board',
       component: BoardView,
     },

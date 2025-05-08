@@ -1,15 +1,15 @@
 import {Briefcase, Calendar, ClipboardList, Code, Rocket, SquareKanban, Target} from "lucide-vue-next";
 import {useAuthStore} from '@/stores/auth'
-import uniqueId from "@/utils/uuid.js";
+import {uniqueId} from "@/utils/uuid";
 import {i18n} from '@/i18n/index'
 
 const {t} = i18n.global
 
 
-const configDefault = {
+export const configDefault = {
   showLike: false,
   showVisibility: false,
-  showAuthorCard: false,
+  showAuthorCard: true,
   showTitle: true,
   showDescription: true,
   showTags: true,
@@ -242,7 +242,7 @@ export function getTemplates(): Array<Template> {
       type: 'sprintRetrospective',
       icon: SquareKanban,
       title: `${t('templates.name')} - ${t('templates.types.sprintRetrospective.name')}`,
-      config: {...configDefault, showLike: true, showVisibility: true, showAuthorCard: true},
+      config: {...configDefault, showLike: true, showVisibility: true, showTitle: false},
       columns: [
         {
           id: uniqueId(),
@@ -268,6 +268,8 @@ export function getTemplates(): Array<Template> {
 export function getTemplate(id: number): object {
   const auth = useAuthStore()
   const template: Template | undefined = id === 0 ? getTemplateBlank() : getTemplates().find(template => template.id === id)
+
+  console.log(template, "HERER")
   return {
     name: template?.title,
     owner: auth.user?.name,

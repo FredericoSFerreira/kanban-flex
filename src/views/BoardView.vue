@@ -298,7 +298,7 @@
 <script>
 import {Modal} from 'bootstrap';
 import Parse from 'parse/dist/parse.min.js';
-import uniqueId from "@/utils/uuid.js";
+import {uniqueId} from "@/utils/uuid";
 import {validateEmail} from "@/utils/validate.js";
 import EmojiPicker from 'vue3-emoji-picker'
 import 'vue3-emoji-picker/css'

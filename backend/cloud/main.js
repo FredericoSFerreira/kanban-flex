@@ -1,6 +1,384 @@
 import {UAParser} from 'ua-parser-js';
 
 
+// Board operations Cloud Functions
+Parse.Cloud.define("updateCardPosition", async (request) => {
+
+  try {
+    const { boardId, columnId, items } = request.params;
+    const queryBoard = new Parse.Query("boards");
+    queryBoard.equalTo('objectId', boardId);
+
+    const board = await queryBoard.first();
+    if (!board) {
+      throw new Error("Board not found");
+    }
+
+    const columns = board.get('columns');
+    const [column, columnIndex] = findColumn(columns, columnId);
+
+    if (!column) {
+      throw new Error("Column not found");
+    }
+
+    // Update the items array for this specific column
+    board.set(`columns.${columnIndex}.itens`, items);
+
+    const result = await board.save(null, { useMasterKey: true });
+    return { success: true, result };
+  } catch (error) {
+    console.error("Error in updateCardPosition:", error);
+    throw error;
+  }
+});
+
+Parse.Cloud.define("moveCardBetweenColumns", async (request) => {
+  try {
+    const { boardId, sourceColumnId, targetColumnId, cardId } = request.params;
+    const queryBoard = new Parse.Query("boards");
+    queryBoard.equalTo('objectId', boardId);
+
+    const board = await queryBoard.first();
+    if (!board) {
+      throw new Error("Board not found");
+    }
+
+    const columns = board.get('columns');
+    const [sourceColumn, sourceColumnIndex] = findColumn(columns, sourceColumnId);
+    const [targetColumn, targetColumnIndex] = findColumn(columns, targetColumnId);
+
+    if (!sourceColumn || !targetColumn) {
+      throw new Error("Column not found");
+    }
+
+    const [card, cardIndex] = findCard(sourceColumn, cardId);
+    if (!card) {
+      throw new Error("Card not found");
+    }
+
+    // Remove card from source column
+    sourceColumn.itens.splice(cardIndex, 1);
+
+    // Add card to target column
+    targetColumn.itens.push(card);
+
+    // Update both columns
+    board.set(`columns.${sourceColumnIndex}.itens`, sourceColumn.itens);
+    board.set(`columns.${targetColumnIndex}.itens`, targetColumn.itens);
+
+    const result = await board.save(null, { useMasterKey: true });
+    return { success: true, result };
+  } catch (error) {
+    console.error("Error in moveCardBetweenColumns:", error);
+    throw error;
+  }
+});
+
+Parse.Cloud.define("updateColumnPosition", async (request) => {
+  try {
+    const { boardId, columns } = request.params;
+    const queryBoard = new Parse.Query("boards");
+    queryBoard.equalTo('objectId', boardId);
+
+    const board = await queryBoard.first();
+    if (!board) {
+      throw new Error("Board not found");
+    }
+
+    // Update the columns array
+    board.set('columns', columns);
+
+    const result = await board.save(null, { useMasterKey: true });
+    return { success: true, result };
+  } catch (error) {
+    console.error("Error in updateColumnPosition:", error);
+    throw error;
+  }
+});
+
+Parse.Cloud.define("addCard", async (request) => {
+  try {
+    const { boardId, columnId, card } = request.params;
+    const queryBoard = new Parse.Query("boards");
+    queryBoard.equalTo('objectId', boardId);
+
+    const board = await queryBoard.first();
+    if (!board) {
+      throw new Error("Board not found");
+    }
+
+    const columns = board.get('columns');
+    const [column, columnIndex] = findColumn(columns, columnId);
+
+    if (!column) {
+      throw new Error("Column not found");
+    }
+
+    // Add card to column
+    board.add(`columns.${columnIndex}.itens`, card);
+
+    const result = await board.save(null, { useMasterKey: true });
+    return { success: true, result };
+  } catch (error) {
+    console.error("Error in addCard:", error);
+    throw error;
+  }
+});
+
+Parse.Cloud.define("updateCard", async (request) => {
+  try {
+    const { boardId, columnId, cardId, updates } = request.params;
+    const queryBoard = new Parse.Query("boards");
+    queryBoard.equalTo('objectId', boardId);
+
+    const board = await queryBoard.first();
+    if (!board) {
+      throw new Error("Board not found");
+    }
+
+    const columns = board.get('columns');
+    const [column, columnIndex] = findColumn(columns, columnId);
+
+    if (!column) {
+      throw new Error("Column not found");
+    }
+
+    const [card, cardIndex] = findCard(column, cardId);
+    if (!card) {
+      throw new Error("Card not found");
+    }
+
+    // Update card properties
+    Object.keys(updates).forEach(key => {
+      board.set(`columns.${columnIndex}.itens.${cardIndex}.${key}`, updates[key]);
+    });
+
+    const result = await board.save(null, { useMasterKey: true });
+    return { success: true, result };
+  } catch (error) {
+    console.error("Error in updateCard:", error);
+    throw error;
+  }
+});
+
+Parse.Cloud.define("removeCard", async (request) => {
+  try {
+    const { boardId, columnId, cardId } = request.params;
+    const queryBoard = new Parse.Query("boards");
+    queryBoard.equalTo('objectId', boardId);
+
+    const board = await queryBoard.first();
+    if (!board) {
+      throw new Error("Board not found");
+    }
+
+    const columns = board.get('columns');
+    const [column, columnIndex] = findColumn(columns, columnId);
+
+    if (!column) {
+      throw new Error("Column not found");
+    }
+
+    const [card, cardIndex] = findCard(column, cardId);
+    if (!card) {
+      throw new Error("Card not found");
+    }
+
+    // Remove card from column
+    board.remove(`columns.${columnIndex}.itens`, card);
+
+    const result = await board.save(null, { useMasterKey: true });
+    return { success: true, result };
+  } catch (error) {
+    console.error("Error in removeCard:", error);
+    throw error;
+  }
+});
+
+Parse.Cloud.define("addColumn", async (request) => {
+  try {
+    const { boardId, column } = request.params;
+    const queryBoard = new Parse.Query("boards");
+    queryBoard.equalTo('objectId', boardId);
+
+    const board = await queryBoard.first();
+    if (!board) {
+      throw new Error("Board not found");
+    }
+
+    // Add column to board
+    board.add("columns", column);
+
+    const result = await board.save(null, { useMasterKey: true });
+    return { success: true, result };
+  } catch (error) {
+    console.error("Error in addColumn:", error);
+    throw error;
+  }
+});
+
+Parse.Cloud.define("updateColumn", async (request) => {
+  try {
+    const { boardId, columnId, updates } = request.params;
+    const queryBoard = new Parse.Query("boards");
+    queryBoard.equalTo('objectId', boardId);
+
+    const board = await queryBoard.first();
+    if (!board) {
+      throw new Error("Board not found");
+    }
+
+    const columns = board.get('columns');
+    const [column, columnIndex] = findColumn(columns, columnId);
+
+    if (!column) {
+      throw new Error("Column not found");
+    }
+
+    // Update column properties
+    Object.keys(updates).forEach(key => {
+      board.set(`columns.${columnIndex}.${key}`, updates[key]);
+    });
+
+    const result = await board.save(null, { useMasterKey: true });
+    return { success: true, result };
+  } catch (error) {
+    console.error("Error in updateColumn:", error);
+    throw error;
+  }
+});
+
+Parse.Cloud.define("removeColumn", async (request) => {
+  try {
+    const { boardId, columnId } = request.params;
+    const queryBoard = new Parse.Query("boards");
+    queryBoard.equalTo('objectId', boardId);
+
+    const board = await queryBoard.first();
+    if (!board) {
+      throw new Error("Board not found");
+    }
+
+    const columns = board.get('columns');
+    const [column, columnIndex] = findColumn(columns, columnId);
+
+    if (!column) {
+      throw new Error("Column not found");
+    }
+
+    // Remove column from board
+    board.remove("columns", column);
+
+    const result = await board.save(null, { useMasterKey: true });
+    return { success: true, result };
+  } catch (error) {
+    console.error("Error in removeColumn:", error);
+    throw error;
+  }
+});
+
+Parse.Cloud.define("updateBoardProperties", async (request) => {
+  try {
+    const { boardId, updates } = request.params;
+    const queryBoard = new Parse.Query("boards");
+    queryBoard.equalTo('objectId', boardId);
+
+    const board = await queryBoard.first();
+    if (!board) {
+      throw new Error("Board not found");
+    }
+
+    // Update board properties
+    Object.keys(updates).forEach(key => {
+      board.set(key, updates[key]);
+    });
+
+    const result = await board.save(null, { useMasterKey: true });
+    return { success: true, result };
+  } catch (error) {
+    console.error("Error in updateBoardProperties:", error);
+    throw error;
+  }
+});
+
+Parse.Cloud.define("updateCardVotes", async (request) => {
+  try {
+    const { boardId, columnId, cardId, userId, voteType } = request.params;
+    const queryBoard = new Parse.Query("boards");
+    queryBoard.equalTo('objectId', boardId);
+
+    const board = await queryBoard.first();
+    if (!board) {
+      throw new Error("Board not found");
+    }
+
+    const columns = board.get('columns');
+    const [column, columnIndex] = findColumn(columns, columnId);
+
+    if (!column) {
+      throw new Error("Column not found");
+    }
+
+    const [card, cardIndex] = findCard(column, cardId);
+    if (!card) {
+      throw new Error("Card not found");
+    }
+
+    // Check if user already voted
+    const upVoteUsers = card.up_vote_users || [];
+    const downVoteUsers = card.down_vote_users || [];
+
+    // Toggle vote behavior
+    if (voteType === 'up') {
+      if (upVoteUsers.includes(userId)) {
+        // User already upvoted, so remove the vote
+        board.remove(`columns.${columnIndex}.itens.${cardIndex}.up_vote_users`, userId);
+        board.increment(`columns.${columnIndex}.itens.${cardIndex}.up_vote`, -1);
+      } else {
+        // Add new upvote
+        board.addUnique(`columns.${columnIndex}.itens.${cardIndex}.up_vote_users`, userId);
+        board.increment(`columns.${columnIndex}.itens.${cardIndex}.up_vote`);
+      }
+    } else if (voteType === 'down') {
+      if (downVoteUsers.includes(userId)) {
+        // User already downvoted, so remove the vote
+        board.remove(`columns.${columnIndex}.itens.${cardIndex}.down_vote_users`, userId);
+        board.increment(`columns.${columnIndex}.itens.${cardIndex}.down_vote`, -1);
+      } else {
+        // Add new downvote
+        board.addUnique(`columns.${columnIndex}.itens.${cardIndex}.down_vote_users`, userId);
+        board.increment(`columns.${columnIndex}.itens.${cardIndex}.down_vote`);
+      }
+    }
+
+    const result = await board.save(null, { useMasterKey: true });
+    return { success: true, result };
+  } catch (error) {
+    console.error("Error in updateCardVotes:", error);
+    throw error;
+  }
+});
+
+// Helper functions for board operations
+function findColumn(columns, columnId) {
+  for (const columnIndex in columns) {
+    if (columns[columnIndex].id === columnId) {
+      return [columns[columnIndex], columnIndex];
+    }
+  }
+  return [null, -1];
+}
+
+function findCard(column, cardId) {
+  for (const cardIndex in column.itens) {
+    const cardItem = column.itens[cardIndex];
+    if (cardItem?.id === cardId) {
+      return [cardItem, cardIndex];
+    }
+  }
+  return [null, -1];
+}
+
 async function saveLog(request, user, action = 'login') {
   const accessLog = Parse.Object.extend("accessLog");
   const log = new accessLog();
