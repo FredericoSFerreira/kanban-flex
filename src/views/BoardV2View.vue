@@ -82,7 +82,7 @@
             @dragover.prevent
             @dragenter.prevent
           >
-            <div class="d-flex mb-2 p-2 column-drag-handle">
+            <div class="d-flex p-2 column-drag-handle">
               <GripVertical size="18" class="me-1 text-muted"/>
               <h6 class="column-title me-auto">{{ column.name }}</h6>
               <div>
@@ -245,7 +245,7 @@
                 <label for="exampleInputEmail1" class="form-label">{{ $t('boardV2.description') }}</label>
               </div>
               <div class="col-1">
-                <i class="bi bi-emoji-smile" @click="showEmoji = true"></i>
+                <i class="bi bi-emoji-smile" @click="showEmoji = !showEmoji"></i>
               </div>
             </div>
             <EmojiPicker v-if="showEmoji" offset="10000" :tdext="cardName" class="form-control" :native="false"
@@ -253,7 +253,7 @@
                          :hide-group-names="true" :disable-sticky-group-names="true" :disable-skin-tones="true"
                          :display-recent="true"/>
 
-            <textarea v-if="!showEmoji" rows="5" v-model="cardName" class="form-control" id="exampleInputEmail1"
+            <textarea v-if="!showEmoji" rows="5" v-model="cardName" class="form-control" id="cardName"
                       aria-describedby="emailHelp"></textarea>
           </div>
 
@@ -349,13 +349,13 @@
                 <label for="cardEditDescription" class="form-label">{{ $t('boardV2.description') }}</label>
               </div>
               <div class="col-1">
-                <i class="bi bi-emoji-smile" @click="showEmoji = true"></i>
+                <i class="bi bi-emoji-smile" @click="showEmoji = !showEmoji"></i>
               </div>
             </div>
 
             <EmojiPicker v-if="showEmoji" offset="10000" :tdext="cardEditDescription" class="form-control"
                          :native="false"
-                         @select="onSelectEmoji" pickerType="" :static-texts="{ placeholder: 'Pesquisar emoji...' }"
+                         @select="onSelectEmojiEdit" pickerType="" :static-texts="{ placeholder: 'Pesquisar emoji...' }"
                          :hide-group-names="true" :disable-sticky-group-names="true" :disable-skin-tones="true"
                          :display-recent="true"/>
 
@@ -590,6 +590,11 @@ const orderByOnChange = (event) => {
 
 const onSelectEmoji = (emoji) => {
   cardName.value += emoji.i;
+  showEmoji.value = false;
+};
+
+const onSelectEmojiEdit = (emoji) => {
+  cardEditDescription.value += emoji.i;
   showEmoji.value = false;
 };
 
@@ -1029,10 +1034,6 @@ const saveCard = () => {
       // Revert optimistic update if server update failed
       column.itens.pop(); // Remove the last card (the one we just added)
       toast.error("Falha ao adicionar o card", {
-        position: toast.POSITION.TOP_CENTER,
-      });
-    } else {
-      toast.success("Card adicionado com sucesso!", {
         position: toast.POSITION.TOP_CENTER,
       });
     }
@@ -1528,81 +1529,6 @@ html {
 .kanban-column::-webkit-scrollbar-thumb:hover,
 .card-list::-webkit-scrollbar-thumb:hover {
   background: #a8a8a8;
-}
-
-/* Dark mode styles */
-:deep(.dark-mode) {
-  /* Modal styles */
-
-  .modal-content {
-    background-color: #1e1e1e;
-    color: #ffffff;
-  }
-
-  .modal-header {
-    border-bottom-color: #2d2d2d;
-  }
-
-  .modal-footer {
-    border-top-color: #2d2d2d;
-  }
-
-  .btn-close {
-    filter: invert(1) grayscale(100%) brightness(200%);
-  }
-
-  /* Card styles */
-
-  .kanban-card {
-    background-color: #2d2d2d;
-    color: #ffffff;
-  }
-
-  .kanban-card:hover {
-    background-color: #363636;
-  }
-
-  .text-muted {
-    color: #a0a0a0 !important;
-  }
-
-  .form-control {
-    background-color: #2d2d2d;
-    border-color: #363636;
-    color: #ffffff;
-  }
-
-  .form-control:focus {
-    background-color: #363636;
-    border-color: #4a4a4a;
-    color: #ffffff;
-  }
-
-  .form-control::placeholder {
-    color: #a0a0a0;
-  }
-
-  /* Scrollbar styles for dark mode */
-
-  .kanban-column::-webkit-scrollbar-track,
-  .card-list::-webkit-scrollbar-track {
-    background: #2d2d2d;
-  }
-
-  .kanban-column::-webkit-scrollbar-thumb,
-  .card-list::-webkit-scrollbar-thumb {
-    background: #4a4a4a;
-  }
-
-  .kanban-column::-webkit-scrollbar-thumb:hover,
-  .card-list::-webkit-scrollbar-thumb:hover {
-    background: #5a5a5a;
-  }
-}
-
-.card-description {
-  font-size: medium;
-  font-family: bootstrap-icons;
 }
 
 </style>

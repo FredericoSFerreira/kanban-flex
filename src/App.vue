@@ -69,34 +69,37 @@
             <router-link v-if="!auth.isAuthenticated" to="/login" class="btn btn-link text-decoration-none me-3"
                          :class="isDarkMode ? 'text-light' : 'text-dark'">{{ $t('nav.login') }}
             </router-link>
-            <router-link v-if="!auth.isAuthenticated" to="/register" class="btn btn-primary">{{ $t('nav.signUp') }}</router-link>
+            <router-link v-if="!auth.isAuthenticated" to="/register" class="btn btn-primary">{{
+                $t('nav.signUp')
+              }}
+            </router-link>
 
 
-          <div class="d-flex align-items-center" v-if="auth.isAuthenticated">
-            <div class="dropdown me-3">
-              <button
-                class="btn btn-link text-decoration-none dropdown-toggle"
-                :class="isDarkMode ? 'text-light' : 'text-dark'"
-                type="button"
-                id="languageDropdown"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
-                ref="languageDropdownBtn"
-              >
-                {{ getFirstAndLastName() }}
-              </button>
-              <ul class="dropdown-menu" aria-labelledby="languageDropdown">
-                <li >
-                  <button
-                    class="dropdown-item"
-                    @click="logout()"
-                  >
-                    {{ $t('auth.logout') }}
-                  </button>
-                </li>
-              </ul>
+            <div class="d-flex align-items-center" v-if="auth.isAuthenticated">
+              <div class="dropdown me-3">
+                <button
+                  class="btn btn-link text-decoration-none dropdown-toggle"
+                  :class="isDarkMode ? 'text-light' : 'text-dark'"
+                  type="button"
+                  id="languageDropdown"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                  ref="languageDropdownBtn"
+                >
+                  {{ getFirstAndLastName() }}
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="languageDropdown">
+                  <li>
+                    <button
+                      class="dropdown-item"
+                      @click="logout()"
+                    >
+                      {{ $t('auth.logout') }}
+                    </button>
+                  </li>
+                </ul>
+              </div>
             </div>
-          </div>
           </div>
         </div>
       </div>
@@ -267,7 +270,7 @@ const footerColumns = [
 ];
 
 
-const getFirstAndLastName = (): string  => {
+const getFirstAndLastName = (): string => {
   const parts = auth.user?.name?.trim().split(/\s+/) || '';
   if (parts.length === 1) {
     return parts[0];
@@ -281,34 +284,70 @@ const getFirstAndLastName = (): string  => {
 <style>
 /* Dark mode styles */
 .dark-mode {
-  background-color: #121212;
-  color: #ffffff;
+  background-color: #121212 !important;
+  color: #ffffff !important;
 }
 
 .dark-mode .card {
-  background-color: #1e1e1e;
-  border-color: #2d2d2d;
-  color: #ffffff;
+  background-color: #1e1e1e !important;
+  border-color: #2d2d2d !important;
+  color: #ffffff !important;
 }
 
 .dark-mode .card-header {
-  background-color: #2d2d2d;
-  border-bottom-color: #363636;
+  background-color: #2d2d2d !important;
+  border-bottom-color: #363636 !important;
+  color: #ffffff !important;
+}
+
+/* Kanban board structure styles */
+.dark-mode .kanban-header {
+  background-color: #1e1e1e !important;
   color: #ffffff;
+  border-bottom: 1px solid #2d2d2d;
+}
+
+.dark-mode .kanban-board {
+  background-color: #121212 !important;
+}
+
+.dark-mode .kanban-column {
+  background-color: #1e1e1e !important;
+  border-color: #2d2d2d !important;
+  color: #ffffff !important;
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.15);
+}
+
+/* Comment styles */
+.dark-mode .comment {
+  background-color: #2d2d2d !important;
+  color: #ffffff !important;
+  border: 1px solid #363636 !important;
+}
+
+.dark-mode .comment:hover {
+  background-color: #363636 !important;
 }
 
 .dark-mode .modal-content {
-  background-color: #1e1e1e;
-  color: #ffffff;
+  background-color: #1e1e1e !important;
+  color: #ffffff !important;
 }
 
 .dark-mode .modal-header {
-  border-bottom-color: #2d2d2d;
-  color: #ffffff;
+  border-bottom-color: #2d2d2d !important;
+  color: #ffffff !important;
+}
+.dark-mode input::placeholder {
+  color: white; /* Cor do placeholder */
+}
+
+.dark-mode textarea::placeholder {
+  color: white; /* Cor do placeholder */
 }
 
 .dark-mode .modal-footer {
-  border-top-color: #2d2d2d;
+  border-top-color: #2d2d2d !important;
 }
 
 .dark-mode .form-control {
@@ -329,7 +368,7 @@ const getFirstAndLastName = (): string  => {
 
 .dark-mode .form-floating > .form-control:focus ~ label,
 .dark-mode .form-floating > .form-control:not(:placeholder-shown) ~ label {
-  color: #ffffff;
+  color: #2d2d2d !important;
 }
 
 .dark-mode .form-check-input {
