@@ -164,10 +164,11 @@
                       </div>
 
                       <small :class="{ 'blur-kanban-card': !checkPermission(card.user_id) && !board.visibility}" v-if="boardConfig.showAuthorCard">
-                        <User size="14" class="text-muted me-2"/>
+                        <img :src="card.avatar || userDefault" :alt="card.name" class="rounded-circle" width="25" height="25">
                         {{
                           card.name
-                        }}</small>
+                        }}
+                      </small>
 
                       <div v-if="card.labels && card.labels.length && boardConfig.showTags" class="d-flex flex-wrap gap-1 mt-2"
                            :class="{ 'blur-kanban-card': !checkPermission(card.user_id) && !board.visibility }">
@@ -452,6 +453,7 @@
             </div>
             <div v-else v-for="comment in selectedCard.comments" :key="comment.id" class="comment mb-3">
               <div class="d-flex gap-3">
+                <img v-if="comment.avatar" :src="comment.avatar" :alt="comment.userName" class="rounded-circle" width="32" height="32">
                 <div class="flex-grow-1">
                   <div class="d-flex justify-content-between align-items-start">
                     <h6 class="mb-1">{{ comment.userName }}</h6>
@@ -473,6 +475,7 @@
           </div>
           <div class="add-comment">
             <div class="d-flex gap-3">
+               <img :src="avatar" alt="Current User" class="rounded-circle" width="32" height="32">
               <div class="flex-grow-1">
                 <textarea
                   class="form-control mb-2"
@@ -503,6 +506,7 @@ import {Modal} from 'bootstrap';
 import Parse from 'parse/dist/parse.min.js';
 import {uniqueId} from "@/utils/uuid";
 import {configDefault} from "@/utils/templates"
+import userDefault from '@/assets/user-default.png';
 
 import EmojiPicker from 'vue3-emoji-picker';
 import 'vue3-emoji-picker/css';
@@ -522,6 +526,7 @@ import {
 import {useSwal} from '@/utils/swal';
 import draggable from 'vuedraggable';
 import {useAuthStore} from "@/stores/auth";
+import{getFirstAndLastName} from '@/utils/utils'
 // Initialize Parse
 Parse.initialize(import.meta.env.VITE_PARSE_APP_ID);
 Parse.serverURL = import.meta.env.VITE_BACKEND_URL;
@@ -565,6 +570,8 @@ const auth = useAuthStore();
 const boardConfig = reactive(Object.assign({}, configDefault))
 
 const user = reactive(auth.user);
+
+const avatar = ref(user?.avatar ? user?.avatar : `https://ui-avatars.com/api/?background=0D8ABC&color=fff&name=${getFirstAndLastName(user)}`);
 
 // Comments state
 const selectedCard = ref(null);
@@ -1009,6 +1016,7 @@ const saveCard = () => {
     id: uniqueId(),
     name: user.name,
     user_id: user.id,
+    avatar: avatar.value,
     title: cardTitle.value,
     description: cardName.value,
     labels: cardLabels.value ? cardLabels.value.split(',').map(label => label.trim()).filter(Boolean) : [],
@@ -1265,6 +1273,7 @@ const addComment = () => {
     userId: user.id,
     userName: user.name,
     text: newComment.value,
+    avatar: avatar.value,
     createdAt: new Date().toISOString()
   };
 

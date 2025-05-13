@@ -30,6 +30,9 @@ export default {
     }
   },
   auth: {
+    googleLogin: 'Continue com Google',
+    or: 'ou',
+    myProfile: 'Meu Perfil',
     welcomeBack: 'Bem-vindo de Volta',
     createAccount: 'Criar Conta',
     startJourney: 'Comece sua jornada conosco',
@@ -278,6 +281,11 @@ export default {
         }
       }
     }
+  },
+    myProfile: {
+    accessLogs: 'Logs de Acesso',
+    register: 'Cadastro',
+    login: 'Login',
   },
   boardV2: {
     newCard: 'Novo Card',

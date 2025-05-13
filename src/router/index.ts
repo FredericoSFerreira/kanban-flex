@@ -9,6 +9,7 @@ import Login from "@/views/auth/Login.vue"
 import Register from "@/views/auth/Register.vue"
 import Terms from "@/views/Terms.vue"
 import PrivacyPolicy from "@/views/PrivacyPolicy.vue"
+import MyProfileView from "@/views/MyProfileView.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -33,6 +34,12 @@ const router = createRouter({
       path: "/my-boards",
       name: 'my-board',
       component: MyBoardView,
+      meta: {requiresAuth: true}
+    },
+    {
+      path: "/my-profile",
+      name: 'my-profile',
+      component: MyProfileView,
       meta: {requiresAuth: true}
     },
     {

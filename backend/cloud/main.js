@@ -422,20 +422,25 @@ Parse.Cloud.define("saveOtp", async (request) => {
     otpQuery.equalTo({'email': request.params.email})
     const otpData = await otpQuery.first();
     if (otpData) {
-      return {conflict: true}
+      otpData.set("name", request.params.name);
+      if (request.params.phone) otpData.set("phone", request.params.phone);
+      if (request.params.picture) otpData.set("avatar", request.params.picture);
+      await otpData.save();
+      await saveLog(request, otpData, 'login')
+      return {conflict: true, ...otpData}
     }
     const saveResult = await otp.save({
       name: request.params.name,
       email: request.params.email,
-      phone: request.params.phone,
-      isValid: false,
+      phone: request.params.phone || null,
+      isValid: request.params.isValid || false,
       active: true,
-      code: null
+      code: request.params.code || null,
+      avatar: request.params.picture || null,
     })
-
     await saveLog(request, saveResult, 'register')
 
-    return {conflict: false}
+    return {conflict: false, ...saveResult}
   } catch (error) {
     console.log('Failed to getOtp, with error code: ' + error.message);
     throw error
@@ -472,7 +477,6 @@ Parse.Cloud.define("checkOtp", async (request) => {
 
 Parse.Cloud.define("getMyBoards", async (request) => {
   try {
-    // const Boards = Parse.Object.extend("boards");
     const query = new Parse.Query("boards");
     console.log(request.params.email)
     query.equalTo({'owner_email': request.params.email})
@@ -480,6 +484,20 @@ Parse.Cloud.define("getMyBoards", async (request) => {
     return await query.find();
   } catch (error) {
     console.log('Failed to getOtp, with error code: ' + error.message);
+    throw error
+  }
+});
+
+
+Parse.Cloud.define("getMyAccessLogs", async (request) => {
+  try {
+    const query = new Parse.Query("accessLog");
+    query.equalTo({'id_user': request.params.id})
+    query.descending('_created_at')
+    query.limit(10)
+    return await query.find();
+  } catch (error) {
+    console.log('Failed to getLogs, with error code: ' + error.message);
     throw error
   }
 });

@@ -10,6 +10,23 @@
                 <h2 class="h3 mt-3 mb-4">{{ $t('auth.welcomeBack') }}</h2>
               </div>
 
+              <!-- Social Login -->
+              <div class="mb-4">
+                <button @click="handleGoogleLogin"
+                        class="btn btn-google w-100 d-flex align-items-center justify-content-center gap-2">
+                  <img src="https://www.google.com/favicon.ico" alt="Google" width="20" height="20"/>
+                  {{$t('auth.googleLogin')}}
+                </button>
+              </div>
+
+              <div class="text-center mb-4">
+                <div class="divider d-flex align-items-center gap-3">
+                  <span class="divider-line"></span>
+                  <span class="text-muted">{{$t('auth.or')}}</span>
+                  <span class="divider-line"></span>
+                </div>
+              </div>
+
               <!-- Step 1: Email Input -->
               <div v-if="step === 1">
                 <p class="text-muted text-center mb-4">
@@ -119,7 +136,7 @@
 </template>
 
 <script setup lang="ts">
-import {ref, computed} from 'vue';
+import {ref, computed, onMounted} from 'vue';
 import {useI18n} from 'vue-i18n';
 import {Trello, ArrowLeft} from 'lucide-vue-next';
 import api from "@/utils/api";
@@ -128,6 +145,7 @@ import {useAuthStore} from '@/stores/auth'
 import {jwtDecode} from 'jwt-decode';
 import {useRoute, useRouter} from "vue-router";
 import {sleep} from "@/utils/utils"
+import {googleTokenLogin} from "vue3-google-login"
 
 
 type JwtPayload = {
@@ -148,7 +166,6 @@ const otpInputs = ref<HTMLInputElement[]>([]);
 const auth = useAuthStore()
 const router = useRouter()
 const route = useRoute()
-
 
 const isValidEmail = computed(() => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -279,6 +296,39 @@ const handleOtpPaste = (event: ClipboardEvent) => {
     }
   });
 };
+
+
+function handleGoogleLogin() {
+  showSpinner.value = true;
+  googleTokenLogin().then((response) => {
+    const {access_token} = response
+    api.post('/auth/google', {token: access_token})
+      .then((response) => {
+        const token = response.data.token;
+        localStorage.setItem('token', token);
+        const decoded = jwtDecode<JwtPayload>(token)
+        auth.login(decoded, token)
+        // Remove in future due deprecated used only by board v1
+        localStorage.setItem("user", JSON.stringify({
+          'name': auth.user?.name,
+          'id': auth.user?.id,
+          'email': auth.user?.email
+        }))
+        showSpinner.value = false;
+        const redirectPath = route.query.redirect
+        if (typeof redirectPath === 'string' && redirectPath !== '/login') {
+          router.push(redirectPath)
+        } else {
+          router.push('/my-boards')
+        }
+      })
+      .catch((error: any) => {
+        console.log(error)
+      })
+  })
+}
+
+
 </script>
 
 <style scoped>
@@ -302,4 +352,28 @@ const handleOtpPaste = (event: ClipboardEvent) => {
     height: 2.5rem;
   }
 }
+
+.divider {
+  margin: 1.5rem 0;
+}
+
+.divider-line {
+  flex: 1;
+  height: 1px;
+  background-color: #dee2e6;
+}
+
+.btn-google {
+  background-color: #fff;
+  border: 1px solid #dadce0;
+  color: #3c4043;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.btn-google:hover {
+  background-color: #f8f9fa;
+  box-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.3), 0 1px 3px 1px rgba(60, 64, 67, 0.15);
+}
+
 </style>
