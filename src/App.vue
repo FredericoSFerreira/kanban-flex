@@ -219,7 +219,7 @@ watchEffect(() => {
 
 const logout = () => {
   auth.logout();
-  window.location.href = '/';
+  router.push('/');
 }
 
 
