@@ -16,22 +16,22 @@ async function generateToken(payload) {
 
 async function verifyToken(req, res, next) {
   const authHeader = req.headers['authorization'];
-  console.log(authHeader, "herer")
   const token = authHeader && authHeader.split(' ')[1];
 
   if (!token) {
-    return res.status(401).json({mensagem: 'Token não fornecido'});
+    return res.status(401).json({mensagem: 'Token not pass'});
   }
 
   try {
     const {payload} = await jwtVerify(token, SECRET_KEY, {
       algorithms: ['HS256'],
     });
+    console.log(payload)
     req.user = payload;
     next();
   } catch (error) {
     console.error(error);
-    return res.status(403).json({mensagem: 'Token inválido'});
+    return res.status(403).json({mensagem: 'Invalid Token'});
   }
 }
 
