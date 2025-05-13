@@ -30,6 +30,9 @@ export default {
     }
   },
   auth: {
+    googleLogin: 'Continue with Google',
+    or: 'or',
+    myProfile: 'My Profile',
     welcomeBack: 'Welcome Back',
     createAccount: 'Create Account',
     startJourney: 'Start your journey with us',
@@ -278,6 +281,11 @@ export default {
         }
       }
     }
+  },
+  myProfile: {
+    accessLogs: 'Access Logs',
+    register: 'Register',
+    login: 'Login',
   },
   boardV2: {
     newCard: 'New Card',

@@ -86,9 +86,21 @@
                   aria-expanded="false"
                   ref="languageDropdownBtn"
                 >
-                  {{ getFirstAndLastName() }}
+                  <img
+                    referrerpolicy="no-referrer"
+                    :src="auth.user?.avatar ? auth.user?.avatar : `https://ui-avatars.com/api/?background=0D8ABC&color=fff&name=${getFirstAndLastName(auth.user)}`"
+                    alt="Avatar" class="rounded-circle img-fluid" style="width: 28px; height: 28px;">
+                  {{ getFirstAndLastName(auth.user) }}
                 </button>
-                <ul class="dropdown-menu" aria-labelledby="languageDropdown">
+                <ul class="dropdown-menu" aria-labelledby="profileDropdown">
+                  <li>
+                    <button
+                      class="dropdown-item"
+                      @click="myProfile()"
+                    >
+                      {{ $t('auth.myProfile') }}
+                    </button>
+                  </li>
                   <li>
                     <button
                       class="dropdown-item"
@@ -153,6 +165,7 @@ import {useI18n} from 'vue-i18n';
 import {useRouter, useRoute} from 'vue-router';
 import {useAuthStore} from "@/stores/auth";
 import {Dropdown} from 'bootstrap';
+import{getFirstAndLastName} from '@/utils/utils'
 import {
   Trello,
   Github,
@@ -205,8 +218,13 @@ watchEffect(() => {
 });
 
 const logout = () => {
-  router.push('/');
   auth.logout();
+  window.location.href = '/';
+}
+
+
+const myProfile = () => {
+  router.push('/my-profile');
 }
 
 const navigateToSection = async (sectionId: string) => {
@@ -269,16 +287,6 @@ const footerColumns = [
   },
 ];
 
-
-const getFirstAndLastName = (): string => {
-  const parts = auth.user?.name?.trim().split(/\s+/) || '';
-  if (parts.length === 1) {
-    return parts[0];
-  }
-  const first = parts[0];
-  const last = parts[parts.length - 1];
-  return `${first} ${last}`;
-}
 </script>
 
 <style>
@@ -338,6 +346,7 @@ const getFirstAndLastName = (): string => {
   border-bottom-color: #2d2d2d !important;
   color: #ffffff !important;
 }
+
 .dark-mode input::placeholder {
   color: white; /* Cor do placeholder */
 }
