@@ -176,6 +176,7 @@ const showSpinner = ref(false)
 const isPhoneValid = ref(false);
 
 const profile = reactive({
+  id: user?.id,
   name: user?.name,
   email: user?.email,
   phone: user?.phone,
