@@ -742,7 +742,7 @@ const saveCardVotes = (idColumn, idCard, upVote = false, downVote = false) => {
 };
 
 const saveEditCard = () => {
-  if (!cardEditDescription.value) {
+  if (!cardEditDescription.value && boardConfig.showDescription) {
     return $swal.fire({
       icon: "error",
       title: t('boardV2.errors.oops'),
@@ -998,7 +998,7 @@ const saveColumn = () => {
 };
 
 const saveCard = () => {
-  if (!cardName.value) {
+  if (!cardName.value && boardConfig.showDescription) {
     return $swal.fire({
       icon: "error",
       title: t('boardV2.errors.oops'),

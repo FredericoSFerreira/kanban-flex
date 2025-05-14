@@ -37,33 +37,115 @@
               :class="{ active: activeTab === tab.id }"
               @click="activeTab = tab.id"
             >
-              <component :is="tab.icon" size="18" class="me-2"/>
-              {{ tab.name }}
+              <component :is="tab.icon" :size="18" class="me-2"/>
+              {{ $t(tab.name) }}
             </button>
           </li>
         </ul>
       </div>
       <div class="card-body p-4">
+        <div v-if="activeTab === 'profile'" class="settings-tab">
+          <form @submit.prevent="saveProfile">
+            <div class="row g-4">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label class="form-label">Full Name</label>
+                  <input type="text" class="form-control" v-model="profile.name" required>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Email</label>
+                  <input type="email" class="form-control" v-model="profile.email" disabled>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Phone</label>
+
+                  <div class="form-floating">
+                    <vue-tel-input
+                      v-model="profile.phone"
+                      :inputOptions="{placeholder: $t('auth.phone')}"
+                      mode="auto"
+                      :valid-characters-only="true"
+                      :enable-area-codes="true"
+                      :default-country="defaultCountry"
+                      :preferred-countries="['BR', 'US']"
+                      :input-classes="['form-control', 'form-control-lg']"
+                      @validate="validatePhone"
+                    ></vue-tel-input>
+
+                    <div v-if="!isPhoneValid && profile.phone" class="text-danger small mt-1">
+                      {{ $t('auth.invalidPhone') }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="form-check mt-4 mb-3">
+              <input class="form-check-input" type="checkbox" required id="lgpdConsent">
+              <label class="form-check-label" for="lgpdConsent">
+                {{ $t('myProfile.accept') }}
+                <a href="/privacy-policy" target="_blank">{{ $t('cookies.privacyPolicy') }}</a>.
+              </label>
+            </div>
+            <div class="mt-4 pt-3 border-top">
+              <button type="submit" class="btn btn-primary" :disabled="!isValidForm">Save Changes</button>
+              <button type="button" class="btn btn-outline-danger ms-2">Delete Account</button>
+            </div>
+          </form>
+        </div>
         <div v-if="activeTab === 'logs'" class="logs-tab">
           <div class="text-center mt-3" v-if="showSpinner">
             <div class="spinner-border" role="status">
               <span class="visually-hidden">Loading...</span>
             </div>
           </div>
-
-
-          <div class="timeline">
-            <div v-for="(log, index) in accessLogs" :key="index" class="timeline-item">
-              <div class="timeline-icon bg-info">
-                <KeyRound size="16"/>
-              </div>
-              <div class="timeline-content">
-                <p class="mb-1">{{ $t(`myProfile.${log.action}`) }}</p>
-                <p class="mb-1">{{ log.ip }}</p>
-                <p class="">{{ log.browser }}</p>
-                <small class="text-muted">{{ new Date(log.createdAt).toLocaleString() }}</small>
-              </div>
-            </div>
+          <div class="table-responsive">
+            <table class="table">
+              <thead>
+              <tr>
+                <th>Date</th>
+                <th>Action</th>
+                <th>Browser</th>
+                <th>Device</th>
+                <th>Location</th>
+                <th>Status</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr v-for="log in accessLogs" :key="log.objectId">
+                <td>
+                  <div>{{ formatDate(log.createdAt) }}</div>
+                  <small class="text-muted">{{ formatTime(log.createdAt) }}</small>
+                </td>
+                <td>
+                    <span class="badge" :class="getActionBadgeClass(log.action)">
+                      {{ $t(`myProfile.${log.action}`) }}
+                    </span>
+                </td>
+                <td>
+                  <div class="d-flex align-items-center">
+                    <Globe size="16" class="me-2 text-muted"/>
+                    {{ log.browser }}
+                  </div>
+                </td>
+                <td>
+                  <div class="d-flex align-items-center">
+                    <Monitor :size="16" class="me-2 text-muted"/>
+                    {{ log.device.os || 'Unknown' }}
+                    <span v-if="log.device.model" class="ms-1">({{ log.device.model }})</span>
+                  </div>
+                </td>
+                <td>
+                  <div class="d-flex align-items-center">
+                    <MapPin :size="16" class="me-2 text-muted"/>
+                    {{ log.ip == '::1' ? '127.0.0.1' : log.ip }}
+                  </div>
+                </td>
+                <td>
+                  <span class="badge bg-success"> {{ $t('myProfile.success') }}</span>
+                </td>
+              </tr>
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
@@ -72,20 +154,38 @@
 </template>
 
 <script setup lang="ts">
-import {ref, onMounted} from 'vue';
+import {ref, onMounted, computed, reactive} from 'vue';
 import {
   Layout,
-  KeyRound,
+  User,
+  Globe,
+  Monitor,
+  MapPin
 } from 'lucide-vue-next';
 import {useAuthStore} from '@/stores/auth'
 import api from "@/utils/api";
 import {useI18n} from "vue-i18n";
-
+import {formatDate, formatTime} from "@/utils/utils";
+import {VueTelInput} from "vue-tel-input";
+import {toast} from "vue3-toastify";
 
 const {locale, t} = useI18n();
 const user = useAuthStore().user
-let accessLogs = ref(null)
+let accessLogs = ref([])
 const showSpinner = ref(false)
+const isPhoneValid = ref(false);
+
+const profile = reactive({
+  name: user?.name,
+  email: user?.email,
+  phone: user?.phone,
+  avatar: user?.avatar,
+});
+
+
+const validatePhone = ({valid}: { valid: boolean }) => {
+  isPhoneValid.value = valid;
+};
 
 onMounted(() => {
   showSpinner.value = true;
@@ -96,106 +196,66 @@ onMounted(() => {
 })
 
 
+const getActionBadgeClass = (action: string) => {
+  switch (action.toLowerCase()) {
+    case 'login':
+      return 'bg-success';
+    case 'logout':
+      return 'bg-info';
+    default:
+      return 'bg-secondary';
+  }
+};
+
+const isValidForm = computed(() => {
+  return profile?.name.trim().length >= 2 && isPhoneValid.value;
+});
+
 const tabs = [
-  {id: 'logs', name: t('myProfile.accessLogs'), icon: Layout},
+  {id: 'profile', name: 'myProfile.profile', icon: User},
+  {id: 'logs', name: 'myProfile.accessLogs', icon: Layout},
 ];
 
-const activeTab = ref('logs');
+const defaultCountry = computed(() => {
+  return locale.value === 'pt-BR' ? 'BR' : 'US';
+});
+
+const activeTab = ref('profile');
+
+const saveProfile = () => {
+  showSpinner.value = true;
+
+  api.put('/user', {...profile}).then(res => {
+    const token = useAuthStore().token
+    console.log(token, "kjhk")
+    accessLogs.value = res.data
+    showSpinner.value = false;
+    useAuthStore().updateUser(profile)
+    toast.success(t('myProfile.saveProfile'), {
+      position: toast.POSITION.TOP_CENTER,
+    });
+  }).catch(err => {
+    toast.error(t('myProfile.errorSaveProfile'), {
+      position: toast.POSITION.TOP_CENTER,
+    });
+  })
+  console.log('Profile saved:', profile);
+};
 
 </script>
 
 <style scoped>
-.timeline {
-  position: relative;
-  padding-left: 3rem;
+.dark-mode .table {
+  background-color: #1e1e1e;
+  color: #ffffff;
 }
 
-.timeline-item {
-  position: relative;
-  padding-bottom: 1.5rem;
+.dark-mode .table tbody tr {
+  border-bottom: 1px solid #404040;
 }
 
-.timeline-item:not(:last-child)::before {
-  content: '';
-  position: absolute;
-  left: -1.5rem;
-  top: 1.5rem;
-  bottom: 0;
-  width: 2px;
-  background-color: #e9ecef;
+.dark-mode .table tbody tr:hover {
+  background-color: #2d2d2d;
 }
 
-.timeline-icon {
-  position: absolute;
-  left: -2rem;
-  width: 2rem;
-  height: 2rem;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-}
-
-.timeline-content {
-  background-color: #f8f9fa;
-  padding: 1rem;
-  border-radius: 0.375rem;
-}
-
-/* Dark mode compatibility */
-:deep(.dark-mode) {
-  .timeline-content {
-    background-color: #2d2d2d;
-  }
-
-  .timeline-item:not(:last-child)::before {
-    background-color: #404040;
-  }
-
-  .card {
-    background-color: #1e1e1e;
-    border-color: #2d2d2d;
-  }
-
-  .nav-tabs .nav-link {
-    color: #ffffff;
-  }
-
-  .nav-tabs .nav-link:hover {
-    border-color: #404040;
-  }
-
-  .nav-tabs .nav-link.active {
-    background-color: #1e1e1e;
-    border-color: #404040 #404040 #1e1e1e;
-    color: var(--bs-primary);
-  }
-
-  .table {
-    color: #ffffff;
-  }
-
-  .table td, .table th {
-    border-color: #404040;
-  }
-
-  .form-control,
-  .form-select {
-    background-color: #2d2d2d;
-    border-color: #404040;
-    color: #ffffff;
-  }
-
-  .form-control:focus,
-  .form-select:focus {
-    background-color: #363636;
-    border-color: #4a4a4a;
-    color: #ffffff;
-  }
-
-  .text-muted {
-    color: #a0a0a0 !important;
-  }
-}
 </style>

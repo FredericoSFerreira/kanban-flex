@@ -55,6 +55,14 @@
                       {{ $t('auth.invalidPhone') }}
                     </div>
                   </div>
+
+
+                  <input class="form-check-input m-1" type="checkbox" required id="lgpdConsent">
+                  <label class="form-check-label mb-3" for="lgpdConsent">
+                    {{ $t('myProfile.accept') }}
+                    <a href="/privacy-policy" target="_blank">{{ $t('cookies.privacyPolicy') }}</a>.
+                  </label>
+
                   <button
                     type="submit"
                     class="btn btn-primary w-100 py-2"

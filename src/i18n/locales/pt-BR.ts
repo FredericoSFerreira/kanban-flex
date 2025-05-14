@@ -175,8 +175,8 @@ export default {
     },
     terms: {
       title: 'Termos',
-      link1: 'Termos de Uso',
-      link2: 'Política de Privacidade',
+      link1: 'Política de Privacidade',
+      link2: 'Termos de Uso',
     },
     status: {
       title: 'Status/Ajuda',
@@ -282,10 +282,17 @@ export default {
       }
     }
   },
-    myProfile: {
+  myProfile: {
     accessLogs: 'Logs de Acesso',
+    profile: 'Meu Perfil',
     register: 'Cadastro',
     login: 'Login',
+    accept: 'Concordo com os temos da',
+    save: 'Salvar Alterações',
+    delete: 'Solicitar',
+    success: 'Sucesso',
+    saveProfile: 'Salvo com sucesso.',
+    errorSaveProfile: 'Error ao salvar.'
   },
   boardV2: {
     newCard: 'Novo Card',

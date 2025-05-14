@@ -71,6 +71,7 @@ const checkOtp = async (req, res) => {
       const token = await generateToken({
         email: email,
         name: otpData.name,
+        phone: otpData.phone,
         id: otpData.id,
         avatar: otpData.avatar || null,
       });
@@ -98,7 +99,7 @@ const authGoogle = async (req, res) => {
     const userinfo = await client.request({
       url: "https://www.googleapis.com/oauth2/v3/userinfo",
     });
-    const payload =  userinfo.data
+    const payload = userinfo.data
     const {sub, email, name, picture} = payload
     console.log(sub, email, name, picture)
 
@@ -115,8 +116,12 @@ const authGoogle = async (req, res) => {
       email: email,
       name: name,
       id: resultSave.id,
+      phone: resultSave.phone || null,
       avatar: picture,
     });
+
+
+    console.log(resultSave)
     res.json({isValid: true, token: jwtToken});
   } catch (error) {
     console.error(error)
