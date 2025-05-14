@@ -284,8 +284,13 @@ export default {
   },
   myProfile: {
     accessLogs: 'Access Logs',
+    profile: 'My Profile',
     register: 'Register',
     login: 'Login',
+    accept: 'I agree to the use of my data as per',
+    success: 'Success',
+    save: 'Save with success.',
+    error: 'Error to save.'
   },
   boardV2: {
     newCard: 'New Card',

@@ -422,12 +422,11 @@ Parse.Cloud.define("saveOtp", async (request) => {
     otpQuery.equalTo({'email': request.params.email})
     const otpData = await otpQuery.first();
     if (otpData) {
-      otpData.set("name", request.params.name);
       if (request.params.phone) otpData.set("phone", request.params.phone);
       if (request.params.picture) otpData.set("avatar", request.params.picture);
       await otpData.save();
       await saveLog(request, otpData, 'login')
-      return {conflict: true, ...otpData}
+      return {conflict: true, id: otpData.id, ...otpData.attributes}
     }
     const saveResult = await otp.save({
       name: request.params.name,
@@ -494,10 +493,23 @@ Parse.Cloud.define("getMyAccessLogs", async (request) => {
     const query = new Parse.Query("accessLog");
     query.equalTo({'id_user': request.params.id})
     query.descending('_created_at')
-    query.limit(10)
+    // query.limit(10)
     return await query.find();
   } catch (error) {
     console.log('Failed to getLogs, with error code: ' + error.message);
     throw error
   }
+});
+
+
+Parse.Cloud.define("updateUserOtp", async (request) => {
+  const query = new Parse.Query("otp");
+  console.log(request.params, "jgjhg")
+  query.equalTo("objectId", request.params.id)
+  query.first().then((otp) => {
+    otp.set('name', request.params.name)
+    otp.set('phone', request.params.phone)
+    otp.set('active', request.params.active === undefined ? true : request.params.active)
+    return otp.save();
+  });
 });

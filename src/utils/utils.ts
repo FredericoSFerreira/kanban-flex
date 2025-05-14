@@ -18,5 +18,14 @@ const getFirstAndLastName = (user): string => {
   return `${first} ${last}`;
 }
 
-export { removePathFromUrl, sleep, getFirstAndLastName }
+
+const formatDate = (dateString: string) => {
+  return new Date(dateString).toLocaleDateString();
+};
+
+const formatTime = (dateString: string) => {
+  return new Date(dateString).toLocaleTimeString();
+};
+
+export { removePathFromUrl, sleep, getFirstAndLastName, formatDate, formatTime }
 

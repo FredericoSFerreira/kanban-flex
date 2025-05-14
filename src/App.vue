@@ -165,7 +165,7 @@ import {useI18n} from 'vue-i18n';
 import {useRouter, useRoute} from 'vue-router';
 import {useAuthStore} from "@/stores/auth";
 import {Dropdown} from 'bootstrap';
-import{getFirstAndLastName} from '@/utils/utils'
+import {getFirstAndLastName} from '@/utils/utils'
 import {
   Trello,
   Github,
@@ -302,11 +302,6 @@ const footerColumns = [
   color: #ffffff !important;
 }
 
-.dark-mode .card-header {
-  background-color: #2d2d2d !important;
-  border-bottom-color: #363636 !important;
-  color: #ffffff !important;
-}
 
 /* Kanban board structure styles */
 .dark-mode .kanban-header {

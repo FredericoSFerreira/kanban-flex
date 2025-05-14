@@ -8,6 +8,7 @@ import boardsRouter from "./modules/boards/routes/boards-routes.js";
 import http from "http";
 import authRouter from "./modules/auth/routes/auth-routes.js";
 import accessLogsRouter from "./modules/accessLogs/routes/access-logs-routes.js";
+import usersRouter from "./modules/users/routes/users-routes.js";
 
 const app = express();
 const host = process.env.APP_HOST || "localhost";
@@ -45,6 +46,7 @@ app.get("/healthcheck", (req, res) => {
 app.use(boardsRouter);
 app.use(authRouter);
 app.use(accessLogsRouter);
+app.use(usersRouter);
 
 const httpServer = http.createServer(app);
 httpServer.listen(port, () => {
