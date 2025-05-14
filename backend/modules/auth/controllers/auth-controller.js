@@ -72,6 +72,7 @@ const checkOtp = async (req, res) => {
         email: email,
         name: otpData.name,
         id: otpData.id,
+        avatar: otpData.avatar || null,
       });
       res.json({isValid: true, token: token});
     } else {
