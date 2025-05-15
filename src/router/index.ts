@@ -10,6 +10,7 @@ import Register from "@/views/auth/Register.vue"
 import Terms from "@/views/Terms.vue"
 import PrivacyPolicy from "@/views/PrivacyPolicy.vue"
 import MyProfileView from "@/views/MyProfileView.vue";
+import BoardStatistics from "@/views/BoardStatistics.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -23,6 +24,12 @@ const router = createRouter({
       path: '/board/:id',
       name: 'boardV2',
       component: BoardV2View,
+      meta: {requiresAuth: true}
+    },
+    {
+      path: '/board/statistics/:id',
+      name: 'boardStatistics',
+      component: BoardStatistics,
       meta: {requiresAuth: true}
     },
     {

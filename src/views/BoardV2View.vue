@@ -13,7 +13,7 @@
 
       <div class="d-flex flex-row-reverse justify-content-end">
 
-        <div class="btn-group" v-if="board.columns.length > 0 && checkPermission()">
+        <div class="btn-group btn-group-sm" v-if="board.columns.length > 0">
           <button class="btn btn-primary" @click="newColumn()" data-bs-toggle="modal"
                   data-bs-target="#newColumn">
             <Plus size="18" class="me-1"/>
@@ -22,9 +22,9 @@
           <button class="btn btn-primary" @click="showBoardSettings">
             <Settings size="18"/>
           </button>
-          <!--          <button class="btn btn-primary" @click="showingStats = !showingStats">-->
-          <!--            <BarChart2 size="18"/>-->
-          <!--          </button>-->
+          <button class="btn btn-primary" @click="router.push(`/board/statistics/${route.params.id}?redirect=/board/${route.params.id}`)">
+            <BarChart2 size="18"/>
+          </button>
         </div>
 
         <div class="p-1" v-if="checkPermission() && boardConfig.showVisibility" @click="setVisibility()">
@@ -163,14 +163,17 @@
                         </div>
                       </div>
 
-                      <small :class="{ 'blur-kanban-card': !checkPermission(card.user_id) && !board.visibility}" v-if="boardConfig.showAuthorCard">
-                        <img :src="card.avatar || userDefault" :alt="card.name" class="rounded-circle" width="25" height="25">
+                      <small :class="{ 'blur-kanban-card': !checkPermission(card.user_id) && !board.visibility}"
+                             v-if="boardConfig.showAuthorCard">
+                        <img :src="card.avatar || userDefault" :alt="card.name" class="rounded-circle" width="25"
+                             height="25">
                         {{
                           card.name
                         }}
                       </small>
 
-                      <div v-if="card.labels && card.labels.length && boardConfig.showTags" class="d-flex flex-wrap gap-1 mt-2"
+                      <div v-if="card.labels && card.labels.length && boardConfig.showTags"
+                           class="d-flex flex-wrap gap-1 mt-2"
                            :class="{ 'blur-kanban-card': !checkPermission(card.user_id) && !board.visibility }">
                       <span
                         v-for="label in card.labels"
@@ -453,7 +456,8 @@
             </div>
             <div v-else v-for="comment in selectedCard.comments" :key="comment.id" class="comment mb-3">
               <div class="d-flex gap-3">
-                <img v-if="comment.avatar" :src="comment.avatar" :alt="comment.userName" class="rounded-circle" width="32" height="32">
+                <img v-if="comment.avatar" :src="comment.avatar" :alt="comment.userName" class="rounded-circle"
+                     width="32" height="32">
                 <div class="flex-grow-1">
                   <div class="d-flex justify-content-between align-items-start">
                     <h6 class="mb-1">{{ comment.userName }}</h6>
@@ -475,7 +479,7 @@
           </div>
           <div class="add-comment">
             <div class="d-flex gap-3">
-               <img :src="avatar" alt="Current User" class="rounded-circle" width="32" height="32">
+              <img :src="avatar" alt="Current User" class="rounded-circle" width="32" height="32">
               <div class="flex-grow-1">
                 <textarea
                   class="form-control mb-2"
@@ -526,7 +530,7 @@ import {
 import {useSwal} from '@/utils/swal';
 import draggable from 'vuedraggable';
 import {useAuthStore} from "@/stores/auth";
-import{getFirstAndLastName} from '@/utils/utils'
+import {getFirstAndLastName} from '@/utils/utils'
 // Initialize Parse
 Parse.initialize(import.meta.env.VITE_PARSE_APP_ID);
 Parse.serverURL = import.meta.env.VITE_BACKEND_URL;
@@ -538,7 +542,6 @@ const route = useRoute();
 const router = useRouter();
 const $swal = useSwal();
 const {t} = useI18n();
-const showingStats = ref(false);
 
 // Reactive state
 const orderBy = ref("default");

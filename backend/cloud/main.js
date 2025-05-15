@@ -5,7 +5,7 @@ import {UAParser} from 'ua-parser-js';
 Parse.Cloud.define("updateCardPosition", async (request) => {
 
   try {
-    const { boardId, columnId, items } = request.params;
+    const {boardId, columnId, items} = request.params;
     const queryBoard = new Parse.Query("boards");
     queryBoard.equalTo('objectId', boardId);
 
@@ -24,8 +24,8 @@ Parse.Cloud.define("updateCardPosition", async (request) => {
     // Update the items array for this specific column
     board.set(`columns.${columnIndex}.itens`, items);
 
-    const result = await board.save(null, { useMasterKey: true });
-    return { success: true, result };
+    const result = await board.save(null, {useMasterKey: true});
+    return {success: true, result};
   } catch (error) {
     console.error("Error in updateCardPosition:", error);
     throw error;
@@ -34,7 +34,7 @@ Parse.Cloud.define("updateCardPosition", async (request) => {
 
 Parse.Cloud.define("moveCardBetweenColumns", async (request) => {
   try {
-    const { boardId, sourceColumnId, targetColumnId, cardId } = request.params;
+    const {boardId, sourceColumnId, targetColumnId, cardId} = request.params;
     const queryBoard = new Parse.Query("boards");
     queryBoard.equalTo('objectId', boardId);
 
@@ -66,8 +66,8 @@ Parse.Cloud.define("moveCardBetweenColumns", async (request) => {
     board.set(`columns.${sourceColumnIndex}.itens`, sourceColumn.itens);
     board.set(`columns.${targetColumnIndex}.itens`, targetColumn.itens);
 
-    const result = await board.save(null, { useMasterKey: true });
-    return { success: true, result };
+    const result = await board.save(null, {useMasterKey: true});
+    return {success: true, result};
   } catch (error) {
     console.error("Error in moveCardBetweenColumns:", error);
     throw error;
@@ -76,7 +76,7 @@ Parse.Cloud.define("moveCardBetweenColumns", async (request) => {
 
 Parse.Cloud.define("updateColumnPosition", async (request) => {
   try {
-    const { boardId, columns } = request.params;
+    const {boardId, columns} = request.params;
     const queryBoard = new Parse.Query("boards");
     queryBoard.equalTo('objectId', boardId);
 
@@ -88,8 +88,8 @@ Parse.Cloud.define("updateColumnPosition", async (request) => {
     // Update the columns array
     board.set('columns', columns);
 
-    const result = await board.save(null, { useMasterKey: true });
-    return { success: true, result };
+    const result = await board.save(null, {useMasterKey: true});
+    return {success: true, result};
   } catch (error) {
     console.error("Error in updateColumnPosition:", error);
     throw error;
@@ -98,7 +98,7 @@ Parse.Cloud.define("updateColumnPosition", async (request) => {
 
 Parse.Cloud.define("addCard", async (request) => {
   try {
-    const { boardId, columnId, card } = request.params;
+    const {boardId, columnId, card} = request.params;
     const queryBoard = new Parse.Query("boards");
     queryBoard.equalTo('objectId', boardId);
 
@@ -117,8 +117,8 @@ Parse.Cloud.define("addCard", async (request) => {
     // Add card to column
     board.add(`columns.${columnIndex}.itens`, card);
 
-    const result = await board.save(null, { useMasterKey: true });
-    return { success: true, result };
+    const result = await board.save(null, {useMasterKey: true});
+    return {success: true, result};
   } catch (error) {
     console.error("Error in addCard:", error);
     throw error;
@@ -127,7 +127,7 @@ Parse.Cloud.define("addCard", async (request) => {
 
 Parse.Cloud.define("updateCard", async (request) => {
   try {
-    const { boardId, columnId, cardId, updates } = request.params;
+    const {boardId, columnId, cardId, updates} = request.params;
     const queryBoard = new Parse.Query("boards");
     queryBoard.equalTo('objectId', boardId);
 
@@ -153,8 +153,8 @@ Parse.Cloud.define("updateCard", async (request) => {
       board.set(`columns.${columnIndex}.itens.${cardIndex}.${key}`, updates[key]);
     });
 
-    const result = await board.save(null, { useMasterKey: true });
-    return { success: true, result };
+    const result = await board.save(null, {useMasterKey: true});
+    return {success: true, result};
   } catch (error) {
     console.error("Error in updateCard:", error);
     throw error;
@@ -163,7 +163,7 @@ Parse.Cloud.define("updateCard", async (request) => {
 
 Parse.Cloud.define("removeCard", async (request) => {
   try {
-    const { boardId, columnId, cardId } = request.params;
+    const {boardId, columnId, cardId} = request.params;
     const queryBoard = new Parse.Query("boards");
     queryBoard.equalTo('objectId', boardId);
 
@@ -187,8 +187,8 @@ Parse.Cloud.define("removeCard", async (request) => {
     // Remove card from column
     board.remove(`columns.${columnIndex}.itens`, card);
 
-    const result = await board.save(null, { useMasterKey: true });
-    return { success: true, result };
+    const result = await board.save(null, {useMasterKey: true});
+    return {success: true, result};
   } catch (error) {
     console.error("Error in removeCard:", error);
     throw error;
@@ -197,7 +197,7 @@ Parse.Cloud.define("removeCard", async (request) => {
 
 Parse.Cloud.define("addColumn", async (request) => {
   try {
-    const { boardId, column } = request.params;
+    const {boardId, column} = request.params;
     const queryBoard = new Parse.Query("boards");
     queryBoard.equalTo('objectId', boardId);
 
@@ -209,8 +209,8 @@ Parse.Cloud.define("addColumn", async (request) => {
     // Add column to board
     board.add("columns", column);
 
-    const result = await board.save(null, { useMasterKey: true });
-    return { success: true, result };
+    const result = await board.save(null, {useMasterKey: true});
+    return {success: true, result};
   } catch (error) {
     console.error("Error in addColumn:", error);
     throw error;
@@ -219,7 +219,7 @@ Parse.Cloud.define("addColumn", async (request) => {
 
 Parse.Cloud.define("updateColumn", async (request) => {
   try {
-    const { boardId, columnId, updates } = request.params;
+    const {boardId, columnId, updates} = request.params;
     const queryBoard = new Parse.Query("boards");
     queryBoard.equalTo('objectId', boardId);
 
@@ -240,8 +240,8 @@ Parse.Cloud.define("updateColumn", async (request) => {
       board.set(`columns.${columnIndex}.${key}`, updates[key]);
     });
 
-    const result = await board.save(null, { useMasterKey: true });
-    return { success: true, result };
+    const result = await board.save(null, {useMasterKey: true});
+    return {success: true, result};
   } catch (error) {
     console.error("Error in updateColumn:", error);
     throw error;
@@ -250,7 +250,7 @@ Parse.Cloud.define("updateColumn", async (request) => {
 
 Parse.Cloud.define("removeColumn", async (request) => {
   try {
-    const { boardId, columnId } = request.params;
+    const {boardId, columnId} = request.params;
     const queryBoard = new Parse.Query("boards");
     queryBoard.equalTo('objectId', boardId);
 
@@ -269,8 +269,8 @@ Parse.Cloud.define("removeColumn", async (request) => {
     // Remove column from board
     board.remove("columns", column);
 
-    const result = await board.save(null, { useMasterKey: true });
-    return { success: true, result };
+    const result = await board.save(null, {useMasterKey: true});
+    return {success: true, result};
   } catch (error) {
     console.error("Error in removeColumn:", error);
     throw error;
@@ -279,7 +279,7 @@ Parse.Cloud.define("removeColumn", async (request) => {
 
 Parse.Cloud.define("updateBoardProperties", async (request) => {
   try {
-    const { boardId, updates } = request.params;
+    const {boardId, updates} = request.params;
     const queryBoard = new Parse.Query("boards");
     queryBoard.equalTo('objectId', boardId);
 
@@ -293,8 +293,8 @@ Parse.Cloud.define("updateBoardProperties", async (request) => {
       board.set(key, updates[key]);
     });
 
-    const result = await board.save(null, { useMasterKey: true });
-    return { success: true, result };
+    const result = await board.save(null, {useMasterKey: true});
+    return {success: true, result};
   } catch (error) {
     console.error("Error in updateBoardProperties:", error);
     throw error;
@@ -303,7 +303,7 @@ Parse.Cloud.define("updateBoardProperties", async (request) => {
 
 Parse.Cloud.define("updateCardVotes", async (request) => {
   try {
-    const { boardId, columnId, cardId, userId, voteType } = request.params;
+    const {boardId, columnId, cardId, userId, voteType} = request.params;
     const queryBoard = new Parse.Query("boards");
     queryBoard.equalTo('objectId', boardId);
 
@@ -351,8 +351,8 @@ Parse.Cloud.define("updateCardVotes", async (request) => {
       }
     }
 
-    const result = await board.save(null, { useMasterKey: true });
-    return { success: true, result };
+    const result = await board.save(null, {useMasterKey: true});
+    return {success: true, result};
   } catch (error) {
     console.error("Error in updateCardVotes:", error);
     throw error;
@@ -512,4 +512,115 @@ Parse.Cloud.define("updateUserOtp", async (request) => {
     otp.set('active', request.params.active === undefined ? true : request.params.active)
     return otp.save();
   });
+});
+
+
+Parse.Cloud.define("getBoardStats", async (request) => {
+  const {id} = request.params;
+  const db = new Parse.Query("boards");
+  const pipeline = [
+    {$match: {_id: id}},
+    {
+      $set: {
+        boardName: "$name",
+        totalColumns: {$size: "$columns"},
+        totalItems: {
+          $sum: {
+            $map: {
+              input: "$columns",
+              as: "col",
+              in: {$size: "$$col.itens"}
+            }
+          }
+        }
+      }
+    },
+    {$unwind: "$columns"},
+    {$unwind: "$columns.itens"},
+    {
+      $facet: {
+        board_info: [
+          {
+            $limit: 1
+          },
+          {
+            $project: {
+              boardName: 1,
+              totalColumns: 1,
+              totalItems: 1
+            }
+          }
+        ],
+        unique_users: [
+          {
+            $group: {
+              _id: "$columns.itens.user_id",
+              name: {$first: "$columns.itens.name"},
+              avatar: {$first: "$columns.itens.avatar"}
+            }
+          },
+          {
+            $project: {
+              _id: 0,
+              user_id: "$_id",
+              name: 1,
+              avatar: 1
+            }
+          }
+        ],
+        top_liked_card: [
+          {$sort: {"columns.itens.up_vote": -1}},
+          {$limit: 1},
+          {$replaceRoot: {newRoot: "$columns.itens"}}
+        ],
+        top_disliked_card: [
+          {$sort: {"columns.itens.down_vote": -1}},
+          {$limit: 1},
+          {$replaceRoot: {newRoot: "$columns.itens"}}
+        ],
+        top_commented_card: [
+          {
+            $addFields: {
+              comment_count: {$size: "$columns.itens.comments"}
+            }
+          },
+          {$sort: {comment_count: -1}},
+          {$limit: 1},
+          {$replaceRoot: {newRoot: "$columns.itens"}}
+        ],
+        totals: [
+          {
+            $group: {
+              _id: null,
+              total_likes: {$sum: "$columns.itens.up_vote"},
+              total_dislikes: {$sum: "$columns.itens.down_vote"},
+              total_comments: {$sum: {$size: "$columns.itens.comments"}}
+            }
+          },
+          {$project: {_id: 0}}
+        ],
+        label_counts: [
+          {$unwind: "$columns.itens.labels"},
+          {
+            $group: {
+              _id: "$columns.itens.labels",
+              count: {$sum: 1}
+            }
+          },
+          {
+            $project: {
+              _id: 0,
+              label: "$_id",
+              count: 1
+            }
+          },
+          {$sort: {count: -1}}
+        ]
+      }
+    }
+  ];
+
+  const results = await db.aggregate(pipeline)
+  return results[0]
+
 });
