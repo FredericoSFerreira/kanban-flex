@@ -9,6 +9,24 @@ export default {
     login: 'Entrar',
     signUp: 'Cadastre-se Grátis'
   },
+  boardStatistics: {
+    totalColumns: 'Total de Colunas',
+    totalCards: 'Total de Cards',
+    totalLabels: 'Total de Labels',
+    totalLikes: 'Total de Likes',
+    totalDislikes: 'Total de Dislikes',
+    totalComments: 'Total de Comentarios',
+    boardSummary: 'Resumo do Board',
+    boardSummaryRegenerateButton: 'Gerar',
+     boardSummaryAIText: 'Gerado por IA com base na atividade e no conteúdo do quadro',
+    teamMembers: 'Membros do Board',
+    labelsDistribution: 'Distribuição das Labels',
+    engagementMetrics: 'Métricas de Engajamento',
+    commentsPerCard: 'Comentários por Card',
+    labelsPerCards: 'Labels por Card',
+    notSupportTitle: 'Desculpe',
+    notSupport: 'Este board não suporta as estatísticas.'
+  },
   myBoards: {
     title: 'Meus Quadros',
     createBoard: 'Criar Novo Quadro',
@@ -20,7 +38,8 @@ export default {
     },
     actions: {
       view: 'Ver Quadro',
-      delete: 'Excluir Quadro'
+      delete: 'Excluir Quadro',
+      statistics: 'Estatísticas do Quadro'
     },
     deleteModal: {
       title: 'Excluir Quadro',

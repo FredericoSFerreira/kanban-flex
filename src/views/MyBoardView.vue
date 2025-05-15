@@ -46,6 +46,12 @@
                       {{ $t('myBoards.actions.view') }}
                     </router-link>
                   </li>
+                             <li>
+                    <router-link :to="`/board/statistics/${board.id}`" class="dropdown-item">
+                      <BarChart :size="16" class="me-2"/>
+                      {{ $t('myBoards.actions.statistics') }}
+                    </router-link>
+                  </li>
                   <li>
                     <button class="dropdown-item text-danger" @click="removeBoard(board.id)">
                       <Trash2 :size="16" class="me-2"/>
@@ -76,7 +82,7 @@
 <script setup lang="ts">
 import {ref, onMounted} from 'vue';
 import Parse from 'parse/dist/parse.min.js';
-import {Layout, MoreVertical, Eye, Trash2, Calendar, Users} from 'lucide-vue-next';
+import {Layout, MoreVertical, Eye, Trash2, Calendar, Users, BarChart} from 'lucide-vue-next';
 import api from "@/utils/api";
 import {useSwal} from "@/utils/swal";
 import CreateBoardModal from "@/components/CreateBoardModal.vue";
