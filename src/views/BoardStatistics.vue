@@ -2,8 +2,13 @@
   <div class="container mt-3 mb-3">
     <div class="row g-4">
 
-      <div class="col-12">
+      <div class="col-11">
         <h2>{{ stats.boardName }}</h2>
+      </div>
+      <div class="col-1">
+        <button class="btn btn-primary" @click="router.push(`/board/${route.params.id}`)">
+          <Undo2 size="18"/>
+        </button>
       </div>
 
       <!-- Overview Cards -->
@@ -78,17 +83,23 @@
           <div class="card-body">
             <div class="d-flex justify-content-between align-items-center mb-4">
               <h5 class="card-title mb-0">{{ $t('boardStatistics.boardSummary') }}</h5>
-              <button class="btn btn-sm btn-outline-primary">
-                <RefreshCw ::size="14" class="me-2"/>
+              <button class="btn btn-sm btn-outline-primary" @click="generateBoardSummary(true)">
+                <RefreshCw class="me-2"/>
                 {{ $t('boardStatistics.boardSummaryRegenerateButton') }}
               </button>
             </div>
             <div class="board-summary">
-              <p class="text-muted mb-4">
-                {{ boardSummary }} Em breve...
+
+              <div class="text-center py-5" v-if="showSpinner">
+                <div class="spinner-border" role="status">
+                  <span class="visually-hidden">Loading...</span>
+                </div>
+              </div>
+              <p class="text-muted mb-4" v-if="!showSpinner">
+                {{ stats.boardSummary }}
               </p>
               <div class="d-flex align-items-center">
-                <Sparkles ::size="16" class="text-primary me-2"/>
+                <Sparkles ::size="22" class="text-primary me-2"/>
                 <small class="text-muted">{{ $t('boardStatistics.boardSummaryAIText') }}</small>
               </div>
             </div>
@@ -191,8 +202,9 @@
 </template>
 
 <script setup lang="ts">
-import {onMounted, reactive} from 'vue';
+import {onMounted, reactive, ref} from 'vue';
 import {useSwal} from '@/utils/swal';
+
 const {t} = useI18n();
 
 const $swal = useSwal();
@@ -204,7 +216,8 @@ import {
   RefreshCw,
   ThumbsUp,
   ThumbsDown,
-  Sparkles
+  Sparkles,
+  Undo2
 } from 'lucide-vue-next';
 import api from "@/utils/api";
 import {useRoute} from "vue-router";
@@ -226,6 +239,13 @@ const stats = reactive({
   teamMembers: [] as { name: string, avatar?: string, user_id: string }[]
 })
 
+const showSpinner = ref(false)
+
+function sanitizeAiResponse() {
+  stats.boardSummary = stats.boardSummary.replace(/\\n+/g, '');
+  stats.boardSummary = stats.boardSummary.replace(/\*+/g, '*');
+  return stats.boardSummary.trim();
+}
 
 const getLabelClass = (label: string) => {
   const hash = label.split('').reduce((acc, char) => {
@@ -272,8 +292,23 @@ const getStats = () => {
     });
 }
 
+const generateBoardSummary = (regenerate: boolean = false) => {
+  showSpinner.value = true
+  api.get(`boards/summary/${route.params.id}?retry=${regenerate}`).then((response) => {
+    const {data} = response
+    showSpinner.value = false
+    stats.boardSummary = data.summary
+    sanitizeAiResponse()
+  }).catch(error => {
+    showSpinner.value = false
+    console.log(error)
+  })
+}
+
+
 onMounted(async () => {
   await getStats();
+  await generateBoardSummary();
 })
 </script>
 

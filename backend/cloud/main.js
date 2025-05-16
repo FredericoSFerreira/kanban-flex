@@ -624,3 +624,17 @@ Parse.Cloud.define("getBoardStats", async (request) => {
   return results[0]
 
 });
+
+
+Parse.Cloud.define("getBoardById", async (request) => {
+  try {
+    const {id} = request.params;
+    const query = new Parse.Query("boards");
+    query.equalTo('objectId', id)
+    return await query.first();
+  } catch (error) {
+    console.log('Failed to getBoardById, with error code: ' + error.message);
+    throw error
+  }
+});
+

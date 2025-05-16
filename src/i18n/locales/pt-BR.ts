@@ -76,7 +76,7 @@ export default {
   },
   hero: {
     title: 'Visualize seu Fluxo de Trabalho com',
-    subtitle: 'A ferramenta de quadro Kanban mais intuitiva para ajudar equipes a visualizar o trabalho, limitar trabalho em andamento e maximizar a eficiência..',
+    subtitle: 'Trabalho visível, resultados incríveis. Simplifique sua gestão com nosso quadro Kanban',
     getStarted: 'Começar Agora',
     subtitle_footer: 'É um quadro web moderno, aplicativo de código aberto baseado em colunas e cartões.'
   },
@@ -314,6 +314,7 @@ export default {
     errorSaveProfile: 'Error ao salvar.'
   },
   boardV2: {
+    statistics: 'Estatísticas',
     newCard: 'Novo Card',
     title: 'Título',
     description: 'Descrição',
