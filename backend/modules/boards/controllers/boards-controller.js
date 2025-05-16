@@ -34,13 +34,13 @@ const getBoardStats = async (req, res) => {
 const getBoardSummary = async (req, res) => {
   try {
     const id = req.params.id;
-    const regenerate = parseBoolean(req.query.regenerate);
+    const retry = parseBoolean(req.query.retry);
     if (!id) return res.status(400).send("Invalid id");
 
     const client = await getRedisClient();
     const cacheKey = `summary_board_${id}`;
 
-    if (!regenerate) {
+    if (!retry) {
       const valor = await client.get(cacheKey);
       if (valor) {
         console.log('searched in cache');

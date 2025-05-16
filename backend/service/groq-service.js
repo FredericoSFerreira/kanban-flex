@@ -21,7 +21,7 @@ async function getAIBoardSummary(payload) {
           content: payload
         }
       ],
-      temperature: 0.7
+      temperature: 1
     })
   });
 

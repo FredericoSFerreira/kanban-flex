@@ -84,7 +84,7 @@
             <div class="d-flex justify-content-between align-items-center mb-4">
               <h5 class="card-title mb-0">{{ $t('boardStatistics.boardSummary') }}</h5>
               <button class="btn btn-sm btn-outline-primary" @click="generateBoardSummary(true)">
-                <RefreshCw  class="me-2"/>
+                <RefreshCw class="me-2"/>
                 {{ $t('boardStatistics.boardSummaryRegenerateButton') }}
               </button>
             </div>
@@ -96,7 +96,7 @@
                 </div>
               </div>
               <p class="text-muted mb-4" v-if="!showSpinner">
-                {{stats.boardSummary}}
+                {{ stats.boardSummary }}
               </p>
               <div class="d-flex align-items-center">
                 <Sparkles ::size="22" class="text-primary me-2"/>
@@ -294,7 +294,7 @@ const getStats = () => {
 
 const generateBoardSummary = (regenerate: boolean = false) => {
   showSpinner.value = true
-  api.get(`boards/summary/${route.params.id}?regenerate=${regenerate}`).then((response) => {
+  api.get(`boards/summary/${route.params.id}?retry=${regenerate}`).then((response) => {
     const {data} = response
     showSpinner.value = false
     stats.boardSummary = data.summary

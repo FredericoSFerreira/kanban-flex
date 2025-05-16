@@ -76,7 +76,7 @@ export default {
   },
   hero: {
     title: 'Visualize Your Workflow with',
-    subtitle: 'The most intuitive Kanban board tool to help teams visualize work, limit work-in-progress, and maximize efficiency.',
+    subtitle: 'Visible work, incredible results. Simplify your management with our Kanban board.',
     getStarted: 'Get Started',
     watchDemo: 'Watch Demo',
     subtitle_footer: 'Is a web modern board, open-source application based in columns and cards.',
