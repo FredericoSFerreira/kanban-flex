@@ -46,4 +46,28 @@ function requestInfo(req, res, next) {
 }
 
 
-export {generateOtp, generateToken, verifyToken, requestInfo}
+function generateBoardSummaryPrompt(board) {
+  let text = `Board: ${board.name}\n\n`;
+
+  board.columns.forEach((coluna, i) => {
+    text += `Coluna: ${coluna.name}\n`;
+
+    coluna.itens.forEach((card, j) => {
+      text += `- Card ${j + 1}\n`;
+      text += `  - Título: ${card.title || 'Sem título'}\n`;
+      text += `  - Descrição: ${card.description || 'Sem descrição'}\n`;
+      // text += `  - Tags: ${card.labels.length ? card.labels.join(', ') : 'nenhuma'}\n`;
+    });
+
+    text += `\n`;
+  });
+
+  return text;
+}
+
+
+function parseBoolean(value) {
+  return value === 'true' ? true : value === 'false' ? false : undefined;
+}
+
+export {generateOtp, generateToken, verifyToken, requestInfo, generateBoardSummaryPrompt, parseBoolean}

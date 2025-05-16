@@ -46,7 +46,7 @@
                       {{ $t('myBoards.actions.view') }}
                     </router-link>
                   </li>
-                             <li>
+                  <li v-if="board?.columns.length > 0 && board?.columns.filter(column => column.itens.length > 0).length > 0">
                     <router-link :to="`/board/statistics/${board.id}`" class="dropdown-item">
                       <BarChart :size="16" class="me-2"/>
                       {{ $t('myBoards.actions.statistics') }}

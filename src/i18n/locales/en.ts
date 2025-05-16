@@ -12,7 +12,7 @@ export default {
   boardStatistics: {
     totalColumns: 'Total Columns',
     totalCards: 'Total Cards',
-    totalLabes: 'Total Labels',
+    totalLabels: 'Total Labels',
     totalLikes: 'Total Likes',
     totalDislikes: 'Total Dislikes',
     totalComments: 'Total Comments',
@@ -312,6 +312,7 @@ export default {
     error: 'Error to save.'
   },
   boardV2: {
+    statistics: 'Statistics',
     newCard: 'New Card',
     title: 'Title',
     description: 'Description',

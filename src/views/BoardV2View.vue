@@ -19,11 +19,16 @@
             <Plus size="18" class="me-1"/>
             {{ t('board.addColumn') }}
           </button>
+          <button
+            v-if="board?.columns.length > 0 && board?.columns.filter(column => column.itens.length > 0).length > 0"
+            class="btn btn-primary"
+            @click="router.push(`/board/statistics/${route.params.id}?redirect=/board/${route.params.id}`)
+          ">
+            <BarChart2 size="18"/>
+            {{t('boardV2.statistics')}}
+          </button>
           <button class="btn btn-primary" @click="showBoardSettings">
             <Settings size="18"/>
-          </button>
-          <button class="btn btn-primary" @click="router.push(`/board/statistics/${route.params.id}?redirect=/board/${route.params.id}`)">
-            <BarChart2 size="18"/>
           </button>
         </div>
 
@@ -56,7 +61,7 @@
           <h2 class="h3 mb-3">{{ $t('board.emptyState.title') }}</h2>
           <p class="text-muted mb-4">{{ $t('board.emptyState.description') }}</p>
 
-          <button class="btn btn-primary btn-lg" @click="newColumn()">
+          <button class="btn btn-primary btn-md" @click="newColumn()">
             <Plus size="20" class="me-2"/>
             {{ $t('board.emptyState.cta') }}
           </button>

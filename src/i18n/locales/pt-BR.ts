@@ -314,6 +314,7 @@ export default {
     errorSaveProfile: 'Error ao salvar.'
   },
   boardV2: {
+    statistics: 'Estatísticas',
     newCard: 'Novo Card',
     title: 'Título',
     description: 'Descrição',
