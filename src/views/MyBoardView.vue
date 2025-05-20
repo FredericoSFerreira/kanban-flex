@@ -46,7 +46,7 @@
                       {{ $t('myBoards.actions.view') }}
                     </router-link>
                   </li>
-                  <li v-if="board?.columns.length > 0 && board?.columns.filter(column => column.itens.length > 0).length > 0">
+                  <li v-if="board.totalColumns > 0 && board.totalItems > 0">
                     <router-link :to="`/board/statistics/${board.id}`" class="dropdown-item">
                       <BarChart :size="16" class="me-2"/>
                       {{ $t('myBoards.actions.statistics') }}
@@ -62,13 +62,11 @@
               </div>
             </div>
 
-            <p class="text-muted mb-3">{{ board.description || '' }}</p>
-
             <div class="d-flex align-items-center text-muted small">
               <Calendar :size="14" class="me-2"/>
-              {{ formatDate(board.createdAt) }}
+              {{ formatDate(board.created_at) }}
               <Users :size="14" class="ms-3 me-2"/>
-              {{ board.members || 10 }} {{ $t('myBoards.members') }}
+              {{ board.totalUsers || 0 }} {{ $t('myBoards.members') }}
             </div>
           </div>
         </div>
@@ -82,7 +80,7 @@
 <script setup lang="ts">
 import {ref, onMounted} from 'vue';
 import Parse from 'parse/dist/parse.min.js';
-import {Layout, MoreVertical, Eye, Trash2, Calendar, Users, BarChart} from 'lucide-vue-next';
+import {Layout, MoreVertical, Eye, Trash2, Calendar, Users, BarChart, Columns, FileText} from 'lucide-vue-next';
 import api from "@/utils/api";
 import {useSwal} from "@/utils/swal";
 import CreateBoardModal from "@/components/CreateBoardModal.vue";

@@ -6,7 +6,7 @@
           <div class="card border-0 shadow-sm">
             <div class="card-body p-4 p-md-5">
               <div class="text-center mb-4">
-                <Trello class="text-primary" size="48"/>
+                <img src="@/assets/logo-kanbanflex.png"  alt="logo" height="48px">
                 <h2 class="h3 mt-3">{{ $t('auth.createAccount') }}</h2>
                 <p class="text-muted">{{ $t('auth.startJourney') }}</p>
               </div>

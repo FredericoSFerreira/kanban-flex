@@ -31,6 +31,8 @@ export default {
     title: 'Meus Quadros',
     createBoard: 'Criar Novo Quadro',
     members: 'membros',
+    columns: 'colunas',
+    items: 'itens',
     emptyState: {
       title: 'Nenhum quadro ainda',
       description: 'Crie seu primeiro quadro para começar a organizar seus projetos.',
@@ -78,6 +80,7 @@ export default {
     title: 'Visualize seu Fluxo de Trabalho com',
     subtitle: 'Trabalho visível, resultados incríveis. Simplifique sua gestão com nosso quadro Kanban',
     getStarted: 'Começar Agora',
+    watchDemo: 'Ver Demonstração',
     subtitle_footer: 'É um quadro web moderno, aplicativo de código aberto baseado em colunas e cartões.'
   },
   features: {
@@ -179,6 +182,9 @@ export default {
       title: 'Hora de começar',
       description: 'Começe criando as colunas do seu board',
       cta: 'Criar Primeira Coluna'
+    },
+    demo: {
+      alert: "Este ambiente é de demostração. Todos os dados serão excluídos em 30 minutos. Crie uma conta gratuita para acessar todas as funcionalidades."
     }
   },
   footer: {

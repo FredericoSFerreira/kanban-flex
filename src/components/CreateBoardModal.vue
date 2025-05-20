@@ -79,7 +79,7 @@ const showingTemplates = ref(false);
 const router = useRouter()
 const Boards = Parse.Object.extend("boards");
 const board = new Boards();
-const templates = getTemplates()
+const templates = getTemplates().filter(template => template.type !== 'demo')
 
 onMounted(() => {
 });
@@ -107,14 +107,7 @@ const createBoard = (type: 'blank' | 'template', template?: any) => {
 
   board.save(getTemplate(type === 'blank' ? 0 : template.id))
     .then(async (boardDatabase: any) => {
-
       templateModalInstance?.hide();
-      localStorage.setItem("user", JSON.stringify({
-        'name': auth.user?.name,
-        'id': auth.user?.id,
-        'email': auth.user?.email
-      }))
-
       Swal.fire({
         icon: "success",
         title: t('createBoard.success'),

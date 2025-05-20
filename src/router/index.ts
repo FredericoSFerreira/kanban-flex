@@ -24,7 +24,7 @@ const router = createRouter({
       path: '/board/:id',
       name: 'boardV2',
       component: BoardV2View,
-      meta: {requiresAuth: true}
+      meta: {requiresAuth: true, allowDemo: true},
     },
     {
       path: '/board/statistics/:id',
@@ -80,6 +80,7 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   const auth = useAuthStore()
   if (to.meta.requiresAuth && !auth.isAuthenticated) {
+    if (to.meta.allowDemo && to.query?.demo) return next()
     next({path: '/login', query: {redirect: to.fullPath}})
   } else {
     next()

@@ -8,6 +8,7 @@ import './assets/main.css'
 import GoogleSignInPlugin from 'vue3-google-login'
 import { i18n } from './i18n'
 
+
 import VOtpInput from "vue3-otp-input";
 
 import { createApp } from 'vue'

@@ -31,6 +31,8 @@ export default {
     title: 'My Boards',
     createBoard: 'Create New Board',
     members: 'members',
+    columns: 'columns',
+    items: 'items',
     emptyState: {
       title: 'No boards yet',
       description: 'Create your first board to start organizing your projects.',
@@ -179,7 +181,11 @@ export default {
       title: "Time to get started",
       description: "Start by creating the columns for your board",
       cta: "Create First Column"
+    },
+    demo: {
+      alert: "This is a demo environment. All data will be deleted in 30 minutes. Create a free account to access all features."
     }
+
   },
   footer: {
     boards: {
@@ -309,7 +315,9 @@ export default {
     accept: 'I agree to the use of my data as per',
     success: 'Success',
     save: 'Save with success.',
-    error: 'Error to save.'
+    error: 'Error to save.',
+    saveProfile: 'Save with success',
+    errorSaveProfile: 'Error to save.'
   },
   boardV2: {
     statistics: 'Statistics',
