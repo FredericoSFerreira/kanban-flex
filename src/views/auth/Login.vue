@@ -6,7 +6,7 @@
           <div class="card border-0 shadow-sm">
             <div class="card-body p-4 p-md-5">
               <div class="text-center mb-4">
-                <Trello class="text-primary" size="48"/>
+                 <img src="@/assets/logo-kanbanflex.png"  alt="logo" height="48px">
                 <h2 class="h3 mt-3 mb-4">{{ $t('auth.welcomeBack') }}</h2>
               </div>
 
@@ -217,12 +217,6 @@ const verifyOTP = async () => {
         localStorage.setItem('token', token);
         const decoded = jwtDecode<JwtPayload>(token)
         auth.login(decoded, token)
-        // Remove in future due deprecated used only by board v1
-        localStorage.setItem("user", JSON.stringify({
-          'name': auth.user?.name,
-          'id': auth.user?.id,
-          'email': auth.user?.email
-        }))
         await sleep()
         showSpinner.value = false;
         const redirectPath = route.query.redirect
@@ -308,12 +302,6 @@ function handleGoogleLogin() {
         localStorage.setItem('token', token);
         const decoded = jwtDecode<JwtPayload>(token)
         auth.login(decoded, token)
-        // Remove in future due deprecated used only by board v1
-        localStorage.setItem("user", JSON.stringify({
-          'name': auth.user?.name,
-          'id': auth.user?.id,
-          'email': auth.user?.email
-        }))
         showSpinner.value = false;
         const redirectPath = route.query.redirect
         if (typeof redirectPath === 'string' && redirectPath !== '/login') {

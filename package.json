@@ -13,7 +13,6 @@
     "lint": "eslint . --fix"
   },
   "dependencies": {
-    "uuid": "^9.0.1",
     "@popperjs/core": "^2.11.8",
     "axios": "^1.7.9",
     "bootstrap": "^5.3.3",
@@ -24,6 +23,7 @@
     "pinia": "^3.0.2",
     "pinia-plugin-persistedstate": "^4.2.0",
     "sweetalert2": "^11.15.10",
+    "uuid": "^9.0.1",
     "vue": "^3.5.12",
     "vue-country-flag-next": "^2.3.2",
     "vue-i18n": "^9.9.1",
@@ -31,18 +31,18 @@
     "vue-sweetalert2": "^5.0.11",
     "vue-tel-input": "^9.3.0",
     "vue3-emoji-picker": "^1.1.8",
+    "vue3-google-login": "2.0.33",
     "vue3-otp-input": "^0.5.21",
     "vue3-toastify": "^0.2.8",
-    "vuedraggable": "^4.1.0",
-    "vue3-google-login": "2.0.33"
+    "vuedraggable": "^4.1.0"
   },
   "devDependencies": {
-    "@types/uuid": "^9.0.8",
     "@tsconfig/node22": "^22.0.0",
     "@types/bootstrap": "^5.2.10",
     "@types/jsdom": "^21.1.7",
     "@types/node": "^22.10.5",
     "@types/parse": "^3.0.9",
+    "@types/uuid": "^9.0.8",
     "@types/vue-tel-input": "^2.1.7",
     "@vitejs/plugin-vue": "^5.2.1",
     "@vitest/eslint-plugin": "1.1.7",

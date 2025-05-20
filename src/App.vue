@@ -5,7 +5,7 @@
          :class="isDarkMode ? 'navbar-dark bg-dark' : 'navbar-light bg-white shadow-sm'">
       <div class="container">
         <router-link class="navbar-brand d-flex align-items-center" to="/">
-          <Trello class="text-primary" size="32"/>
+          <img src="@/assets/logo-kanbanflex.png"  alt="logo" height="32px">
           <span class="ms-2 fw-bold">KanbanFlex</span>
         </router-link>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -14,19 +14,19 @@
         <div class="collapse navbar-collapse" id="navbarNav">
           <ul class="navbar-nav mx-auto">
             <li class="nav-item">
-              <router-link class="nav-link" to="/">{{ $t('nav.home') }}</router-link>
+              <router-link class="nav-link" to="/">{{ t('nav.home') }}</router-link>
             </li>
             <li class="nav-item">
-              <router-link class="nav-link" to="/my-boards">{{ $t('nav.myBoards') }}</router-link>
+              <router-link class="nav-link" to="/my-boards">{{ t('nav.myBoards') }}</router-link>
             </li>
             <li class="nav-item">
               <a class="nav-link" @click.prevent="navigateToSection('features')" href="#features">{{
-                  $t('nav.features')
+                  t('nav.features')
                 }}</a>
             </li>
             <li class="nav-item">
               <a class="nav-link" @click.prevent="navigateToSection('pricing')" href="#pricing">{{
-                  $t('nav.pricing')
+                  t('nav.pricing')
                 }}</a>
             </li>
           </ul>
@@ -43,7 +43,7 @@
               >
                 <country-flag :country="currentLocale === 'en' ? 'usa' : 'bra'" size='small' rounded="true"/>
 
-                {{ $t(`language.${currentLocale}`) }}
+                {{ t(`language.${currentLocale}`) }}
               </button>
               <ul class="dropdown-menu" aria-labelledby="languageDropdown">
                 <li v-for="locale in availableLocales" :key="locale">
@@ -53,7 +53,7 @@
                     @click="changeLocale(locale)"
                   >
                     <country-flag :country="locale === 'en' ? 'usa' : 'bra'" size='small' rounded="true"/>
-                    {{ $t(`language.${locale}`) }}
+                    {{ t(`language.${locale}`) }}
                   </button>
                 </li>
               </ul>
@@ -67,10 +67,10 @@
               <Moon v-else :size="20"/>
             </button>
             <router-link v-if="!auth.isAuthenticated" to="/login" class="btn btn-link text-decoration-none me-3"
-                         :class="isDarkMode ? 'text-light' : 'text-dark'">{{ $t('nav.login') }}
+                         :class="isDarkMode ? 'text-light' : 'text-dark'">{{ t('nav.login') }}
             </router-link>
             <router-link v-if="!auth.isAuthenticated" to="/register" class="btn btn-primary">{{
-                $t('nav.signUp')
+                t('nav.signUp')
               }}
             </router-link>
 
@@ -98,7 +98,7 @@
                       class="dropdown-item"
                       @click="myProfile()"
                     >
-                      {{ $t('auth.myProfile') }}
+                      {{ t('auth.myProfile') }}
                     </button>
                   </li>
                   <li>
@@ -106,7 +106,7 @@
                       class="dropdown-item"
                       @click="logout()"
                     >
-                      {{ $t('auth.logout') }}
+                      {{ t('auth.logout') }}
                     </button>
                   </li>
                 </ul>
@@ -125,21 +125,21 @@
         <div class="row g-4">
           <div class="col-lg-4 col-md-4">
             <div class="d-flex align-items-center mb-3">
-              <Trello class="text-primary" size="32"/>
+              <img src="@/assets/logo-kanbanflex.png"  alt="logo" height="32px">
               <span class="ms-2 h5 fw-bold mb-0">KanbanFlex</span>
             </div>
             <p class="text-light">
-              {{ $t('hero.subtitle_footer') }}
+              {{ t('hero.subtitle_footer') }}
             </p>
           </div>
 
           <div v-for="(column, index) in footerColumns" :key="index" class="col-lg-2 col-md-2 col-sm-3">
-            <h3 class="h5 fw-bold mb-3 text-light">{{ $t(`footer.${column.key}.title`) }}</h3>
+            <h3 class="h5 fw-bold mb-3 text-light">{{ t(`footer.${column.key}.title`) }}</h3>
             <ul class="list-unstyled">
               <li v-for="(link, linkIndex) in column.links" :key="linkIndex" class="mb-2">
                 <a :href="`${link.path}`" :target="link.target || '_self'"
                    class="text-light text-decoration-none hover-opacity">{{
-                    $t(`footer.${column.key}.${link.label}`)
+                    t(`footer.${column.key}.${link.label}`)
                   }}</a>
               </li>
             </ul>
@@ -147,7 +147,7 @@
         </div>
 
         <div class="border-top border-secondary mt-3 pt-4 text-center text-light">
-          <p>{{ $t('footer.copyright') }}</p>       <a href="https://github.com/FredericoSFerreira/kanban-flex"
+          <p>{{ t('footer.copyright') }}</p>       <a href="https://github.com/FredericoSFerreira/kanban-flex"
                                                        class="text-light hover-opacity">
           <Github :size="24"/>
         </a>
@@ -167,10 +167,7 @@ import {useAuthStore} from "@/stores/auth";
 import {Dropdown} from 'bootstrap';
 import {getFirstAndLastName} from '@/utils/utils'
 import {
-  Trello,
   Github,
-  Twitter,
-  Linkedin,
   Sun,
   Moon
 } from 'lucide-vue-next';
@@ -219,6 +216,7 @@ watchEffect(() => {
 
 const logout = () => {
   auth.logout();
+  localStorage.removeItem('token');
   router.push('/');
 }
 

@@ -20,12 +20,12 @@
             {{ t('board.addColumn') }}
           </button>
           <button
-            v-if="board?.columns.length > 0 && board?.columns.filter(column => column.itens.length > 0).length > 0"
+            v-if="board?.columns.length > 0 && board?.columns.filter(column => column.itens.length > 0).length > 0 && user.id != 'demo'"
             class="btn btn-primary"
-            @click="router.push(`/board/statistics/${route.params.id}?redirect=/board/${route.params.id}`)
+            @click="router.push(`/board/statistics/${route.params.id}`)
           ">
             <BarChart2 size="18"/>
-            {{t('boardV2.statistics')}}
+            {{ t('boardV2.statistics') }}
           </button>
           <button class="btn btn-primary" @click="showBoardSettings">
             <Settings size="18"/>
@@ -51,12 +51,15 @@
 
       </div>
     </div>
-
+    <div class="alert alert-warning" role="alert" v-if="user.id === 'demo'">
+      <AlertTriangle size="25" class=""/>
+      {{ $t('board.demo.alert') }}
+    </div>
     <section class="py-5 text-center container" v-if="board.columns.length === 0 && checkPermission()">
       <div class="empty-state text-center py-5">
         <div class="empty-state-content mx-auto">
           <div class="empty-state-icon mb-4">
-            <Trello size="64" class="text-primary"/>
+            <img src="@/assets/logo-kanbanflex.png" alt="logo" height="64px">
           </div>
           <h2 class="h3 mb-3">{{ $t('board.emptyState.title') }}</h2>
           <p class="text-muted mb-4">{{ $t('board.emptyState.description') }}</p>
@@ -235,7 +238,8 @@
 
 
   <!-- Modal -->
-  <div class="modal fade" id="modalCardName" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal fade modal-lg" id="modalCardName" tabindex="-1" aria-labelledby="exampleModalLabel"
+       aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
@@ -337,7 +341,7 @@
   </div>
 
 
-  <div class="modal fade" id="modalCardDescription" tabindex="-1" aria-labelledby="exampleModalLabel"
+  <div class="modal fade modal-lg" id="modalCardDescription" tabindex="-1" aria-labelledby="exampleModalLabel"
        aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -530,7 +534,10 @@ import {
   MessageSquare,
   Trash2,
   Edit2,
-  GripVertical, BarChart2, Settings, User
+  GripVertical,
+  BarChart2,
+  Settings,
+  AlertTriangle
 } from 'lucide-vue-next';
 import {useSwal} from '@/utils/swal';
 import draggable from 'vuedraggable';
@@ -577,7 +584,7 @@ const auth = useAuthStore();
 
 const boardConfig = reactive(Object.assign({}, configDefault))
 
-const user = reactive(auth.user);
+const user = reactive(auth.user || {id: "demo", name: "Frederico Ferreira", email: "demo@email.com",});
 
 const avatar = ref(user?.avatar ? user?.avatar : `https://ui-avatars.com/api/?background=0D8ABC&color=fff&name=${getFirstAndLastName(user)}`);
 
