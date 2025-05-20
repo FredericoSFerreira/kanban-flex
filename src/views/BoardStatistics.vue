@@ -7,7 +7,7 @@
       </div>
       <div class="col-1">
         <button class="btn btn-primary" @click="router.push(`/board/${route.params.id}`)">
-          <Undo2 size="18"/>
+          <Undo2 :size="18"/>
         </button>
       </div>
 
@@ -20,7 +20,7 @@
                 <LayoutList :size="24" class="text-primary"/>
               </div>
               <div class="ms-3">
-                <h6 class="text-muted mb-1">{{ $t('boardStatistics.totalColumns') }}</h6>
+                <h6 class="text-muted mb-1">{{ t('boardStatistics.totalColumns') }}</h6>
                 <h3 class="mb-0">{{ stats.totalColumns }}</h3>
               </div>
             </div>
@@ -36,7 +36,7 @@
                 <CheckSquare :size="24" class="text-success"/>
               </div>
               <div class="ms-3">
-                <h6 class="text-muted mb-1">{{ $t('boardStatistics.totalCards') }}</h6>
+                <h6 class="text-muted mb-1">{{ t('boardStatistics.totalCards') }}</h6>
                 <h3 class="mb-0">{{ stats.totalCards }}</h3>
               </div>
             </div>
@@ -52,7 +52,7 @@
                 <Tag :size="24" class="text-info"/>
               </div>
               <div class="ms-3">
-                <h6 class="text-muted mb-1">{{ $t('boardStatistics.totalLabels') }}</h6>
+                <h6 class="text-muted mb-1">{{ t('boardStatistics.totalLabels') }}</h6>
                 <h3 class="mb-0">{{ stats.totalLabels }}</h3>
               </div>
             </div>
@@ -68,7 +68,7 @@
                 <MessageSquare :size="24" class="text-warning"/>
               </div>
               <div class="ms-3">
-                <h6 class="text-muted mb-1">{{ $t('boardStatistics.totalComments') }}</h6>
+                <h6 class="text-muted mb-1">{{ t('boardStatistics.totalComments') }}</h6>
                 <h3 class="mb-0">{{ stats.totalComments }}</h3>
               </div>
             </div>
@@ -82,10 +82,10 @@
         <div class="card border-0 shadow-sm">
           <div class="card-body">
             <div class="d-flex justify-content-between align-items-center mb-4">
-              <h5 class="card-title mb-0">{{ $t('boardStatistics.boardSummary') }}</h5>
+              <h5 class="card-title mb-0">{{ t('boardStatistics.boardSummary') }}</h5>
               <button class="btn btn-sm btn-outline-primary" @click="generateBoardSummary(true)">
                 <RefreshCw class="me-2"/>
-                {{ $t('boardStatistics.boardSummaryRegenerateButton') }}
+                {{ t('boardStatistics.boardSummaryRegenerateButton') }}
               </button>
             </div>
             <div class="board-summary">
@@ -100,7 +100,7 @@
               </p>
               <div class="d-flex align-items-center">
                 <Sparkles ::size="22" class="text-primary me-2"/>
-                <small class="text-muted">{{ $t('boardStatistics.boardSummaryAIText') }}</small>
+                <small class="text-muted">{{ t('boardStatistics.boardSummaryAIText') }}</small>
               </div>
             </div>
           </div>
@@ -112,7 +112,7 @@
         <div class="card border-0 shadow-sm">
           <div class="card-body">
             <div class="d-flex justify-content-between align-items-center mb-4">
-              <h5 class="card-title mb-0">{{ $t('boardStatistics.teamMembers') }} ({{ stats.teamMembers.length }})</h5>
+              <h5 class="card-title mb-0">{{ t('boardStatistics.teamMembers') }} ({{ stats.teamMembers.length }})</h5>
             </div>
             <div class="members-list">
               <div v-for="member in stats.teamMembers" :key="member.user_id"
@@ -126,7 +126,6 @@
                 />
                 <div class="flex-grow-1">
                   <h6 class="mb-0">{{ member.name }}</h6>
-                  <small class="text-muted">{{ member.role }}</small>
                 </div>
               </div>
             </div>
@@ -138,7 +137,7 @@
       <div class="col-md-6">
         <div class="card border-0 shadow-sm">
           <div class="card-body">
-            <h5 class="card-title mb-4">{{ $t('boardStatistics.labelsDistribution') }}</h5>
+            <h5 class="card-title mb-4">{{ t('boardStatistics.labelsDistribution') }}</h5>
             <div class="labels-list">
               <div v-for="label in stats.labelStats" :key="label.name" class="mb-3">
                 <div class="d-flex justify-content-between align-items-center mb-1">
@@ -163,34 +162,34 @@
       <div class="col-md-12">
         <div class="card border-0 shadow-sm">
           <div class="card-body">
-            <h5 class="card-title mb-4">{{ $t('boardStatistics.engagementMetrics') }}</h5>
+            <h5 class="card-title mb-4">{{ t('boardStatistics.engagementMetrics') }}</h5>
             <div class="row g-4">
               <div class="col-6">
                 <div class="text-center p-3 rounded bg-light">
                   <ThumbsUp ::size="24" class="text-success mb-2"/>
                   <h3 class="mb-1">{{ stats.totalLikes }}</h3>
-                  <p class="text-muted mb-0">{{ $t('boardStatistics.totalLikes') }}</p>
+                  <p class="text-muted mb-0">{{ t('boardStatistics.totalLikes') }}</p>
                 </div>
               </div>
               <div class="col-6">
                 <div class="text-center p-3 rounded bg-light">
                   <ThumbsDown ::size="24" class="text-danger mb-2"/>
                   <h3 class="mb-1">{{ stats.totalDislikes }}</h3>
-                  <p class="text-muted mb-0">{{ $t('boardStatistics.totalDislikes') }}</p>
+                  <p class="text-muted mb-0">{{ t('boardStatistics.totalDislikes') }}</p>
                 </div>
               </div>
               <div class="col-6">
                 <div class="text-center p-3 rounded bg-light">
                   <MessageSquare ::size="24" class="text-info mb-2"/>
                   <h3 class="mb-1">{{ (stats.totalComments / stats.totalCards).toFixed(1) }}</h3>
-                  <p class="text-muted mb-0">{{ $t('boardStatistics.commentsPerCard') }}</p>
+                  <p class="text-muted mb-0">{{ t('boardStatistics.commentsPerCard') }}</p>
                 </div>
               </div>
               <div class="col-6">
                 <div class="text-center p-3 rounded bg-light">
                   <Tag ::size="24" class="text-primary mb-2"/>
                   <h3 class="mb-1">{{ (stats.totalLabels / stats.totalCards).toFixed(1) }}</h3>
-                  <p class="text-muted mb-0">{{ $t('boardStatistics.labelsPerCards') }}</p>
+                  <p class="text-muted mb-0">{{ t('boardStatistics.labelsPerCards') }}</p>
                 </div>
               </div>
             </div>

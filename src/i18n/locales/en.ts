@@ -309,7 +309,9 @@ export default {
     accept: 'I agree to the use of my data as per',
     success: 'Success',
     save: 'Save with success.',
-    error: 'Error to save.'
+    error: 'Error to save.',
+    saveProfile: 'Save with success',
+    errorSaveProfile: 'Error to save.'
   },
   boardV2: {
     statistics: 'Statistics',
