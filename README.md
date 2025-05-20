@@ -4,7 +4,7 @@
 
 
 
-[**KanbanFlex**](https://kanbanflex.com/) is a web modern board, open-source application for sprint retrospective based in columns and cards.
+[**KanbanFlex**](https://kanbanflex.com/) is a web modern board, open-source application based in columns and cards.
 
 ---
 
@@ -139,10 +139,8 @@ We welcome contributions from the open-source community! Here's how you can get 
 
 ## 🪐 Future Plans
 
-- Analitycs and report
 - Group and ungroup cards
-- Improve OTP login system
-- Implement comments in card
+- New integrations
 
 ---
 
