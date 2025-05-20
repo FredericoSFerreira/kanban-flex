@@ -18,7 +18,7 @@ export default {
     totalComments: 'Total de Comentarios',
     boardSummary: 'Resumo do Board',
     boardSummaryRegenerateButton: 'Gerar',
-     boardSummaryAIText: 'Gerado por IA com base na atividade e no conteúdo do quadro',
+    boardSummaryAIText: 'Gerado por IA com base na atividade e no conteúdo do quadro',
     teamMembers: 'Membros do Board',
     labelsDistribution: 'Distribuição das Labels',
     engagementMetrics: 'Métricas de Engajamento',
@@ -303,6 +303,29 @@ export default {
           third: 'Revisão',
           fourth: 'Aprovado',
           fifth: 'Lançado',
+        }
+      },
+      demo: {
+        name: 'Minhas publicações de artigo',
+        card1: {
+          title: 'Artigo sobre tendências da indústria',
+          description: '👨‍💻 Escrever um artigo sobre as tendências da indústria',
+          labels: 'Tendências, Blog, Estudo'
+        },
+        card2: {
+          title: 'Artigo sobre tendências da WEB3',
+          description: 'Escrever um artigo sobre as tendências da WEB3',
+          labels: 'Pesquisa, Blog, WEB3'
+        },
+        card3: {
+          title: 'Artigo sobre visão computacional',
+          description: 'Escrever um artigo sobre visão computacional',
+          labels: 'Pesquisa, Blog, Estudo'
+        },
+        card4: {
+          title: 'Artigo sobre IA',
+          description: 'Escrever um artigo sobre inteligência artifical',
+          labels: 'Pesquisa, Blog, Estudo, IA'
         }
       }
     }
