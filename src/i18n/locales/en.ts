@@ -304,7 +304,31 @@ export default {
           fourth: 'Approved',
           fifth: 'Launched',
         }
+      },
+      demo: {
+        name: 'My Article Publications',
+        card1: {
+          title: 'Article on Industry Trends',
+          description: '👨‍💻 Write an article about industry trends',
+          labels: 'Trends, Blog, Study'
+        },
+        card2: {
+          title: 'Article on WEB3 Trends',
+          description: 'Write an article about WEB3 trends',
+          labels: 'Research, Blog, WEB3'
+        },
+        card3: {
+          title: 'Article on Computer Vision',
+          description: 'Write an article about computer vision',
+          labels: 'Research, Blog, Study'
+        },
+        card4: {
+          title: 'Article on AI',
+          description: 'Write an article about artificial intelligence',
+          labels: 'Research, Blog, Study, AI'
+        }
       }
+
     }
   },
   myProfile: {

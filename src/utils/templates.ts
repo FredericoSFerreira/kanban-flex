@@ -265,7 +265,7 @@ export function getTemplates(): Array<Template> {
       id: 8,
       type: 'demo',
       icon: null,
-      title: `${t('templates.name')} - ${t('templates.types.demo.name')}`,
+      title: `${t('templates.types.demo.name')}`,
       config: {...configDefault, showLike: true},
       columns: [
         {
@@ -275,12 +275,9 @@ export function getTemplates(): Array<Template> {
             "name": "Frederico Ferreira",
             "user_id": "demo",
             "avatar": "https://ui-avatars.com/api/?background=0D8ABC&color=fff&name=Frederico+Ferreira",
-            "title": "Industry trends article",
-            "description": "👨‍💻Write about emerging trends in tech",
-            "labels": [
-              "Blog",
-              "Research"
-            ],
+            "title": t('templates.types.demo.card1.title'),
+            "description": t('templates.types.demo.card1.description'),
+            "labels": t('templates.types.demo.card1.labels').split(','),
             "up_vote": 0,
             "down_vote": 0,
             "up_vote_users": [],
@@ -292,12 +289,9 @@ export function getTemplates(): Array<Template> {
             "name": "Frederico Ferreira",
             "user_id": "demo",
             "avatar": "https://ui-avatars.com/api/?background=0D8ABC&color=fff&name=Frederico+Ferreira",
-            "title": "Industry trends article",
-            "description": "Write about emerging trends in tech",
-            "labels": [
-              "Blog",
-              "Research"
-            ],
+            "title": t('templates.types.demo.card2.title'),
+            "description": t('templates.types.demo.card2.description'),
+            "labels": t('templates.types.demo.card2.labels').split(','),
             "up_vote": 0,
             "down_vote": 0,
             "up_vote_users": [],
@@ -318,12 +312,9 @@ export function getTemplates(): Array<Template> {
             "name": "Frederico Ferreira",
             "user_id": "demo",
             "avatar": "https://ui-avatars.com/api/?background=0D8ABC&color=fff&name=Frederico+Ferreira",
-            "title": "Compute vision article",
-            "description": "Write about compute vison",
-            "labels": [
-              "Blog",
-              "Research"
-            ],
+            "title": t('templates.types.demo.card3.title'),
+            "description": t('templates.types.demo.card3.description'),
+            "labels": t('templates.types.demo.card3.labels').split(','),
             "up_vote": 0,
             "down_vote": 0,
             "up_vote_users": [],
@@ -344,12 +335,9 @@ export function getTemplates(): Array<Template> {
             "name": "Frederico Ferreira",
             "user_id": "demo",
             "avatar": "https://ui-avatars.com/api/?background=0D8ABC&color=fff&name=Frederico+Ferreira",
-            "title": "AI trends article",
-            "description": "Write about Artificial Intelligence",
-            "labels": [
-              "Blog",
-              "Research"
-            ],
+            "title": t('templates.types.demo.card4.title'),
+            "description": t('templates.types.demo.card4.description'),
+            "labels": t('templates.types.demo.card4.labels').split(','),
             "up_vote": 0,
             "down_vote": 0,
             "up_vote_users": [],
