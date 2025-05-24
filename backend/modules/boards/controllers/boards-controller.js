@@ -14,6 +14,19 @@ const getMyBoards = async (req, res) => {
   }
 };
 
+const getParticipatingBoards = async (req, res) => {
+  try {
+    const params = { userId: req.user.id };
+    const boardsData = await Parse.Cloud.run("getParticipatingBoards", params);
+    res.status(200);
+    res.json(boardsData);
+  } catch (e) {
+    console.log("Occurred error in get participating boards", e);
+    res.status(500);
+    res.send("Occurred error in get participating boards");
+  }
+};
+
 
 const getBoardStats = async (req, res) => {
   try {
@@ -63,4 +76,4 @@ const getBoardSummary = async (req, res) => {
   }
 }
 
-export { getMyBoards, getBoardStats, getBoardSummary };
+export { getMyBoards, getParticipatingBoards, getBoardStats, getBoardSummary };

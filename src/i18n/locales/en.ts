@@ -29,6 +29,7 @@ export default {
   },
   myBoards: {
     title: 'My Boards',
+    titleParticipate: 'Boards I participate in',
     createBoard: 'Create New Board',
     members: 'members',
     columns: 'columns',
