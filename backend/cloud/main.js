@@ -681,3 +681,69 @@ Parse.Cloud.define("getBoardById", async (request) => {
     throw error
   }
 });
+
+Parse.Cloud.define("getParticipatingBoards", async (request) => {
+  try {
+    const query = new Parse.Query("boards");
+    const userId = request.params.userId;
+
+    const pipeline = [
+      {
+        $match: {
+          "owner_id": { $not: { $eq: userId } },
+          "columns.itens.user_id": userId
+        }
+      },
+      {
+        $addFields: {
+          totalColumns: { $size: "$columns" },
+          totalItems: {
+            $sum: {
+              $map: {
+                input: "$columns",
+                as: "col",
+                in: { $size: "$$col.itens" }
+              }
+            }
+          }
+        }
+      },
+      {
+        $unwind: { path: "$columns", preserveNullAndEmptyArrays: true }
+      },
+      {
+        $unwind: { path: "$columns.itens", preserveNullAndEmptyArrays: true }
+      },
+      {
+        $group: {
+          _id: "$_id",
+          name: { $first: "$name" },
+          totalColumns: { $first: "$totalColumns" },
+          totalItems: { $first: "$totalItems" },
+          unique_users: {
+            $addToSet: "$columns.itens.user_id"
+          },
+          created_at: {
+            $first: "$_created_at"
+          }
+        }
+      },
+      {
+        $project: {
+          _id: 1,
+          name: 1,
+          totalColumns: 1,
+          totalItems: 1,
+          totalUsers: { $size: "$unique_users" },
+          created_at: 1
+        }
+      },
+      { $sort: { created_at: -1 } }
+    ];
+
+    return await query.aggregate(pipeline);
+  } catch (error) {
+    console.log('Failed to getParticipatingBoards, with error code: ' + error.message);
+    throw error;
+  }
+});

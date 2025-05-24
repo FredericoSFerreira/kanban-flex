@@ -72,6 +72,54 @@
         </div>
       </div>
     </div>
+
+
+    <h1 class="h2 mb-0" v-if="boardsParticipating.length > 0">{{ $t('myBoards.titleParticipate') }}</h1>
+
+    <div class="row g-4 py-5">
+      <div v-for="board in boardsParticipating" :key="board.id" class="col-md-6 col-lg-4">
+        <div class="card h-100 board-card">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+              <h3 class="h5 mb-0">{{ board.name }}</h3>
+              <div class="dropdown">
+                <button
+                  class="btn btn-link p-0"
+                  type="button"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                >
+                  <MoreVertical :size="18"/>
+                </button>
+                <ul class="dropdown-menu">
+                  <li>
+                    <router-link :to="`/board/${board.id}`" class="dropdown-item">
+                      <Eye :size="16" class="me-2"/>
+                      {{ $t('myBoards.actions.view') }}
+                    </router-link>
+                  </li>
+                  <li v-if="board.totalColumns > 0 && board.totalItems > 0">
+                    <router-link :to="`/board/statistics/${board.id}`" class="dropdown-item">
+                      <BarChart :size="16" class="me-2"/>
+                      {{ $t('myBoards.actions.statistics') }}
+                    </router-link>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="d-flex align-items-center text-muted small">
+              <Calendar :size="14" class="me-2"/>
+              {{ formatDate(board.created_at) }}
+              <Users :size="14" class="ms-3 me-2"/>
+              {{ board.totalUsers || 0 }} {{ $t('myBoards.members') }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
   </div>
 
   <CreateBoardModal ref="createBoardModalComponent"></CreateBoardModal>
@@ -92,6 +140,7 @@ const query = new Parse.Query(Boards);
 const Swal = useSwal();
 
 const boards = ref([]);
+const boardsParticipating = ref([]);
 const showSpinner = ref(false);
 
 const createBoardModalComponent = ref(null);
@@ -150,9 +199,30 @@ const getBoards = async () => {
   }
 };
 
+
+const getBoardsParticipating = async () => {
+  try {
+    // showSpinner.value = true;
+    api.get('/boards/participating')
+      .then((response) => {
+        console.log(response);
+        boardsParticipating.value = response.data.map((b: any) => ({'id': b.objectId, ...b}));
+        // showSpinner.value = false;
+      })
+      .catch((error) => {
+        // showSpinner.value = false;
+        console.log(error);
+      });
+  } catch (error: unknown | any) {
+    console.log('Failed to create new object, with error code: ' + error.message);
+  }
+};
+
 // Lifecycle hook
 onMounted(async () => {
-  await getBoards();
+  // await getBoards();
+  // await getBoardsParticipating()
+  await Promise.all([getBoards(), getBoardsParticipating()])
 });
 </script>
 <style scoped>

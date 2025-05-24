@@ -29,6 +29,7 @@ export default {
   },
   myBoards: {
     title: 'Meus Quadros',
+    titleParticipate: 'Quadros que participo',
     createBoard: 'Criar Novo Quadro',
     members: 'membros',
     columns: 'colunas',
