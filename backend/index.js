@@ -3,7 +3,7 @@ import { ParseServer } from "parse-server";
 import "dotenv/config";
 import bodyParser from "body-parser";
 import cors from "cors";
-import { requestInfo } from "./utils.js";
+import { requestInfo } from "./middleware/request-info.js";
 import boardsRouter from "./modules/boards/routes/boards-routes.js";
 import http from "http";
 import authRouter from "./modules/auth/routes/auth-routes.js";

@@ -1,6 +1,6 @@
 import express from "express";
 import {getBoardStats, getMyBoards, getParticipatingBoards, getBoardSummary} from "../controllers/boards-controller.js";
-import { verifyToken } from "../../../utils.js";
+import { verifyToken } from "../../../middleware/auth.js";
 import { rateLimiter } from "../../../middleware/rate-limiter.js";
 const boardSummaryRateLimit =  Number(process.env.BOARD_SUMMARY_RATE_LIMIT) || 10;
 
