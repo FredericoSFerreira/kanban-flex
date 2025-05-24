@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ locale }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Código OTP</title>
+    <title>{{ t 'email.title' }}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
@@ -11,65 +11,105 @@
             margin: 0;
             font-family: Arial, sans-serif;
         }
+
         .email-container {
             max-width: 600px;
             margin: 20px auto;
-            background: #ffffff;
+            background: #f6f6f6;
             border-radius: 8px;
             overflow: hidden;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
-        .email-header {
-            background: #888b8c;
-            color: #ffffff;
+
+        .header {
+            padding: 24px;
             text-align: center;
-            padding: 20px;
         }
+
+        .header img {
+            width: 60px;
+            margin-bottom: 12px;
+        }
+
+        .header h1 {
+            font-weight: bold;
+            color: white;
+            margin: 0;
+            padding-top: 5px;
+        }
+
+        .header h2 {
+            font-weight: bold;
+            color: black;
+            font-size: 20px;
+            margin: 0;
+        }
+
         .email-body {
             padding: 20px;
         }
+
         .otp-code {
             font-size: 24px;
             font-weight: bold;
             letter-spacing: 5px;
-            color: #6c757d;
+            color: #0070f3;
             margin: 20px 0;
             text-align: center;
         }
+
         .email-footer {
             text-align: center;
             padding: 15px;
-            background: #f1f1f1;
+            background: #e4e4e4;
             font-size: 14px;
-            color: #6c757d;
+            color:  #6c757d;
+        }
+
+        .email-footer a {
+            color:  #6c757d;
+        }
+
+        .email-footer img {
+            padding: 24px;
+            text-align: center;
+            width: 80px;
+            margin-bottom: 12px;
         }
     </style>
 </head>
 <body>
-    <div class="email-container">
-        <!-- Header -->
-        <div class="email-header">
-            <h1>Código de acesso</h1>
-        </div>
+<div class="email-container">
 
-        <!-- Body -->
-        <div class="email-body">
-            <p>Olá {{name}},</p>
-            <p>Utilize o código abaixo para concluir o processo no site:</p>
-
-            <div class="otp-code">
-                <!-- Código OTP -->
-                {{code}}
-            </div>
-
-            <p>Se você não solicitou este código, por favor, ignore este e-mail.</p>
-            <p>Atenciosamente,<br>Equipe do KanbanFlex</p>
-        </div>
-
-        <!-- Footer -->
-        <div class="email-footer">
-            <p>&copy; 2024 {{host}} Contruibua com o projeto <a target="_blank" href="https://github.com/FredericoSFerreira/Open-Sprint-Retro"> Open Source </a> </p>
-        </div>
+    <div class="header" style="background-color: #0070f3;">
+        <h1>{{ t 'email.title' }}</h1>
     </div>
+    <div class="header">
+        <img src="https://vdqkpuzsaktjtfsbsxri.supabase.co/storage/v1/object/public/kanbanflex//logo-kanbanflex.png"
+             alt="{{ t 'email.appName' }} Logo">
+        <h2>{{ t 'email.appName' }}</h2>
+    </div>
+
+    <!-- Body -->
+    <div class="email-body">
+        <p>{{ t 'email.greeting' }} {{ name }},</p>
+        <p>{{ t 'email.instruction' }}</p>
+
+        <div class="otp-code">
+            <!-- Access Code -->
+            {{ code }}
+        </div>
+
+        <p>{{ t 'email.disclaimer' }}</p>
+        <p>{{ t 'email.regards' }}<br>{{ t 'email.team' }}</p>
+    </div>
+
+    <!-- Footer -->
+    <div class="email-footer">
+        <p>{{ t 'email.copyright' }} {{ host }} {{ t 'email.contribute' }} <a target="_blank"
+                                                              href="https://github.com/FredericoSFerreira/kanban-flex">
+            {{ t 'email.openSource' }} </a></p>
+    </div>
+</div>
 </body>
 </html>

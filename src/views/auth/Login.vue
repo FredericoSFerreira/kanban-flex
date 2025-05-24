@@ -6,29 +6,29 @@
           <div class="card border-0 shadow-sm">
             <div class="card-body p-4 p-md-5">
               <div class="text-center mb-4">
-                 <img src="@/assets/logo-kanbanflex.png"  alt="logo" height="48px">
+                <img src="@/assets/logo-kanbanflex.png" alt="logo" height="48px">
                 <h2 class="h3 mt-3 mb-4">{{ $t('auth.welcomeBack') }}</h2>
               </div>
-
-              <!-- Social Login -->
-              <div class="mb-4">
-                <button @click="handleGoogleLogin"
-                        class="btn btn-google w-100 d-flex align-items-center justify-content-center gap-2">
-                  <img src="https://www.google.com/favicon.ico" alt="Google" width="20" height="20"/>
-                  {{$t('auth.googleLogin')}}
-                </button>
-              </div>
-
-              <div class="text-center mb-4">
-                <div class="divider d-flex align-items-center gap-3">
-                  <span class="divider-line"></span>
-                  <span class="text-muted">{{$t('auth.or')}}</span>
-                  <span class="divider-line"></span>
-                </div>
-              </div>
-
-              <!-- Step 1: Email Input -->
               <div v-if="step === 1">
+                <!-- Social Login -->
+                <div class="mb-4">
+                  <button @click="handleGoogleLogin"
+                          class="btn btn-google w-100 d-flex align-items-center justify-content-center gap-2">
+                    <img src="https://www.google.com/favicon.ico" alt="Google" width="20" height="20"/>
+                    {{ $t('auth.googleLogin') }}
+                  </button>
+                </div>
+
+                <div class="text-center mb-4">
+                  <div class="divider d-flex align-items-center gap-3">
+                    <span class="divider-line"></span>
+                    <span class="text-muted">{{ $t('auth.or') }}</span>
+                    <span class="divider-line"></span>
+                  </div>
+                </div>
+
+                <!-- Step 1: Email Input -->
+
                 <p class="text-muted text-center mb-4">
                   {{ $t('auth.enterEmail') }}
                 </p>

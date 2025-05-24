@@ -23,7 +23,11 @@ const register = async (req, res) => {
     }
     const code = generateOtp();
     await Parse.Cloud.run("updateOtp", {email, code});
-    await sendEmail(req.body.email, name, code);
+    // change for middleware
+    const acceptLanguage = req.headers['accept-language'] || '';
+    console.log(acceptLanguage, "HERE")
+    const locale = acceptLanguage.includes('en') ? 'en' : 'pt-BR';
+    await sendEmail(req.body.email, name, code, locale);
     res.send("OK");
   } catch (e) {
     console.log("Occurred error in send otp", e);
@@ -42,7 +46,9 @@ const sendOtp = async (req, res) => {
     const name = userData.name;
     const code = generateOtp();
     await Parse.Cloud.run("updateOtp", {email, code});
-    await sendEmail(req.body.email, name, code);
+    const acceptLanguage = req.headers['accept-language'] || '';
+    const locale = acceptLanguage.includes('en') ? 'en' : 'pt-BR';
+    await sendEmail(req.body.email, name, code, locale);
     res.send("OK");
   } catch (e) {
     console.log("Occurred error in send otp", e);
