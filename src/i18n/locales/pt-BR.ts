@@ -130,6 +130,8 @@ export default {
       unlimited: 'Quadros ilimitados',
       teamMembers: 'Até {count} membros da equipe',
       unlimitedMembers: 'Membros ilimitados',
+      boardSummaryAi: "Resumo do quadro com IA",
+      unlimitedTemplates: "Acesso a todos modelos"
     }
   },
   testimonials: {

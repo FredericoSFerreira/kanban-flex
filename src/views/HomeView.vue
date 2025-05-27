@@ -175,14 +175,14 @@ const features = ref([
     description: 'voting'
   },
   {
-    icon: Shield,
-    title: 'anonymous',
-    description: 'anonymous'
-  },
-  {
     icon: BarChart3,
     title: 'analytics',
     description: 'analytics',
+  },
+    {
+    icon: Shield,
+    title: 'anonymous',
+    description: 'anonymous',
     is_coming: true
   },
 ]);
@@ -193,6 +193,8 @@ const plans = ref([
     features: [
       'unlimited',
       'unlimitedMembers',
+      'boardSummaryAi',
+      'unlimitedTemplates'
     ],
     icon: CheckSquare,
     link: '#',

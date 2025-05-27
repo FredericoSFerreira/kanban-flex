@@ -128,7 +128,9 @@ export default {
     "features": {
       "unlimited": "Unlimited Boards",
       "teamMembers": "Up to {count} team members",
-      "unlimitedMembers": "Unlimited Members"
+      "unlimitedMembers": "Unlimited Members",
+      "boardSummaryAi": "Summary board with AI",
+      "unlimitedTemplates": "Access full templates"
     }
   },
   testimonials: {
