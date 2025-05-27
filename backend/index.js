@@ -35,7 +35,7 @@ app.use(bodyParser.json());
 
 app.use(
   cors({
-    origin: [process.env.FRONTEND_HOST, "http://localhost:5173"],
+    origin: [process.env.FRONT_HOST, "http://localhost:5173"],
   })
 );
 app.use("/parse", api.app);
