@@ -1,6 +1,6 @@
 import {OAuth2Client} from 'google-auth-library';
 import {generateOtp, generateToken} from "../../../utils.js";
-import sendEmail from "../../../email.js";
+import sendEmail from "../../../service/email-service.js";
 
 
 const client = new OAuth2Client()

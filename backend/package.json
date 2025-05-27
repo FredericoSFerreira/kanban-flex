@@ -25,7 +25,8 @@
         "nodemailer": "^6.10.1",
         "parse-server": "^7.5.2",
         "redis": "^5.0.1",
-        "ua-parser-js": "^2.0.3"
+        "ua-parser-js": "^2.0.3",
+        "helmet": "^8.1.0"
     },
     "devDependencies": {
         "nodemon": "^3.1.10"

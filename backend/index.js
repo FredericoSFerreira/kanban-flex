@@ -9,8 +9,10 @@ import http from "http";
 import authRouter from "./modules/auth/routes/auth-routes.js";
 import accessLogsRouter from "./modules/accessLogs/routes/access-logs-routes.js";
 import usersRouter from "./modules/users/routes/users-routes.js";
+import helmet from 'helmet';
 
 const app = express();
+app.use(helmet());
 const host = process.env.APP_HOST || "localhost";
 const port = process.env.APP_PORT || 3000;
 
@@ -33,7 +35,7 @@ app.use(bodyParser.json());
 
 app.use(
   cors({
-    origin: "*",
+    origin: [process.env.FRONTEND_HOST, "http://localhost:5173"],
   })
 );
 app.use("/parse", api.app);

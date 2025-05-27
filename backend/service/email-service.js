@@ -5,7 +5,7 @@ import pkg from 'handlebars';
 const { compile } = pkg;
 
 import { fileURLToPath } from 'url';
-import { t } from './i18n/index.js';
+import { t } from '../i18n/index.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -22,7 +22,7 @@ const transporter = nodemailer.createTransport({
 
 
 async function sendEmail(emailTo, name, otpCode, locale = 'pt-BR') {
-  const filePath = path.join(__dirname, './templates/emails/index.html');
+  const filePath = path.join(__dirname, '../templates/emails/index.html');
   const source = fs.readFileSync(filePath, 'utf-8').toString();
   const template = compile(source);
   const replacements = {
