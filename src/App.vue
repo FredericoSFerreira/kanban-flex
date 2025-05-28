@@ -165,7 +165,8 @@ import {useI18n} from 'vue-i18n';
 import {useRouter, useRoute} from 'vue-router';
 import {useAuthStore} from "@/stores/auth";
 import {Dropdown} from 'bootstrap';
-import {getFirstAndLastName} from '@/utils/utils'
+import {getFirstAndLastName} from '@/utils/utils';
+import {useMetaTags} from '@/utils/head';
 import {
   Github,
   Sun,
@@ -176,6 +177,9 @@ const auth = useAuthStore()
 const {locale, t} = useI18n();
 const router = useRouter();
 const route = useRoute();
+
+// Initialize meta tags
+useMetaTags();
 const currentLocale = computed({
   get: () => locale.value,
   set: (val) => {

@@ -14,12 +14,14 @@ import VOtpInput from "vue3-otp-input";
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
+import { createHead } from '@vueuse/head'
 
 import App from './App.vue'
 import router from './router'
 
 const app = createApp(App)
 const pinia = createPinia()
+const head = createHead()
 const GKEY = import.meta.env.VITE_GOOGLE_CLIENT_ID
 pinia.use(piniaPluginPersistedstate)
 
@@ -30,6 +32,7 @@ app.use(GoogleSignInPlugin, {
 app.use(pinia)
 app.use(router)
 app.use(VueSweetalert2)
+app.use(head)
 app.component('v-otp-input', VOtpInput)
 app.component('country-flag', CountryFlag)
 app.use(i18n)
