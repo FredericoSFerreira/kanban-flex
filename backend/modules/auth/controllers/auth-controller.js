@@ -22,7 +22,7 @@ const register = async (req, res) => {
       return res.status(409).send("Email already registered");
     }
     const code = generateOtp();
-    await Parse.Cloud.run("updateOtp", {email, code});
+    await updateOtp(email, code);
     // change for middleware
     const acceptLanguage = req.headers['accept-language'] || '';
     console.log(acceptLanguage, "HERE")
@@ -45,11 +45,11 @@ const sendOtp = async (req, res) => {
     }
     const name = userData.name;
     const code = generateOtp();
-    await Parse.Cloud.run("updateOtp", {email, code});
+    await updateOtp(email, code);
     const acceptLanguage = req.headers['accept-language'] || '';
     const locale = acceptLanguage.includes('en') ? 'en' : 'pt-BR';
     await sendEmail(req.body.email, name, code, locale);
-    res.send("OK");
+    res.status(201).send();
   } catch (e) {
     console.log("Occurred error in send otp", e);
     res.status(500);
@@ -69,11 +69,7 @@ const checkOtp = async (req, res) => {
       userAgent,
     });
     if (otpData) {
-      await Parse.Cloud.run("updateOtp", {
-        email,
-        code: generateOtp(),
-        isValid: true,
-      });
+      await updateOtp(email, generateOtp(), true);
       const token = await generateToken({
         email: email,
         name: otpData.name,
@@ -133,6 +129,17 @@ const authGoogle = async (req, res) => {
     console.error(error)
     res.status(401).json({error: 'Invalid token'})
   }
+}
+
+
+const updateOtp = async (email, code, isValid= false) => {
+  const query = new Parse.Query("otp");
+  query.equalTo("email", email)
+  query.first().then((otp) => {
+    otp.set('code', code)
+    if (isValid) otp.set('isValid', isValid)
+    otp.save();
+  });
 }
 
 export {register, sendOtp, checkOtp, authGoogle};

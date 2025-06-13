@@ -101,8 +101,8 @@ export default {
       description: "Create personalized workflows that fit your team’s unique processes."
     },
     analytics: {
-      title: "Analytics & Reports",
-      description: "Gain insights into your team's performance with detailed analytics and custom reports."
+      title: 'Board Analysis',
+      description: 'Get insights into everything that happened with your boards in a simple and objective way.'
     },
     voting: {
       title: "Voting & Prioritization",
@@ -111,7 +111,11 @@ export default {
     anonymous: {
       title: "Anonymous Mode",
       description: "Give your team more freedom by enabling honest feedback without pressure."
-    }
+    },
+    ai: {
+      title: 'Artificial Intelligence',
+      description: 'With the help of our AI, your workflow on the boards becomes more productive.'
+    },
   },
   "pricing": {
     "title": "Simple and Transparent Pricing",

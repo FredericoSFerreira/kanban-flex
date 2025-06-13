@@ -228,7 +228,6 @@ const saveProfile = () => {
 
   api.put('/user', {...profile}).then(res => {
     const token = useAuthStore().token
-    console.log(token, "kjhk")
     accessLogs.value = res.data
     showSpinner.value = false;
     useAuthStore().updateUser(profile)

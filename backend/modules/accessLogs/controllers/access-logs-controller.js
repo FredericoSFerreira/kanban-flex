@@ -1,7 +1,8 @@
+import {callFunction} from "../../../utils/parse-utils.js";
+
 const getMyAccessLogs = async (req, res) => {
   try {
-    console.log(req.user.id, "8898")
-    const accessLogsData = await Parse.Cloud.run("getMyAccessLogs", req.user);
+    const accessLogsData = await callFunction("getMyAccessLogs", req.user, req.token);
     res.status(200);
     res.json(accessLogsData);
   } catch (e) {

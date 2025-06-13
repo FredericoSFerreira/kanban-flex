@@ -543,6 +543,7 @@ import {useSwal} from '@/utils/swal';
 import draggable from 'vuedraggable';
 import {useAuthStore} from "@/stores/auth";
 import {getFirstAndLastName} from '@/utils/utils'
+import {useCloudFunctions} from '@/composables/useCloudFunctions';
 // Initialize Parse
 Parse.initialize(import.meta.env.VITE_PARSE_APP_ID);
 Parse.serverURL = import.meta.env.VITE_BACKEND_URL;
@@ -581,6 +582,7 @@ const board = reactive({
   _created_at: null,
 });
 const auth = useAuthStore();
+const { callFunction } = useCloudFunctions();
 
 const boardConfig = reactive(Object.assign({}, configDefault))
 
@@ -643,15 +645,29 @@ const saveBoardName = () => {
     });
   }
 
-  query.equalTo('objectId', route.params.id);
-  query.first().then((retorno) => {
-    retorno.set('name', boardName.value);
-    retorno.save();
-    getBoard();
-    boardName.value = "";
-    modalBoardName.hide();
+  callFunction('updateBoardName', {
+    boardId: route.params.id,
+    name: boardName.value
+  }).then(result => {
+    if (result.success) {
+      getBoard();
+      boardName.value = "";
+      modalBoardName.hide();
+    } else {
+      console.error('Erro ao salvar nome do quadro:', result);
+      $swal.fire({
+        icon: "error",
+        title: t('boardV2.errors.oops'),
+        text: t('boardV2.errors.saveFailed'),
+      });
+    }
   }).catch((error) => {
     console.error('Erro ao salvar documento: ' + error);
+    $swal.fire({
+      icon: "error",
+      title: t('boardV2.errors.oops'),
+      text: t('boardV2.errors.saveFailed'),
+    });
   });
 };
 
@@ -733,7 +749,7 @@ const saveCardVotes = (idColumn, idCard, upVote = false, downVote = false) => {
   }
 
   const voteType = upVote ? 'up' : 'down';
-  Parse.Cloud.run('updateCardVotes', {
+  callFunction('updateCardVotes', {
     boardId: route.params.id,
     columnId: idColumn,
     cardId: idCard,
@@ -782,7 +798,7 @@ const saveEditCard = () => {
   card.title = cardEditTitle.value;
   card.labels = labels;
 
-  Parse.Cloud.run('updateCard', {
+  callFunction('updateCard', {
     boardId: route.params.id,
     columnId: columnSelectedId.value,
     cardId: cardSelectedId.value,
@@ -827,7 +843,7 @@ const setVisibility = () => {
 };
 
 const updateBoardProperties = (updateData) => {
-  Parse.Cloud.run('updateBoardProperties', {
+  callFunction('updateBoardProperties', {
     boardId: route.params.id,
     updates: updateData
   }).catch(error => {
@@ -865,7 +881,7 @@ const removeCard = (columnId, cardId) => {
 
       column.itens.splice(cardIndex, 1);
 
-      Parse.Cloud.run('removeCard', {
+      callFunction('removeCard', {
         boardId: route.params.id,
         columnId: columnId,
         cardId: cardId
@@ -905,7 +921,7 @@ const removeColumn = (id) => {
       const originalColumns = JSON.parse(JSON.stringify(board.columns));
       board.columns.splice(columnIndex, 1);
 
-      Parse.Cloud.run('removeColumn', {
+      callFunction('removeColumn', {
         boardId: route.params.id,
         columnId: id
       }).then(result => {
@@ -947,7 +963,7 @@ const saveEditColumn = () => {
 
   column.name = columnEditName.value;
 
-  Parse.Cloud.run('updateColumn', {
+  callFunction('updateColumn', {
     boardId: route.params.id,
     columnId: columnSelectedId.value,
     updates: {name: columnEditName.value}
@@ -989,7 +1005,7 @@ const saveColumn = () => {
 
   board.columns.push(newColumn);
 
-  Parse.Cloud.run('addColumn', {
+  callFunction('addColumn', {
     boardId: route.params.id,
     column: newColumn
   }).then(result => {
@@ -1047,7 +1063,7 @@ const saveCard = () => {
   column.itens.push(newCard);
 
   // Call Cloud Function to add the card on the server
-  Parse.Cloud.run('addCard', {
+  callFunction('addCard', {
     boardId: route.params.id,
     columnId: columnSelectedId.value,
     card: newCard
@@ -1086,27 +1102,40 @@ const sortItemsByLike = () => {
 };
 
 const getBoard = () => {
-  query.get(route.params.id)
+  callFunction('getBoardById', {
+    id: route.params.id
+  })
     .then((boardData) => {
-      setBoard(boardData);
-    }, (error) => {
-      console.log('Failed to create new object, with error code: ' + error.message);
+      if (boardData) {
+        setBoard(boardData);
+      } else {
+        console.log('Board not found');
+        router.push(`/404`);
+      }
+    })
+    .catch((error) => {
+      console.log('Failed to get board, with error code: ' + error.message);
       router.push(`/404`);
     });
 };
 
 const setBoard = (boardAttr) => {
-  console.log("SET BOARD", boardAttr.attributes);
-  const visibility = boardAttr.attributes.visibility ?? true;
-  const columns = boardAttr.attributes.columns.map((column) => {
+  // Handle both Parse Object (from realtime) and plain object (from Cloud Function)
+  const attributes = boardAttr.attributes || boardAttr;
+  console.log("SET BOARD", attributes);
+
+  const visibility = attributes.visibility ?? true;
+  const columns = attributes.columns.map((column) => {
     return {
       ...column,
       itens: column.itens.filter((item) => item !== null)
     };
   });
-  if (boardAttr.attributes?.config) Object.assign(boardConfig, boardAttr.attributes.config);
+
+  if (attributes?.config) Object.assign(boardConfig, attributes.config);
+
   Object.assign(board, {
-    ...boardAttr.attributes,
+    ...attributes,
     columns,
     visibility: visibility
   });
@@ -1170,7 +1199,7 @@ const onColumnMoved = (evt) => {
 
   const originalColumns = JSON.parse(JSON.stringify(board.columns));
 
-  Parse.Cloud.run('updateColumnPosition', {
+  callFunction('updateColumnPosition', {
     boardId: route.params.id,
     columns: board.columns
   }).then(result => {
@@ -1200,7 +1229,7 @@ const onCardMoved = (evt, columnId) => {
 
   const originalItems = JSON.parse(JSON.stringify(column.itens));
 
-  Parse.Cloud.run('updateCardPosition', {
+  callFunction('updateCardPosition', {
     boardId: route.params.id,
     columnId: columnId,
     items: column.itens
@@ -1241,7 +1270,7 @@ const onDrop = (evt, columnDropId) => {
   sourceColumn.itens.splice(cardIndex, 1);
   targetColumn.itens.push(card);
 
-  Parse.Cloud.run('moveCardBetweenColumns', {
+  callFunction('moveCardBetweenColumns', {
     boardId: route.params.id,
     sourceColumnId: columnToRemoveId,
     targetColumnId: columnDropId,
@@ -1298,7 +1327,7 @@ const addComment = () => {
 
   selectedCard.value.comments.push(comment);
 
-  Parse.Cloud.run('updateCard', {
+  callFunction('updateCard', {
     boardId: route.params.id,
     columnId: selectedColumnId.value,
     cardId: selectedCard.value.id,
@@ -1330,7 +1359,7 @@ const deleteComment = (commentId) => {
   const originalComments = JSON.parse(JSON.stringify(selectedCard.value.comments));
   selectedCard.value.comments.splice(commentIndex, 1);
 
-  Parse.Cloud.run('updateCard', {
+  callFunction('updateCard', {
     boardId: route.params.id,
     columnId: selectedColumnId.value,
     cardId: selectedCard.value.id,

@@ -25,8 +25,10 @@ const api = new ParseServer({
     classNames: ["boards", "otp"],
   },
   serverURL: `${host}:${port}/parse`,
-  logLevel: "INFO",
-  allowClientClassCreation: true,
+  allowClientClassCreation: false,
+  enableClassTransforms: false,
+  enableAnonymousUsers: false,
+  allowExpiredAuthDataToken: false,
 });
 
 api.start();

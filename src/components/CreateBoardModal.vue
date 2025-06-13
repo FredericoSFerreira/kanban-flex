@@ -61,14 +61,13 @@ import {
 } from "lucide-vue-next";
 import {Modal} from 'bootstrap';
 import {useRouter} from "vue-router";
-import Parse from 'parse/dist/parse.min.js';
 import {useAuthStore} from '@/stores/auth'
 import {useSwal} from "@/utils/swal";
 import {useI18n} from "vue-i18n";
 import {getTemplate, getTemplates} from "@/utils/templates";
+import { useCloudFunctions } from '@/composables/useCloudFunctions'
+const { callFunction } = useCloudFunctions()
 
-Parse.initialize(import.meta.env.VITE_PARSE_APP_ID);
-Parse.serverURL = import.meta.env.VITE_BACKEND_URL
 const templateModal = ref(null);
 const Swal = useSwal();
 
@@ -77,8 +76,6 @@ const {t} = useI18n();
 let templateModalInstance: Modal | null = null;
 const showingTemplates = ref(false);
 const router = useRouter()
-const Boards = Parse.Object.extend("boards");
-const board = new Boards();
 const templates = getTemplates().filter(template => template.type !== 'demo')
 
 onMounted(() => {
@@ -103,10 +100,12 @@ const hideTemplateModal = () => {
   templateModalInstance?.hide();
 }
 
-const createBoard = (type: 'blank' | 'template', template?: any) => {
+const createBoard = async (type: 'blank' | 'template', template?: any) => {
+  const templateData = getTemplate(type === 'blank' ? 0 : template.id);
 
-  board.save(getTemplate(type === 'blank' ? 0 : template.id))
-    .then(async (boardDatabase: any) => {
+  await callFunction('createBoard', { template: templateData })
+    .then(async (response: any) => {
+      const boardDatabase = response.board;
       templateModalInstance?.hide();
       Swal.fire({
         icon: "success",

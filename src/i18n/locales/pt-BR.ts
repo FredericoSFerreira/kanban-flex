@@ -101,8 +101,8 @@ export default {
       description: 'Crie fluxos de trabalho personalizados que se adequem aos processos únicos da sua equipe.'
     },
     analytics: {
-      title: 'Análises e Relatórios',
-      description: 'Obtenha insights sobre o desempenho da sua equipe com análises detalhadas e relatórios personalizados.'
+      title: 'Análise dos Quadros',
+      description: 'Obtenha insights sobre tudo o que aconteceu com os seus quadros, de forma simples e objetiva.'
     },
     voting: {
       title: 'Votação e Priorização',
@@ -111,6 +111,10 @@ export default {
     anonymous: {
       title: 'Modo Anônimo',
       description: 'Dê mais liberdade ao time permitindo feedbacks honestos e sem pressões.'
+    },
+    ai: {
+      title: 'Inteligência Artificial',
+      description: 'Com ajuda da nossa IA, seu fluxo de trabalho nos quadros ficam ainda mais produtivos.'
     },
 
   },

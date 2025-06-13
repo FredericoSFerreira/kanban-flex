@@ -1,7 +1,6 @@
 import {createRouter, createWebHistory} from 'vue-router'
 import {useAuthStore} from '@/stores/auth'
 import HomeView from '@/views/HomeView.vue'
-import BoardView from '@/views/BoardView.vue'
 import BoardV2View from "@/views/BoardV2View.vue";
 import ErrorView from '@/views/ErrorView.vue'
 import MyBoardView from "@/views/MyBoardView.vue";
@@ -31,11 +30,6 @@ const router = createRouter({
       name: 'boardStatistics',
       component: BoardStatistics,
       meta: {requiresAuth: true}
-    },
-    {
-      path: '/boardV1/:id',
-      name: 'board',
-      component: BoardView,
     },
     {
       path: "/my-boards",
