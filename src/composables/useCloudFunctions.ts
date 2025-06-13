@@ -28,8 +28,8 @@ export const useCloudFunctions = () => {
     }
   }
 
-  const callPublicFunction = async (functionName: string, params = {}) => {
-    return callFunction(functionName, params, {requireAuth: false})
+  const callPublicFunction = async (functionName: string, params = {}, options = {}) => {
+    return await Parse.Cloud.run(functionName, params, options)
   }
 
   return {

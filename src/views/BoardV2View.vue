@@ -547,8 +547,6 @@ import {useCloudFunctions} from '@/composables/useCloudFunctions';
 // Initialize Parse
 Parse.initialize(import.meta.env.VITE_PARSE_APP_ID);
 Parse.serverURL = import.meta.env.VITE_BACKEND_URL;
-const Boards = Parse.Object.extend("boards");
-const query = new Parse.Query(Boards);
 
 // Router
 const route = useRoute();

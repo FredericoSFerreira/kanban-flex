@@ -17,9 +17,9 @@
                 <ArrowRight class="ms-2" :size="20"/>
               </button>
 
-              <button class="btn btn-outline-primary btn-lg" @click="createBoardDemo()" v-if="!auth.isAuthenticated">
-                {{ t('hero.watchDemo') }}
-              </button>
+<!--              <button class="btn btn-outline-primary btn-lg" @click="createBoardDemo()" v-if="!auth.isAuthenticated">-->
+<!--                {{ t('hero.watchDemo') }}-->
+<!--              </button>-->
             </div>
           </div>
         </div>
@@ -124,7 +124,6 @@
 
 <script setup lang="ts">
 import {ref, onMounted, onUnmounted} from 'vue';
-import Parse from 'parse/dist/parse.min.js';
 import CreateBoardModal from '@/components/CreateBoardModal.vue';
 import {
   CheckSquare,
@@ -138,11 +137,9 @@ import {
 } from 'lucide-vue-next';
 import {useI18n} from "vue-i18n";
 import {getTemplate} from "@/utils/templates";
+import { useCloudFunctions } from '@/composables/useCloudFunctions'
+const { callPublicFunction } = useCloudFunctions()
 
-Parse.initialize(import.meta.env.VITE_PARSE_APP_ID);
-Parse.serverURL = import.meta.env.VITE_BACKEND_URL
-const Boards = Parse.Object.extend("boards");
-const board = new Boards();
 import {useSwal} from '@/utils/swal';
 
 const Swal = useSwal();
@@ -221,11 +218,11 @@ const handleScroll = () => {
   showScrollTop.value = window.scrollY > 100;
 };
 
-const createBoardDemo = () => {
+const createBoardDemo = async () => {
   const templateDemo = getTemplate(8)
-  board.save({demo: true, ...templateDemo})
-    .then(async (boardDatabase: any) => {
-      return router.push(`/board/${boardDatabase.id}?demo=true`)
+  await callPublicFunction('createBoard', {template: {...templateDemo, demo: true}})
+    .then((result: any) => {
+      return router.push(`/board/${result.board.id}?demo=true`)
     }, (error: any) => {
       console.log('Failed to create new object, with error code: ' + error.message)
       return Swal.fire({
