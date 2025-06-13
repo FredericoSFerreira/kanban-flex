@@ -131,21 +131,24 @@ import {
   Users,
   BarChart3,
   ThumbsUp,
-  Shield,
+  Sparkles,
   Trello,
   ArrowRight,
   ArrowUp,
 } from 'lucide-vue-next';
 import {useI18n} from "vue-i18n";
 import {getTemplate} from "@/utils/templates";
+
 Parse.initialize(import.meta.env.VITE_PARSE_APP_ID);
 Parse.serverURL = import.meta.env.VITE_BACKEND_URL
 const Boards = Parse.Object.extend("boards");
 const board = new Boards();
 import {useSwal} from '@/utils/swal';
+
 const Swal = useSwal();
 import {useRouter} from 'vue-router';
 import {useAuthStore} from "@/stores/auth";
+
 const {t} = useI18n();
 const router = useRouter();
 const auth = useAuthStore()
@@ -179,10 +182,10 @@ const features = ref([
     title: 'analytics',
     description: 'analytics',
   },
-    {
-    icon: Shield,
-    title: 'anonymous',
-    description: 'anonymous',
+  {
+    icon: Sparkles,
+    title: 'ai',
+    description: 'ai',
     is_coming: true
   },
 ]);
@@ -222,7 +225,7 @@ const createBoardDemo = () => {
   const templateDemo = getTemplate(8)
   board.save({demo: true, ...templateDemo})
     .then(async (boardDatabase: any) => {
-     return router.push(`/board/${boardDatabase.id}?demo=true`)
+      return router.push(`/board/${boardDatabase.id}?demo=true`)
     }, (error: any) => {
       console.log('Failed to create new object, with error code: ' + error.message)
       return Swal.fire({

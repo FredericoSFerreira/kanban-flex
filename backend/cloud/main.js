@@ -1,10 +1,34 @@
 import {UAParser} from 'ua-parser-js';
+import {verifyTokenParseCloudFunction} from "../middleware/auth.js";
+
+
+// Apply JWT validation to all cloud functions
+Parse.Cloud.beforeSave('*', async (request) => {
+  if (!request.master && !request.isFromCloudCode) {
+    throw new Parse.Error(Parse.Error.OPERATION_FORBIDDEN, 'Direct database access is not allowed');
+  }
+});
+
+Parse.Cloud.beforeDelete('*', async (request) => {
+  if (!request.master && !request.isFromCloudCode) {
+    throw new Parse.Error(Parse.Error.OPERATION_FORBIDDEN, 'Direct database access is not allowed');
+  }
+});
+
+// Global beforeFind trigger to prevent REST API access
+Parse.Cloud.beforeFind('*', async (request) => {
+  if (!request.master && !request.isFromCloudCode) {
+    throw new Parse.Error(Parse.Error.OPERATION_FORBIDDEN, 'Direct database access is not allowed');
+  }
+});
 
 
 // Board operations Cloud Functions
 Parse.Cloud.define("updateCardPosition", async (request) => {
-
   try {
+    // Validate JWT token
+    await verifyTokenParseCloudFunction(request);
+
     const {boardId, columnId, items} = request.params;
     const queryBoard = new Parse.Query("boards");
     queryBoard.equalTo('objectId', boardId);
@@ -34,6 +58,9 @@ Parse.Cloud.define("updateCardPosition", async (request) => {
 
 Parse.Cloud.define("moveCardBetweenColumns", async (request) => {
   try {
+    // Validate JWT token
+    await verifyTokenParseCloudFunction(request);
+
     const {boardId, sourceColumnId, targetColumnId, cardId} = request.params;
     const queryBoard = new Parse.Query("boards");
     queryBoard.equalTo('objectId', boardId);
@@ -76,6 +103,9 @@ Parse.Cloud.define("moveCardBetweenColumns", async (request) => {
 
 Parse.Cloud.define("updateColumnPosition", async (request) => {
   try {
+    // Validate JWT token
+    await verifyTokenParseCloudFunction(request);
+
     const {boardId, columns} = request.params;
     const queryBoard = new Parse.Query("boards");
     queryBoard.equalTo('objectId', boardId);
@@ -98,6 +128,9 @@ Parse.Cloud.define("updateColumnPosition", async (request) => {
 
 Parse.Cloud.define("addCard", async (request) => {
   try {
+    // Validate JWT token
+    await verifyTokenParseCloudFunction(request);
+
     const {boardId, columnId, card} = request.params;
     const queryBoard = new Parse.Query("boards");
     queryBoard.equalTo('objectId', boardId);
@@ -127,6 +160,9 @@ Parse.Cloud.define("addCard", async (request) => {
 
 Parse.Cloud.define("updateCard", async (request) => {
   try {
+    // Validate JWT token
+    await verifyTokenParseCloudFunction(request);
+
     const {boardId, columnId, cardId, updates} = request.params;
     const queryBoard = new Parse.Query("boards");
     queryBoard.equalTo('objectId', boardId);
@@ -163,6 +199,9 @@ Parse.Cloud.define("updateCard", async (request) => {
 
 Parse.Cloud.define("removeCard", async (request) => {
   try {
+    // Validate JWT token
+    await verifyTokenParseCloudFunction(request);
+
     const {boardId, columnId, cardId} = request.params;
     const queryBoard = new Parse.Query("boards");
     queryBoard.equalTo('objectId', boardId);
@@ -197,6 +236,9 @@ Parse.Cloud.define("removeCard", async (request) => {
 
 Parse.Cloud.define("addColumn", async (request) => {
   try {
+    // Validate JWT token
+    await verifyTokenParseCloudFunction(request);
+
     const {boardId, column} = request.params;
     const queryBoard = new Parse.Query("boards");
     queryBoard.equalTo('objectId', boardId);
@@ -219,6 +261,9 @@ Parse.Cloud.define("addColumn", async (request) => {
 
 Parse.Cloud.define("updateColumn", async (request) => {
   try {
+    // Validate JWT token
+    await verifyTokenParseCloudFunction(request);
+
     const {boardId, columnId, updates} = request.params;
     const queryBoard = new Parse.Query("boards");
     queryBoard.equalTo('objectId', boardId);
@@ -250,6 +295,9 @@ Parse.Cloud.define("updateColumn", async (request) => {
 
 Parse.Cloud.define("removeColumn", async (request) => {
   try {
+    // Validate JWT token
+    await verifyTokenParseCloudFunction(request);
+
     const {boardId, columnId} = request.params;
     const queryBoard = new Parse.Query("boards");
     queryBoard.equalTo('objectId', boardId);
@@ -279,6 +327,9 @@ Parse.Cloud.define("removeColumn", async (request) => {
 
 Parse.Cloud.define("updateBoardProperties", async (request) => {
   try {
+    // Validate JWT token
+    await verifyTokenParseCloudFunction(request);
+
     const {boardId, updates} = request.params;
     const queryBoard = new Parse.Query("boards");
     queryBoard.equalTo('objectId', boardId);
@@ -303,6 +354,9 @@ Parse.Cloud.define("updateBoardProperties", async (request) => {
 
 Parse.Cloud.define("updateCardVotes", async (request) => {
   try {
+    // Validate JWT token
+    await verifyTokenParseCloudFunction(request);
+
     const {boardId, columnId, cardId, userId, voteType} = request.params;
     const queryBoard = new Parse.Query("boards");
     queryBoard.equalTo('objectId', boardId);
@@ -405,8 +459,13 @@ Parse.Cloud.define("getOtp", async (request) => {
     if (!otp) {
       return {notFound: true}
     }
-    console.log(otp.attributes)
-    return otp.attributes;
+    return {
+      success: true,
+      email: otp.get('email'),
+      name: otp.get('name'),
+      isValid: otp.get('isValid'),
+    };
+
   } catch (error) {
     console.log('Failed to getOtp, with error code: ' + error.message);
     throw error
@@ -446,21 +505,6 @@ Parse.Cloud.define("saveOtp", async (request) => {
   }
 });
 
-
-Parse.Cloud.define("updateOtp", async (request) => {
-  const query = new Parse.Query("otp");
-
-  query.equalTo("email", request.params.email)
-  query.first().then((otp) => {
-    otp.set('code', request.params.code)
-    if (request.params.isValid) {
-      otp.set('isValid', true)
-    }
-    return otp.save();
-  });
-});
-
-
 Parse.Cloud.define("checkOtp", async (request) => {
   try {
     const query = new Parse.Query("otp");
@@ -476,8 +520,8 @@ Parse.Cloud.define("checkOtp", async (request) => {
 
 Parse.Cloud.define("getMyBoards", async (request) => {
   try {
+    await verifyTokenParseCloudFunction(request);
     const query = new Parse.Query("boards");
-    console.log(request.params.email)
 
     const pipeline = [
       {$match: {owner_email: request.params.email}},
@@ -534,6 +578,9 @@ Parse.Cloud.define("getMyBoards", async (request) => {
 
 Parse.Cloud.define("getMyAccessLogs", async (request) => {
   try {
+    // Validate JWT token
+    await verifyTokenParseCloudFunction(request);
+
     const query = new Parse.Query("accessLog");
     query.equalTo({'id_user': request.params.id})
     query.descending('_created_at')
@@ -547,8 +594,10 @@ Parse.Cloud.define("getMyAccessLogs", async (request) => {
 
 
 Parse.Cloud.define("updateUserOtp", async (request) => {
+  // Validate JWT token
+  await verifyTokenParseCloudFunction(request);
+
   const query = new Parse.Query("otp");
-  console.log(request.params, "jgjhg")
   query.equalTo("objectId", request.params.id)
   query.first().then((otp) => {
     otp.set('name', request.params.name)
@@ -560,6 +609,9 @@ Parse.Cloud.define("updateUserOtp", async (request) => {
 
 
 Parse.Cloud.define("getBoardStats", async (request) => {
+  // Validate JWT token
+  await verifyTokenParseCloudFunction(request);
+
   const {id} = request.params;
   const db = new Parse.Query("boards");
   const pipeline = [
@@ -672,6 +724,9 @@ Parse.Cloud.define("getBoardStats", async (request) => {
 
 Parse.Cloud.define("getBoardById", async (request) => {
   try {
+    // Validate JWT token
+    await verifyTokenParseCloudFunction(request);
+
     const {id} = request.params;
     const query = new Parse.Query("boards");
     query.equalTo('objectId', id)
@@ -684,6 +739,9 @@ Parse.Cloud.define("getBoardById", async (request) => {
 
 Parse.Cloud.define("getParticipatingBoards", async (request) => {
   try {
+    // Validate JWT token
+    await verifyTokenParseCloudFunction(request);
+
     const query = new Parse.Query("boards");
     const userId = request.params.userId;
 
@@ -744,6 +802,76 @@ Parse.Cloud.define("getParticipatingBoards", async (request) => {
     return await query.aggregate(pipeline);
   } catch (error) {
     console.log('Failed to getParticipatingBoards, with error code: ' + error.message);
+    throw error;
+  }
+});
+
+Parse.Cloud.define("updateBoardName", async (request) => {
+  try {
+    // Validate JWT token
+    await verifyTokenParseCloudFunction(request);
+
+    const { boardId, name } = request.params;
+    const queryBoard = new Parse.Query("boards");
+    queryBoard.equalTo('objectId', boardId);
+
+    const board = await queryBoard.first();
+    if (!board) {
+      throw new Error("Board not found");
+    }
+
+    // Update board name
+    board.set('name', name);
+
+    const result = await board.save(null, {useMasterKey: true});
+    return {success: true, result};
+  } catch (error) {
+    console.error("Error in updateBoardName:", error);
+    throw error;
+  }
+});
+
+Parse.Cloud.define("removeBoard", async (request) => {
+  try {
+    // Validate JWT token
+    await verifyTokenParseCloudFunction(request);
+
+    const { boardId } = request.params;
+    const queryBoard = new Parse.Query("boards");
+    queryBoard.equalTo('objectId', boardId);
+
+    const board = await queryBoard.first();
+    if (!board) {
+      throw new Error("Board not found");
+    }
+
+    // Delete the board
+    await board.destroy({useMasterKey: true});
+    return {success: true};
+  } catch (error) {
+    console.error("Error in removeBoard:", error);
+    throw error;
+  }
+});
+
+Parse.Cloud.define("createBoard", async (request) => {
+  try {
+    // Validate JWT token
+    await verifyTokenParseCloudFunction(request);
+
+    const { template } = request.params;
+    const Boards = Parse.Object.extend("boards");
+    const board = new Boards();
+
+    // Save the board with the provided template
+    const boardDatabase = await board.save(template, {useMasterKey: true});
+
+    return {
+      success: true,
+      board: boardDatabase
+    };
+  } catch (error) {
+    console.error("Error in createBoard:", error);
     throw error;
   }
 });

@@ -7,6 +7,7 @@ import CountryFlag from 'vue-country-flag-next'
 import './assets/main.css'
 import GoogleSignInPlugin from 'vue3-google-login'
 import { i18n } from './i18n'
+import { initializeParse } from '@/utils/parse-config'
 
 
 import VOtpInput from "vue3-otp-input";
@@ -23,6 +24,7 @@ const app = createApp(App)
 const pinia = createPinia()
 const head = createHead()
 const GKEY = import.meta.env.VITE_GOOGLE_CLIENT_ID
+
 pinia.use(piniaPluginPersistedstate)
 
 
@@ -36,4 +38,7 @@ app.use(head)
 app.component('v-otp-input', VOtpInput)
 app.component('country-flag', CountryFlag)
 app.use(i18n)
+
+initializeParse()
+
 app.mount('#app')

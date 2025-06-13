@@ -127,16 +127,13 @@
 </template>
 <script setup lang="ts">
 import {ref, onMounted} from 'vue';
-import Parse from 'parse/dist/parse.min.js';
-import {Layout, MoreVertical, Eye, Trash2, Calendar, Users, BarChart, Columns, FileText} from 'lucide-vue-next';
+import {Layout, MoreVertical, Eye, Trash2, Calendar, Users, BarChart} from 'lucide-vue-next';
 import api from "@/utils/api";
 import {useSwal} from "@/utils/swal";
 import CreateBoardModal from "@/components/CreateBoardModal.vue";
+import { useCloudFunctions } from '@/composables/useCloudFunctions'
+const { callFunction } = useCloudFunctions()
 
-Parse.initialize(import.meta.env.VITE_PARSE_APP_ID);
-Parse.serverURL = import.meta.env.VITE_BACKEND_URL;
-const Boards = Parse.Object.extend("boards");
-const query = new Parse.Query(Boards);
 const Swal = useSwal();
 
 const boards = ref([]);
@@ -161,16 +158,30 @@ const removeBoard = async (idBoard: string) => {
     showCancelButton: false,
     confirmButtonText: "Sim",
     denyButtonText: `Não`
-  }).then((result) => {
+  }).then(async (result) => {
     if (result.isConfirmed) {
-      query.equalTo('objectId', idBoard);
-      query.first().then((retorno: any) => {
-        retorno.destroy();
-        setTimeout(() => {
-          getBoards();
-        }, 1000);
+      await callFunction('removeBoard', {
+        boardId: idBoard
+      }).then((result: any) => {
+        if (result.success) {
+          setTimeout(() => {
+            getBoards();
+          }, 1000);
+        } else {
+          console.error('Erro ao remover board:', result);
+          Swal.fire({
+            icon: "error",
+            title: "Oops...",
+            text: "Ocorreu um erro ao remover o board. Tente novamente.",
+          });
+        }
       }).catch((error: any) => {
-        console.error('Erro ao salvar documento: ' + error);
+        console.error('Erro ao remover board: ' + error);
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: "Ocorreu um erro ao remover o board. Tente novamente.",
+        });
       });
     }
   });

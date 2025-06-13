@@ -1,10 +1,11 @@
 import {generateBoardSummaryPrompt, parseBoolean} from "../../../utils.js";
 import{getAIBoardSummary} from "../../../service/groq-service.js";
 import {getRedisClient} from "../../../service/redis-service.js";
+import {callFunction} from "../../../utils/parse-utils.js";
 
 const getMyBoards = async (req, res) => {
   try {
-    const userData = await Parse.Cloud.run("getMyBoards", req.user);
+    const userData = await callFunction("getMyBoards", req.user, req.token);
     res.status(200);
     res.json(userData);
   } catch (e) {
@@ -17,7 +18,7 @@ const getMyBoards = async (req, res) => {
 const getParticipatingBoards = async (req, res) => {
   try {
     const params = { userId: req.user.id };
-    const boardsData = await Parse.Cloud.run("getParticipatingBoards", params);
+    const boardsData = await callFunction("getParticipatingBoards", params, req.token);
     res.status(200);
     res.json(boardsData);
   } catch (e) {
@@ -33,7 +34,7 @@ const getBoardStats = async (req, res) => {
     const id = req.params.id;
     if (!id) return res.status(400).send("Invalid id");
 
-    const boardStats = await Parse.Cloud.run("getBoardStats", req.params);
+    const boardStats = await callFunction("getBoardStats", req.params, req.token);
     res.status(200);
     res.json(boardStats);
   } catch (e) {
@@ -62,7 +63,7 @@ const getBoardSummary = async (req, res) => {
     }
 
     console.log('did not search in cache');
-    const board = await Parse.Cloud.run("getBoardById", req.params);
+    const board = await callFunction("getBoardById", req.params, req.token);
     const prompt = generateBoardSummaryPrompt(board.attributes);
     const aiResponse = await getAIBoardSummary(prompt)
 
