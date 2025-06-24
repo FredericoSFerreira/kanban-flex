@@ -1,5 +1,5 @@
 import { getRedisClient } from "../service/redis-service.js";
-import {parseBoolean} from "../utils.js";
+import {parseBoolean} from "../utils/utils.js";
 
 export const rateLimiter = (maxRequests = 10, windowMs = 60000, keyPrefix = 'ratelimit') => {
   return async (req, res, next) => {

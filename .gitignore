@@ -34,3 +34,4 @@ coverage
 /backend/.env
 
 /backend/mongo_data
+/backend/redis_data
