@@ -1,4 +1,5 @@
-# # KanbanFlex [![Netlify Status](https://api.netlify.com/api/v1/badges/08200383-b16d-4391-a914-37fe41309b3c/deploy-status)](https://app.netlify.com/sites/open-sprint-retro/deploys)
+# # KanbanFlex [![Netlify Status](https://api.netlify.com/api/v1/badges/08200383-b16d-4391-a914-37fe41309b3c/deploy-status)](https://app.netlify.com/sites/open-sprint-retro/deploys) [![codecov](https://codecov.io/gh/FredericoSFerreira/kanban-flex/branch/main/graph/badge.svg?flag=backend)](https://codecov.io/gh/FredericoSFerreira/kanban-flex)
+
 
 
 

@@ -5,9 +5,13 @@ services:
         image: app:latest
         depends_on:
             - database
+            - redis
         ports:
             - 3000:3000
         entrypoint: bash -c "npm run migrate && npm run start"
+        environment:
+            - REDIS_HOST=redis
+            - REDIS_PORT=6379
     database:
         image: mongo:latest
         hostname: mongo
@@ -18,3 +22,18 @@ services:
             test: test $$(echo "rs.initiate().ok || rs.status().ok" | mongo -port 27017 --quiet) -eq 1
             interval: 10s
             start_period: 30s
+
+    redis:
+        image: redis:7-alpine
+        hostname: redis
+        restart: on-failure
+        ports:
+            - 6379:6379
+        volumes:
+            - ./redis_data:/data
+        command: redis-server --appendonly yes
+        healthcheck:
+            test: ["CMD", "redis-cli", "ping"]
+            interval: 10s
+            timeout: 5s
+            retries: 3

@@ -1,4 +1,4 @@
-import {generateBoardSummaryPrompt, parseBoolean} from "../../../utils.js";
+import {generateBoardSummaryPrompt, parseBoolean} from "../../../utils/utils.js";
 import{getAIBoardSummary} from "../../../service/groq-service.js";
 import {getRedisClient} from "../../../service/redis-service.js";
 import {callFunction} from "../../../utils/parse-utils.js";

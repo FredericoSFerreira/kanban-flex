@@ -1,5 +1,5 @@
 import {OAuth2Client} from 'google-auth-library';
-import {generateOtp, generateToken} from "../../../utils.js";
+import {generateOtp, generateToken} from "../../../utils/utils.js";
 import sendEmail from "../../../service/email-service.js";
 
 
