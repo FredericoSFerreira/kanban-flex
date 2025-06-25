@@ -2,7 +2,7 @@ import express from "express";
 import "dotenv/config";
 import bodyParser from "body-parser";
 import cors from "cors";
-import { requestInfo } from "./middleware/request-info.js";
+import {requestInfo} from "./middleware/request-info.js";
 import boardsRouter from "./modules/boards/routes/boards-routes.js";
 import authRouter from "./modules/auth/routes/auth-routes.js";
 import accessLogsRouter from "./modules/accessLogs/routes/access-logs-routes.js";

@@ -31,6 +31,8 @@ jobs:
           NODE_ENV: test
           JWT_SECRET_KEY: test-secret-key
           AUTH_RATE_LIMIT: 100
+          PARSE_APP_ID: 123
+          PARSE_MASTER_KEY: key
         run: node --experimental-vm-modules node_modules/.bin/jest --coverage
 
       - name: Upload coverage folder as artifact

@@ -1,7 +1,8 @@
-import { ParseServer } from "parse-server";
+import {ParseServer} from "parse-server";
 import "dotenv/config";
 import http from "http";
 import app from './app.js';
+
 const host = process.env.APP_HOST || "localhost";
 const port = process.env.APP_PORT || 3000;
 
@@ -15,12 +16,12 @@ const api = new ParseServer({
   },
   serverURL: `${host}:${port}/parse`,
   allowClientClassCreation: false,
-  enableClassTransforms: false,
   enableAnonymousUsers: false,
   allowExpiredAuthDataToken: false,
 });
 
 api.start();
+app.use("/parse", api.app);
 
 const httpServer = http.createServer(app);
 httpServer.listen(port, () => {
