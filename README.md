@@ -1,5 +1,4 @@
-# # KanbanFlex [![Netlify Status](https://api.netlify.com/api/v1/badges/08200383-b16d-4391-a914-37fe41309b3c/deploy-status)](https://app.netlify.com/sites/open-sprint-retro/deploys) [![codecov](https://codecov.io/gh/FredericoSFerreira/kanban-flex/branch/main/graph/badge.svg?flag=backend)](https://codecov.io/gh/FredericoSFerreira/kanban-flex)
-
+# # KanbanFlex [![Netlify Status](https://api.netlify.com/api/v1/badges/08200383-b16d-4391-a914-37fe41309b3c/deploy-status)](https://app.netlify.com/sites/open-sprint-retro/deploys) [![codecov](https://codecov.io/gh/FredericoSFerreira/kanban-flex/branch/main/graph/badge.svg?flag=backend)](https://codecov.io/gh/FredericoSFerreira/kanban-flex) [![Backend Tests and Coverage](https://github.com/FredericoSFerreira/kanban-flex/actions/workflows/tests.yml/badge.svg)](https://github.com/FredericoSFerreira/kanban-flex/actions/workflows/tests.yml)
 
 
 
@@ -107,6 +106,27 @@ npm run migrate
 ```sh
 npm run start
 ```
+
+### Run Tests
+
+```sh
+# Run all tests
+npm test
+
+# Run tests with coverage
+npm run test:coverage
+
+# Run tests in watch mode
+npm run test:watch
+
+# Run only unit tests
+npm run test:unit
+
+# Run only e2e tests
+npm run test:e2e
+```
+
+Execute os testes antes de enviar um PR para garantir que suas alterações não quebrem funcionalidades existentes.
 
 ## 🤝 Contributing
 
