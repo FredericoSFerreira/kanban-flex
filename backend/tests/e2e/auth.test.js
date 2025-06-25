@@ -15,9 +15,19 @@ global.Parse = {
   })),
 }
 
+jest.unstable_mockModule('./middleware/rate-limiter.js', () => ({
+  rateLimiter: () => (req, res, next) => next()
+}));
+
+
 jest.unstable_mockModule('./utils/parse-utils.js', () => ({
   callFunction: mockCallFunction
 }));
+
+jest.unstable_mockModule('./service/email-service.js', () => ({
+  default: jest.fn().mockResolvedValue(true)
+}));
+
 
 const request = (await import('supertest')).default;
 const {default: app} = await import('../../app.js');
@@ -37,8 +47,6 @@ describe('Register Endpoint', () => {
   });
 
   it('should return 201 Created with success message when registration is successful', async () => {
-
-
     Parse.Cloud.run.mockResolvedValue({status: 'success', conflict: false});
 
     const response = await request(app)
