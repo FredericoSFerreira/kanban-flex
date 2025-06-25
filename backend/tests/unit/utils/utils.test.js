@@ -1,5 +1,3 @@
-import { jest } from '@jest/globals';
-
 await jest.unstable_mockModule('jose', () => ({
   SignJWT: jest.fn().mockImplementation(() => ({
     setProtectedHeader: jest.fn().mockReturnThis(),

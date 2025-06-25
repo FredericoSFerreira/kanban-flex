@@ -38,9 +38,9 @@ const getBoardStats = async (req, res) => {
     res.status(200);
     res.json(boardStats);
   } catch (e) {
-    console.log("Occurred error in get my board", e);
+    console.log("Occurred error in get stats board", e);
     res.status(500);
-    res.send("Occurred error in get my board");
+    res.send("Occurred error in get stats board");
   }
 };
 
