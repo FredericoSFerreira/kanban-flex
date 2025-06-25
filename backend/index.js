@@ -1,7 +1,18 @@
+import express from "express";
 import { ParseServer } from "parse-server";
 import "dotenv/config";
+import bodyParser from "body-parser";
+import cors from "cors";
+import { requestInfo } from "./middleware/request-info.js";
+import boardsRouter from "./modules/boards/routes/boards-routes.js";
 import http from "http";
-import app from './app.js';
+import authRouter from "./modules/auth/routes/auth-routes.js";
+import accessLogsRouter from "./modules/accessLogs/routes/access-logs-routes.js";
+import usersRouter from "./modules/users/routes/users-routes.js";
+import helmet from 'helmet';
+
+const app = express();
+app.use(helmet());
 const host = process.env.APP_HOST || "localhost";
 const port = process.env.APP_PORT || 3000;
 
@@ -22,6 +33,25 @@ const api = new ParseServer({
 
 api.start();
 
+app.use(bodyParser.json());
+
+app.use(
+  cors({
+    origin: [process.env.FRONT_HOST, "http://localhost:5173"],
+  })
+);
+app.use("/parse", api.app);
+app.use(requestInfo);
+
+app.get("/healthcheck", (req, res) => {
+  res.send("OK");
+});
+
+app.use(boardsRouter);
+app.use(authRouter);
+app.use(accessLogsRouter);
+app.use(usersRouter);
+
 const httpServer = http.createServer(app);
 httpServer.listen(port, () => {
   try {
@@ -31,3 +61,5 @@ httpServer.listen(port, () => {
   }
   console.log(`API - port ${port}`);
 });
+
+export default app;
