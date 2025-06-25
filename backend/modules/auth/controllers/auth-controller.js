@@ -25,14 +25,13 @@ const register = async (req, res) => {
     await updateOtp(email, code);
     // change for middleware
     const acceptLanguage = req.headers['accept-language'] || '';
-    console.log(acceptLanguage, "HERE")
     const locale = acceptLanguage.includes('en') ? 'en' : 'pt-BR';
     await sendEmail(req.body.email, name, code, locale);
     res.send("OK");
   } catch (e) {
-    console.log("Occurred error in send otp", e);
+    console.log("Occurred error in register otp", e);
     res.status(500);
-    res.send("Occurred error in send otp");
+    res.send("Occurred error in register otp");
   }
 };
 
@@ -83,9 +82,9 @@ const checkOtp = async (req, res) => {
       res.json({isValid: false});
     }
   } catch (e) {
-    console.log("Occurred error in send otp", e);
+    console.log("Occurred error in check otp", e);
     res.status(500);
-    res.send("Occurred error in send otp");
+    res.send("Occurred error in check otp");
   }
 };
 
