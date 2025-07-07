@@ -190,6 +190,41 @@ export default {
       description: 'Começe criando as colunas do seu board',
       cta: 'Criar Primeira Coluna'
     },
+    aiAssist: {
+      chatInputLabel: "Pergunte qualquer coisa sobre o quadro...",
+      quickQuestionsText: "Perguntas rápidas",
+      justNow: "Agora mesmo",
+      "greeting": "👋 Olá! Sou seu assistente de IA para este quadro Kanban.",
+      "helpIntro": "Posso te ajudar com:",
+      "items": {
+        "progress": "Analisar o progresso do seu quadro",
+        "suggestions": "Sugerir melhorias",
+        "questions": "Responder perguntas sobre as tarefas",
+        "tips": "Oferecer dicas de produtividade"
+      },
+      "questions": {
+        "boardProgress": {
+          "label": "Progresso do Quadro",
+          "message": "Como está o progresso do meu quadro?"
+        },
+        "bottlenecks": {
+          "label": "Gargalos",
+          "message": "Existem gargalos no meu fluxo de trabalho?"
+        },
+        "suggestions": {
+          "label": "Sugestões",
+          "message": "Quais melhorias você sugere?"
+        },
+        "teamPerformance": {
+          "label": "Desempenho da Equipe",
+          "message": "Como está o desempenho da minha equipe?"
+        },
+        "boardSummary": {
+          "label": "Resumo do quadro",
+          "message": "Poderia gerar um resumo geral do meu quadro?"
+        }
+      }
+    },
     demo: {
       alert: "Este ambiente é de demostração. Todos os dados serão excluídos em 30 minutos. Crie uma conta gratuita para acessar todas as funcionalidades."
     }
@@ -347,7 +382,14 @@ export default {
     delete: 'Solicitar',
     success: 'Sucesso',
     saveProfile: 'Salvo com sucesso.',
-    errorSaveProfile: 'Error ao salvar.'
+    errorSaveProfile: 'Error ao salvar.',
+    confirmDelete: 'Excluir Conta',
+    deleteWarning: 'Tem certeza que deseja excluir sua conta? Isso irá desativar sua conta e você não poderá mais acessar o sistema.',
+    deleteIrreversible: 'Esta ação não pode ser desfeita!',
+    cancel: 'Cancelar',
+    confirmDeleteBtn: 'Excluir Conta',
+    accountDeactivated: 'Sua conta foi desativada com sucesso.',
+    errorDeactivating: 'Erro ao desativar sua conta. Por favor, tente novamente.'
   },
   boardV2: {
     statistics: 'Estatísticas',

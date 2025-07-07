@@ -1,6 +1,7 @@
 import {OAuth2Client} from 'google-auth-library';
 import {generateOtp, generateToken} from "../../../utils/utils.js";
 import sendEmail from "../../../service/email-service.js";
+import { t } from "../../../i18n/index.js";
 
 
 const client = new OAuth2Client()
@@ -42,6 +43,17 @@ const sendOtp = async (req, res) => {
     if (userData.notFound) {
       return res.status(404).send("Email not found");
     }
+
+    // Check if user is active
+    if (userData.active === false) {
+      const acceptLanguage = req.headers['accept-language'] || '';
+      const locale = acceptLanguage.includes('en') ? 'en' : 'pt-BR';
+      return res.status(406).json({
+        error: 'inactive_account',
+        message: t('auth.inactiveAccount', locale)
+      });
+    }
+
     const name = userData.name;
     const code = generateOtp();
     await updateOtp(email, code);
@@ -112,6 +124,16 @@ const authGoogle = async (req, res) => {
       userAgent,
       isValid: true
     });
+
+    // Check if user is active
+    if (resultSave.active === false) {
+      const acceptLanguage = req.headers['accept-language'] || '';
+      const locale = acceptLanguage.includes('en') ? 'en' : 'pt-BR';
+      return res.status(406).json({
+        error: 'inactive_account',
+        message: t('auth.inactiveAccount', locale)
+      });
+    }
 
     const jwtToken = await generateToken({
       email: email,

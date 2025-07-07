@@ -181,7 +181,6 @@ const requestOTP = () => {
   showSpinner.value = true;
   api.post('/send-otp', {email: email.value})
     .then((response) => {
-      console.log(response);
       step.value = 2;
       startResendTimer();
       showSpinner.value = false;
@@ -197,6 +196,15 @@ const requestOTP = () => {
           router.push(route.query.redirect ? `/register?redirect=${route.query.redirect}` : '/register')
         })
       }
+
+      if (error.response.status === 406) {
+        return Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: error.response.data.message,
+        })
+      }
+
       return Swal.fire({
         icon: "error",
         title: "Oops...",
@@ -260,13 +268,11 @@ const handleOtpInput = (event: Event, index: number) => {
   const input = event.target as HTMLInputElement;
   const value = input.value;
 
-  // Ensure only numbers
   if (!/^\d*$/.test(value)) {
     input.value = '';
     return;
   }
 
-  // Move to next input
   if (value && index < 5) {
     otpInputs.value[index + 1]?.focus();
   }

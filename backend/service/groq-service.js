@@ -1,4 +1,4 @@
-async function getAIBoardSummary(payload) {
+async function getAIBoardSummary(messages, model = 'llama-3.1-8b-instant') {
   if (process.env.NODE_ENV !== 'production') {
     console.log('Using insecure connection to GROQ API');
     process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0';
@@ -10,17 +10,8 @@ async function getAIBoardSummary(payload) {
       "Content-Type": "application/json"
     },
     body: JSON.stringify({
-      model: "llama-3.1-8b-instant",
-      messages: [
-        {
-          role: "system",
-          content: "Você é um assistente que resume quadros de tarefas kanban de forma clara e objetiva. Responda na mesmo idioma que o prompt do usuario foi fornecido. Responda somente em texto puro."
-        },
-        {
-          role: "user",
-          content: payload
-        }
-      ],
+      model: model,
+      messages,
       temperature: 1
     })
   });

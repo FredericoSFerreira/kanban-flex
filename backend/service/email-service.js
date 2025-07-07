@@ -20,29 +20,58 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+/**
+ * Send an email to the user
+ * @param {string} emailTo - Recipient email address
+ * @param {string} name - Recipient name
+ * @param {string} code - OTP code or email type (e.g., "ACCOUNT_DELETED")
+ * @param {string} locale - Locale for translations
+ * @param {object} options - Additional options
+ */
+async function sendEmail(emailTo, name, code, locale = 'pt-BR', options = {}) {
+  // Determine email type
+  const isAccountDeletion = code === "ACCOUNT_DELETED";
 
-async function sendEmail(emailTo, name, otpCode, locale = 'pt-BR') {
-  const filePath = path.join(__dirname, '../templates/emails/index.html');
+  // Select the appropriate template and subject
+  let filePath, subject;
+
+  if (isAccountDeletion) {
+    filePath = path.join(__dirname, '../templates/emails/account-deletion.html');
+    subject = t('email.accountDeletionSubject', locale) || 'Your account has been deactivated';
+  } else {
+    filePath = path.join(__dirname, '../templates/emails/index.html');
+    subject = t('email.subject', locale);
+  }
+
+  // If template file doesn't exist, fall back to the default template
+  if (!fs.existsSync(filePath)) {
+    filePath = path.join(__dirname, '../templates/emails/index.html');
+  }
+
   const source = fs.readFileSync(filePath, 'utf-8').toString();
   const template = compile(source);
+
   const replacements = {
-    code: otpCode,
+    code: isAccountDeletion ? null : code,
     host: process.env.FRONT_HOST,
     name: name,
     locale: locale,
+    isAccountDeletion: isAccountDeletion,
+    ...options,
     t: function(key) {
       return t(key, locale);
     }
   };
+
   const htmlToSend = template(replacements);
   const info = await transporter.sendMail({
-      from: `${t('email.appName', locale)} <${process.env.EMAIL_FROM}>`,
-      to: emailTo,
-      subject: t('email.subject', locale),
-      html: htmlToSend,
-      });
+    from: `${t('email.appName', locale)} <${process.env.EMAIL_FROM}>`,
+    to: emailTo,
+    subject: subject,
+    html: htmlToSend,
+  });
 
-      console.log("Message sent: %s", info.messageId);
+  console.log("Message sent: %s", info.messageId);
 }
 
 export default sendEmail;

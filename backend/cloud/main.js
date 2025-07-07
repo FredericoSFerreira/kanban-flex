@@ -464,6 +464,7 @@ Parse.Cloud.define("getOtp", async (request) => {
       email: otp.get('email'),
       name: otp.get('name'),
       isValid: otp.get('isValid'),
+      active: otp.get('active'),
     };
 
   } catch (error) {
@@ -509,11 +510,19 @@ Parse.Cloud.define("checkOtp", async (request) => {
   try {
     const query = new Parse.Query("otp");
     query.equalTo({'email': request.params.email, 'code': request.params.code})
+    // Add check for active=true
+    query.equalTo('active', true);
+
     const otp = await query.first();
-    if (otp) await saveLog(request, {id: otp.id})
+    if (!otp) {
+      return null; // Return null if no matching OTP found or user is inactive
+    }
+
+    await saveLog(request, {id: otp.id})
     return {id: otp.id, ...otp.attributes};
   } catch (error) {
     console.log('Failed to checkOtp, with error code: ' + error.message);
+    return null;
   }
 });
 
@@ -600,6 +609,9 @@ Parse.Cloud.define("updateUserOtp", async (request) => {
   const query = new Parse.Query("otp");
   query.equalTo("objectId", request.params.id)
   query.first().then((otp) => {
+
+    if (otp.id !== request.params.id) throw new Error("Invalid update User")
+
     otp.set('name', request.params.name)
     otp.set('phone', request.params.phone)
     otp.set('active', request.params.active === undefined ? true : request.params.active)
