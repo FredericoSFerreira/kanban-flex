@@ -88,7 +88,29 @@
             </div>
             <div class="mt-4 pt-3 border-top">
               <button type="submit" class="btn btn-primary" :disabled="!isValidForm">Save Changes</button>
-              <button type="button" class="btn btn-outline-danger ms-2">Delete Account</button>
+              <button type="button" class="btn btn-outline-danger ms-2" @click="confirmDeleteAccount">Delete Account</button>
+            </div>
+
+            <!-- Delete Account Confirmation Modal -->
+            <div class="modal fade" id="deleteAccountModal" tabindex="-1" aria-labelledby="deleteAccountModalLabel" aria-hidden="true">
+              <div class="modal-dialog">
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="deleteAccountModalLabel">{{ $t('myProfile.confirmDelete') }}</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                      <p>{{ $t('myProfile.deleteWarning') }}</p>
+                      <p class="text-danger fw-bold">{{ $t('myProfile.deleteIrreversible') }}</p>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ $t('myProfile.cancel') }}</button>
+                      <button type="button" class="btn btn-danger" @click="deleteAccount">{{ $t('myProfile.confirmDeleteBtn') }}</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </form>
         </div>
@@ -168,6 +190,7 @@ import {useI18n} from "vue-i18n";
 import {formatDate, formatTime} from "@/utils/utils";
 import {VueTelInput} from "vue-tel-input";
 import {toast} from "vue3-toastify";
+import {Modal} from 'bootstrap';
 
 const {locale, t} = useI18n();
 const user = useAuthStore().user
@@ -240,6 +263,53 @@ const saveProfile = () => {
     });
   })
   console.log('Profile saved:', profile);
+};
+
+// Function to show the delete account confirmation modal
+const confirmDeleteAccount = () => {
+  const modalElement = document.getElementById('deleteAccountModal');
+  if (modalElement) {
+    const modal = new Modal(modalElement);
+    modal.show();
+  }
+};
+
+// Function to delete the account (set active=false)
+const deleteAccount = () => {
+  showSpinner.value = true;
+
+  // Create a copy of the profile with active=false
+  const deactivatedProfile = {
+    ...profile,
+    active: false
+  };
+
+  api.put('/user', deactivatedProfile).then(res => {
+    showSpinner.value = false;
+
+    // Hide the modal
+    const modalElement = document.getElementById('deleteAccountModal');
+    if (modalElement) {
+      const modal = Modal.getInstance(modalElement);
+      modal?.hide();
+    }
+
+    // Show success message
+    toast.success(t('myProfile.accountDeactivated'), {
+      position: toast.POSITION.TOP_CENTER,
+    });
+
+    // Log out the user
+    setTimeout(() => {
+      useAuthStore().logout();
+      window.location.href = '/login';
+    }, 2000);
+  }).catch(err => {
+    showSpinner.value = false;
+    toast.error(t('myProfile.errorDeactivating'), {
+      position: toast.POSITION.TOP_CENTER,
+    });
+  });
 };
 
 </script>

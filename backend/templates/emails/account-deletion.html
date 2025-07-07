@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ t 'email.title' }}</title>
+    <title>{{ t 'email.accountDeletionTitle' }}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
@@ -49,13 +49,15 @@
             padding: 20px;
         }
 
-        .otp-code {
-            font-size: 24px;
-            font-weight: bold;
-            letter-spacing: 5px;
-            color: #0070f3;
+        .message-box {
+            font-size: 18px;
+            padding: 15px;
             margin: 20px 0;
             text-align: center;
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            border-radius: 5px;
+            color: #721c24;
         }
 
         .email-footer {
@@ -81,11 +83,11 @@
 <body>
 <div class="email-container">
 
-    <div class="header" style="background-color: #0070f3;">
-        <h1>{{ t 'email.title' }}</h1>
+    <div class="header" style="background-color: #dc3545;">
+        <h1>{{ t 'email.accountDeletionTitle' }}</h1>
     </div>
     <div class="header">
-          <img src="{{host}}/logo-kanbanflex.png"
+        <img src="{{host}}/logo-kanbanflex.png"
              alt="{{ t 'email.appName' }} Logo">
         <h2>{{ t 'email.appName' }}</h2>
     </div>
@@ -93,21 +95,21 @@
     <!-- Body -->
     <div class="email-body">
         <p>{{ t 'email.greeting' }} {{ name }},</p>
-        <p>{{ t 'email.instruction' }}</p>
+        <p>{{ t 'email.accountDeletionMessage' }}</p>
 
-        <div class="otp-code">
-            <!-- Access Code -->
-            {{ code }}
+        <div class="message-box">
+            {{ t 'email.accountDeactivated' }}
         </div>
 
-        <p>{{ t 'email.disclaimer' }}</p>
+        <p>{{ t 'email.accountDeletionInfo' }}</p>
+        <p>{{ t 'email.accountDeletionContact' }}</p>
         <p>{{ t 'email.regards' }}<br>{{ t 'email.team' }}</p>
     </div>
 
     <!-- Footer -->
     <div class="email-footer">
         <p>{{ t 'email.copyright' }} {{ host }} {{ t 'email.contribute' }} <a target="_blank"
-                                                              href="https://github.com/FredericoSFerreira/kanban-flex">
+                                                          href="https://github.com/FredericoSFerreira/kanban-flex">
             {{ t 'email.openSource' }} </a></p>
     </div>
 </div>

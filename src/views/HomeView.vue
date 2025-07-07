@@ -183,7 +183,7 @@ const features = ref([
     icon: Sparkles,
     title: 'ai',
     description: 'ai',
-    is_coming: true
+    is_coming: false
   },
 ]);
 

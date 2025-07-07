@@ -14,7 +14,7 @@ async function generateToken(payload) {
 }
 
 
-function generateBoardSummaryPrompt(board) {
+function generateBoardSummaryPrompt(board, includeLabel = false, includeMembers = false) {
   let text = `Board: ${board.name}\n\n`;
 
   board.columns.forEach((coluna, i) => {
@@ -24,7 +24,8 @@ function generateBoardSummaryPrompt(board) {
       text += `- Card ${j + 1}\n`;
       text += `  - Título: ${card.title || 'Sem título'}\n`;
       text += `  - Descrição: ${card.description || 'Sem descrição'}\n`;
-      // text += `  - Tags: ${card.labels.length ? card.labels.join(', ') : 'nenhuma'}\n`;
+      text += includeLabel ? `  - Tags: ${card.labels.length ? card.labels.join(', ') : 'nenhuma'}\n` : '';
+      text += includeMembers ? `  - Usuario/Membro do Card: ${card.name}\n` : '';
     });
 
     text += `\n`;

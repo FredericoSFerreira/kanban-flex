@@ -189,258 +189,480 @@ export default {
       description: "Start by creating the columns for your board",
       cta: "Create First Column"
     },
-    demo: {
-      alert: "This is a demo environment. All data will be deleted in 30 minutes. Create a free account to access all features."
+    aiAssist: {
+      chatInputLabel: "Ask me anything about yout board...",
+      quickQuestionsText: "Quick Questions",
+      justNow: "Just now",
+      "greeting": "👋 Hello! I'm your AI assistant for this Kanban board.",
+      "helpIntro": "I can help you with:",
+      "items": {
+        "progress": "Analyzing your board progress",
+        "suggestions": "Suggesting improvements",
+        "questions": "Answering questions about tasks",
+        "tips": "Providing productivity tips"
+      },
+      "questions": {
+        "boardProgress": {
+          "label": "Board Progress",
+          "message": "How is my board progressing?"
+        },
+        "bottlenecks": {
+          "label": "Bottlenecks",
+          "message": "Are there any bottlenecks in my workflow?"
+        },
+        "suggestions": {
+          "label": "Suggestions",
+          "message": "What improvements do you suggest?"
+        },
+        "teamPerformance": {
+          "label": "Team Performance",
+          "message": "How is my team performing?"
+        },
+        "boardSummary": {
+          "label": "Board Summary",
+          "message": "Could you generate an overall summary of my board?"
+        }
+      }
     }
-
   },
+  demo: {
+    alert: "This is a demo environment. All data will be deleted in 30 minutes. Create a free account to access all features."
+  }
+  ,
   footer: {
     boards: {
       title: "Boards",
-      link1: "My Boards",
-      link2: "New Board"
-    },
+      link1:
+        "My Boards",
+      link2:
+        "New Board"
+    }
+    ,
     terms: {
       title: 'Terms',
-      link1: 'Privacy Policy',
-      link2: 'Terms of Use',
-    },
+      link1:
+        'Privacy Policy',
+      link2:
+        'Terms of Use',
+    }
+    ,
     account: {
       title: "Account",
-      link1: "Login",
-      link2: "Create Account"
-    },
+      link1:
+        "Login",
+      link2:
+        "Create Account"
+    }
+    ,
     status: {
       title: "Status/Help",
-      link1: "API Status",
-      link2: "Having an issue?"
-    },
-    "copyright": "© 2025 KanbanFlex.",
-  },
+      link1:
+        "API Status",
+      link2:
+        "Having an issue?"
+    }
+    ,
+    "copyright":
+      "© 2025 KanbanFlex.",
+  }
+  ,
   language: {
     en: 'English',
-    'pt-BR': 'Português (BR)'
-  },
+    'pt-BR':
+      'Português (BR)'
+  }
+  ,
   templates: {
     name: 'Template',
-    chooseStart: 'Choose how to start',
-    blankBoard: {
-      title: 'Start from Scratch',
-      description: 'Create a blank board and customize it to your needs'
-    },
+    chooseStart:
+      'Choose how to start',
+    blankBoard:
+      {
+        title: 'Start from Scratch',
+        description:
+          'Create a blank board and customize it to your needs'
+      }
+    ,
     useTemplate: {
       title: 'Use a Template',
-      description: 'Choose from our pre-built templates to get started quickly'
-    },
-    popularTemplates: 'Popular Templates',
-    types: {
-      blankBoard: {
-        name: 'Board Title',
-        description: 'Board empty'
-      },
-      sprintRetrospective: {
-        name: 'Sprint Retrospective',
-        description: 'Plan and execute sprint retrospectives',
-        columns: {
-          first: 'What went well',
-          second: 'To improve',
-          third: 'Action Items / To do next',
-        }
-      },
-      projectManagement: {
-        name: 'Project Management',
-        description: 'Track tasks, milestones, and team progress',
-        columns: {
-          first: 'Backlog',
-          second: 'To Do',
-          third: 'In Progress',
-          fourth: 'Review',
-          fifth: 'Done',
-        }
-      },
-      developmentSprint: {
-        name: 'Development Sprint',
-        description: 'Manage software development sprints',
-        columns: {
-          first: 'Sprint Backlog',
-          second: 'In Development',
-          third: 'Code Review',
-          fourth: 'QA Testing',
-          fifth: 'Done',
-        }
-      },
-      okrTracking: {
-        name: 'OKR Tracking',
-        description: 'Track objectives and key results',
-        columns: {
-          first: 'Objectives',
-          second: 'Key Results',
-          third: 'Initiatives',
-          fourth: 'Completed',
-        }
-      },
-      contentCalendar: {
-        name: 'Content Calendar',
-        description: 'Plan and schedule content creation',
-        columns: {
-          first: 'Content Ideas',
-          second: 'Writing',
-          third: 'Editing',
-          fourth: 'Review',
-          fifth: 'Published',
-        }
-      },
-      bugTracking: {
-        name: 'Bug Tracking',
-        description: 'Track and manage software issues',
-        columns: {
-          first: 'Reported',
-          second: 'To Reproduce',
-          third: 'In Progress',
-          fourth: 'Testing',
-          fifth: 'Fixed',
-        }
-      },
-      productLaunch: {
-        name: 'Product Launch',
-        description: 'Plan and execute product launches',
-        columns: {
-          first: 'Planning',
-          second: 'In Progress',
-          third: 'Review',
-          fourth: 'Approved',
-          fifth: 'Launched',
-        }
-      },
-      demo: {
-        name: 'My Article Publications',
-        card1: {
-          title: 'Article on Industry Trends',
-          description: '👨‍💻 Write an article about industry trends',
-          labels: 'Trends, Blog, Study'
-        },
-        card2: {
-          title: 'Article on WEB3 Trends',
-          description: 'Write an article about WEB3 trends',
-          labels: 'Research, Blog, WEB3'
-        },
-        card3: {
-          title: 'Article on Computer Vision',
-          description: 'Write an article about computer vision',
-          labels: 'Research, Blog, Study'
-        },
-        card4: {
-          title: 'Article on AI',
-          description: 'Write an article about artificial intelligence',
-          labels: 'Research, Blog, Study, AI'
-        }
-      }
-
+      description:
+        'Choose from our pre-built templates to get started quickly'
     }
-  },
+    ,
+    popularTemplates: 'Popular Templates',
+    types:
+      {
+        blankBoard: {
+          name: 'Board Title',
+          description:
+            'Board empty'
+        }
+        ,
+        sprintRetrospective: {
+          name: 'Sprint Retrospective',
+          description:
+            'Plan and execute sprint retrospectives',
+          columns:
+            {
+              first: 'What went well',
+              second:
+                'To improve',
+              third:
+                'Action Items / To do next',
+            }
+        }
+        ,
+        projectManagement: {
+          name: 'Project Management',
+          description:
+            'Track tasks, milestones, and team progress',
+          columns:
+            {
+              first: 'Backlog',
+              second:
+                'To Do',
+              third:
+                'In Progress',
+              fourth:
+                'Review',
+              fifth:
+                'Done',
+            }
+        }
+        ,
+        developmentSprint: {
+          name: 'Development Sprint',
+          description:
+            'Manage software development sprints',
+          columns:
+            {
+              first: 'Sprint Backlog',
+              second:
+                'In Development',
+              third:
+                'Code Review',
+              fourth:
+                'QA Testing',
+              fifth:
+                'Done',
+            }
+        }
+        ,
+        okrTracking: {
+          name: 'OKR Tracking',
+          description:
+            'Track objectives and key results',
+          columns:
+            {
+              first: 'Objectives',
+              second:
+                'Key Results',
+              third:
+                'Initiatives',
+              fourth:
+                'Completed',
+            }
+        }
+        ,
+        contentCalendar: {
+          name: 'Content Calendar',
+          description:
+            'Plan and schedule content creation',
+          columns:
+            {
+              first: 'Content Ideas',
+              second:
+                'Writing',
+              third:
+                'Editing',
+              fourth:
+                'Review',
+              fifth:
+                'Published',
+            }
+        }
+        ,
+        bugTracking: {
+          name: 'Bug Tracking',
+          description:
+            'Track and manage software issues',
+          columns:
+            {
+              first: 'Reported',
+              second:
+                'To Reproduce',
+              third:
+                'In Progress',
+              fourth:
+                'Testing',
+              fifth:
+                'Fixed',
+            }
+        }
+        ,
+        productLaunch: {
+          name: 'Product Launch',
+          description:
+            'Plan and execute product launches',
+          columns:
+            {
+              first: 'Planning',
+              second:
+                'In Progress',
+              third:
+                'Review',
+              fourth:
+                'Approved',
+              fifth:
+                'Launched',
+            }
+        }
+        ,
+        demo: {
+          name: 'My Article Publications',
+          card1:
+            {
+              title: 'Article on Industry Trends',
+              description:
+                '👨‍💻 Write an article about industry trends',
+              labels:
+                'Trends, Blog, Study'
+            }
+          ,
+          card2: {
+            title: 'Article on WEB3 Trends',
+            description:
+              'Write an article about WEB3 trends',
+            labels:
+              'Research, Blog, WEB3'
+          }
+          ,
+          card3: {
+            title: 'Article on Computer Vision',
+            description:
+              'Write an article about computer vision',
+            labels:
+              'Research, Blog, Study'
+          }
+          ,
+          card4: {
+            title: 'Article on AI',
+            description:
+              'Write an article about artificial intelligence',
+            labels:
+              'Research, Blog, Study, AI'
+          }
+        }
+
+      }
+  }
+  ,
   myProfile: {
     accessLogs: 'Access Logs',
-    profile: 'My Profile',
-    register: 'Register',
-    login: 'Login',
-    accept: 'I agree to the use of my data as per',
-    success: 'Success',
-    save: 'Save with success.',
-    error: 'Error to save.',
-    saveProfile: 'Save with success',
-    errorSaveProfile: 'Error to save.'
-  },
+    profile:
+      'My Profile',
+    register:
+      'Register',
+    login:
+      'Login',
+    accept:
+      'I agree to the use of my data as per',
+    success:
+      'Success',
+    save:
+      'Save with success.',
+    error:
+      'Error to save.',
+    saveProfile:
+      'Save with success',
+    errorSaveProfile:
+      'Error to save.',
+    confirmDelete:
+      'Delete Account',
+    deleteWarning:
+      'Are you sure you want to delete your account? This will deactivate your account and you will no longer be able to access the system.',
+    deleteIrreversible:
+      'This action cannot be undone!',
+    cancel:
+      'Cancel',
+    confirmDeleteBtn:
+      'Delete Account',
+    accountDeactivated:
+      'Your account has been deactivated successfully.',
+    errorDeactivating:
+      'Error deactivating your account. Please try again.'
+  }
+  ,
   boardV2: {
     statistics: 'Statistics',
-    newCard: 'New Card',
-    title: 'Title',
-    description: 'Description',
-    labels: 'Labels (separated by comma)',
-    labelsPlaceholder: 'Example: important, bug, feature',
-    close: 'Close',
-    save: 'Save',
-    identify: 'Identify Yourself',
-    name: 'Name',
-    email: 'Email',
-    enterAsAnonymous: 'Enter as Anonymous',
-    editBoardName: 'Edit board name',
-    boardName: 'Board name',
-    newColumn: 'New column',
-    columnName: 'Column name',
-    editColumn: 'Edit column',
-    editCard: 'Edit card',
-    comments: 'Comments',
-    noComments: 'No comments yet.',
-    delete: 'Delete',
-    writeComment: 'Write a comment...',
-    addComment: 'Add Comment',
-    cardHideText: 'Hold on, curious one! The card content is hidden. And remember, curiosity killed the cat.',
-    errors: {
-      oops: 'Oops...',
-      nameRequired: 'You need to provide your name!',
-      emailRequired: 'You need to provide a valid email!',
-      descriptionRequired: 'You need to provide the card description!',
-      columnNameRequired: 'You need to provide the column name!'
-    },
+    newCard:
+      'New Card',
+    title:
+      'Title',
+    description:
+      'Description',
+    labels:
+      'Labels (separated by comma)',
+    labelsPlaceholder:
+      'Example: important, bug, feature',
+    close:
+      'Close',
+    save:
+      'Save',
+    identify:
+      'Identify Yourself',
+    name:
+      'Name',
+    email:
+      'Email',
+    enterAsAnonymous:
+      'Enter as Anonymous',
+    editBoardName:
+      'Edit board name',
+    boardName:
+      'Board name',
+    newColumn:
+      'New column',
+    columnName:
+      'Column name',
+    editColumn:
+      'Edit column',
+    editCard:
+      'Edit card',
+    comments:
+      'Comments',
+    noComments:
+      'No comments yet.',
+    delete:
+      'Delete',
+    writeComment:
+      'Write a comment...',
+    addComment:
+      'Add Comment',
+    cardHideText:
+      'Hold on, curious one! The card content is hidden. And remember, curiosity killed the cat.',
+    errors:
+      {
+        oops: 'Oops...',
+        nameRequired:
+          'You need to provide your name!',
+        emailRequired:
+          'You need to provide a valid email!',
+        descriptionRequired:
+          'You need to provide the card description!',
+        columnNameRequired:
+          'You need to provide the column name!'
+      }
+    ,
     confirmations: {
       removeCard: 'Are you sure you want to remove this card?',
-      removeColumn: 'Are you sure you want to remove this column?',
-      yes: 'Yes',
-      no: 'No'
-    },
+      removeColumn:
+        'Are you sure you want to remove this column?',
+      yes:
+        'Yes',
+      no:
+        'No'
+    }
+    ,
     notifications: {
       alreadyLiked: 'You already liked this card!',
-      alreadyDisliked: 'You already disliked this card!',
-      failedToUpdateVote: 'Failed to update vote',
-      errorUpdatingVote: 'Error updating vote',
-      failedToUpdateCard: 'Failed to update card',
-      cardUpdatedSuccess: 'Card updated successfully!',
-      errorUpdatingCard: 'Error updating card',
-      boardVisibilityFailed: 'Failed to update board visibility',
-      boardNowVisible: 'Board is now visible!',
-      boardNowHidden: 'Board is now hidden!',
-      errorUpdatingVisibility: 'Error updating board visibility',
-      failedToRemoveCard: 'Failed to remove card',
-      cardRemovedSuccess: 'Card removed successfully!',
-      errorRemovingCard: 'Error removing card',
-      failedToRemoveColumn: 'Failed to remove column',
-      columnRemovedSuccess: 'Column removed successfully!',
-      errorRemovingColumn: 'Error removing column',
-      failedToUpdateColumn: 'Failed to update column',
-      columnUpdatedSuccess: 'Column updated successfully!',
-      errorUpdatingColumn: 'Error updating column',
-      failedToAddColumn: 'Failed to add column',
-      columnAddedSuccess: 'Column added successfully!',
-      errorAddingColumn: 'Error adding column',
-      failedToAddCard: 'Failed to add card',
-      cardAddedSuccess: 'Card added successfully!',
-      errorAddingCard: 'Error adding card',
-      failedToReorderColumns: 'Failed to reorder columns',
-      columnsReorderedSuccess: 'Columns reordered successfully!',
-      errorReorderingColumns: 'Error reordering columns',
-      failedToReorderCards: 'Failed to reorder cards',
-      cardsReorderedSuccess: 'Cards reordered successfully!',
-      errorReorderingCards: 'Error reordering cards',
-      failedToMoveCard: 'Failed to move card',
-      cardMovedSuccess: 'Card moved successfully!',
-      errorMovingCard: 'Error moving card',
-      failedToAddComment: 'Failed to add comment',
-      commentAddedSuccess: 'Comment added successfully!',
-      errorAddingComment: 'Error adding comment',
-      failedToRemoveComment: 'Failed to remove comment',
-      commentRemovedSuccess: 'Comment removed successfully!',
-      errorRemovingComment: 'Error removing comment'
+      alreadyDisliked:
+        'You already disliked this card!',
+      failedToUpdateVote:
+        'Failed to update vote',
+      errorUpdatingVote:
+        'Error updating vote',
+      failedToUpdateCard:
+        'Failed to update card',
+      cardUpdatedSuccess:
+        'Card updated successfully!',
+      errorUpdatingCard:
+        'Error updating card',
+      boardVisibilityFailed:
+        'Failed to update board visibility',
+      boardNowVisible:
+        'Board is now visible!',
+      boardNowHidden:
+        'Board is now hidden!',
+      errorUpdatingVisibility:
+        'Error updating board visibility',
+      failedToRemoveCard:
+        'Failed to remove card',
+      cardRemovedSuccess:
+        'Card removed successfully!',
+      errorRemovingCard:
+        'Error removing card',
+      failedToRemoveColumn:
+        'Failed to remove column',
+      columnRemovedSuccess:
+        'Column removed successfully!',
+      errorRemovingColumn:
+        'Error removing column',
+      failedToUpdateColumn:
+        'Failed to update column',
+      columnUpdatedSuccess:
+        'Column updated successfully!',
+      errorUpdatingColumn:
+        'Error updating column',
+      failedToAddColumn:
+        'Failed to add column',
+      columnAddedSuccess:
+        'Column added successfully!',
+      errorAddingColumn:
+        'Error adding column',
+      failedToAddCard:
+        'Failed to add card',
+      cardAddedSuccess:
+        'Card added successfully!',
+      errorAddingCard:
+        'Error adding card',
+      failedToReorderColumns:
+        'Failed to reorder columns',
+      columnsReorderedSuccess:
+        'Columns reordered successfully!',
+      errorReorderingColumns:
+        'Error reordering columns',
+      failedToReorderCards:
+        'Failed to reorder cards',
+      cardsReorderedSuccess:
+        'Cards reordered successfully!',
+      errorReorderingCards:
+        'Error reordering cards',
+      failedToMoveCard:
+        'Failed to move card',
+      cardMovedSuccess:
+        'Card moved successfully!',
+      errorMovingCard:
+        'Error moving card',
+      failedToAddComment:
+        'Failed to add comment',
+      commentAddedSuccess:
+        'Comment added successfully!',
+      errorAddingComment:
+        'Error adding comment',
+      failedToRemoveComment:
+        'Failed to remove comment',
+      commentRemovedSuccess:
+        'Comment removed successfully!',
+      errorRemovingComment:
+        'Error removing comment'
     }
-  },
+  }
+  ,
   createBoard: {
     success: 'Board created successfully!',
-    error: {
-      title: 'Oops...',
-      message: 'An error occurred while creating the board!'
-    }
-  },
+    error:
+      {
+        title: 'Oops...',
+        message:
+          'An error occurred while creating the board!'
+      }
+  }
+  ,
   error: {
     notFound: 'Board or page not found.',
-    back: 'Back'
+    back:
+      'Back'
   }
-};
+}
+;

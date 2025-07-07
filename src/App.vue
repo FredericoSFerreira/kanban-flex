@@ -277,7 +277,7 @@ const footerColumns = [
     links: [
       {
         target: '_blank',
-        path: 'https://github.com/FredericoSFerreira/kanban-flex/issues/issues/new',
+        path: 'https://github.com/FredericoSFerreira/kanban-flex/issues/new',
         label: 'link1'
       },
       {

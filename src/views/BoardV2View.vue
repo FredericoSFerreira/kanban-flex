@@ -27,6 +27,14 @@
             <BarChart2 size="18"/>
             {{ t('boardV2.statistics') }}
           </button>
+          <button
+            class="btn btn-primary ai-chat-toggle"
+            @click="toggleAIChat"
+            title="Chat with AI Assistant"
+          >
+            <MessageCircle size="18" class="me-2"/>
+            AI Assistant
+          </button>
           <button class="btn btn-primary" @click="showBoardSettings">
             <Settings size="18"/>
           </button>
@@ -391,6 +399,258 @@
   </div>
 
 
+  <!--   Settings Modal with Tabs-->
+  <!--  <div class="modal fade" id="settingsModal" tabindex="-1" aria-hidden="true" ref="settingsModal">-->
+  <!--    <div class="modal-dialog modal-lg">-->
+  <!--      <div class="modal-content">-->
+  <!--        <div class="modal-header">-->
+  <!--          <h5 class="modal-title">{{ t('board.settings') }}</h5>-->
+  <!--          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>-->
+  <!--        </div>-->
+  <!--        <div class="modal-body p-0">-->
+  <!--          &lt;!&ndash; Settings Tabs &ndash;&gt;-->
+  <!--          <ul class="nav nav-tabs" role="tablist">-->
+  <!--            <li class="nav-item" role="presentation">-->
+  <!--              <button-->
+  <!--                class="nav-link"-->
+  <!--                :class="{ active: activeSettingsTab === 'general' }"-->
+  <!--                @click="activeSettingsTab = 'general'"-->
+  <!--                type="button"-->
+  <!--              >-->
+  <!--                <Settings size="16" class="me-2"/>-->
+  <!--                General-->
+  <!--              </button>-->
+  <!--            </li>-->
+  <!--            <li class="nav-item" role="presentation">-->
+  <!--              <button-->
+  <!--                class="nav-link"-->
+  <!--                :class="{ active: activeSettingsTab === 'visibility' }"-->
+  <!--                @click="activeSettingsTab = 'visibility'"-->
+  <!--                type="button"-->
+  <!--              >-->
+  <!--                <Eye size="16" class="me-2"/>-->
+  <!--                Visibility-->
+  <!--              </button>-->
+  <!--            </li>-->
+  <!--            <li class="nav-item" role="presentation">-->
+  <!--              <button-->
+  <!--                class="nav-link"-->
+  <!--                :class="{ active: activeSettingsTab === 'permissions' }"-->
+  <!--                @click="activeSettingsTab = 'permissions'"-->
+  <!--                type="button"-->
+  <!--              >-->
+  <!--                <Shield size="16" class="me-2"/>-->
+  <!--                Permissions-->
+  <!--              </button>-->
+  <!--            </li>-->
+  <!--          </ul>-->
+
+  <!--          &lt;!&ndash; Tab Content &ndash;&gt;-->
+  <!--          <div class="tab-content p-4">-->
+  <!--            &lt;!&ndash; General Settings Tab &ndash;&gt;-->
+  <!--            <div v-if="activeSettingsTab === 'general'" class="tab-pane fade show active">-->
+  <!--              <h6 class="mb-3">Board Configuration</h6>-->
+  <!--              <div class="mb-3">-->
+  <!--                <label for="boardTitle" class="form-label">Board Title</label>-->
+  <!--                <div class="d-flex align-items-center gap-2">-->
+  <!--                  <input type="text" class="form-control" id="boardTitle" v-model="board.name">-->
+  <!--                  <button-->
+  <!--                    type="button"-->
+  <!--                    class="btn btn-outline-secondary ai-help-btn"-->
+  <!--                    @click="showAIHelp('board-title', boardSettings)"-->
+  <!--                    :title="'AI Help for Board Title'"-->
+  <!--                  >-->
+  <!--                    <Sparkles size="16" class="text-warning"/>-->
+  <!--                  </button>-->
+  <!--                </div>-->
+  <!--              </div>-->
+  <!--              <div class="mb-3">-->
+  <!--                <label for="boardDescription" class="form-label">Board Description</label>-->
+  <!--                <div class="d-flex align-items-start gap-2">-->
+  <!--                  <textarea class="form-control" id="boardDescription" v-model="board.description" rows="3"></textarea>-->
+  <!--                  <button-->
+  <!--                    type="button"-->
+  <!--                    class="btn btn-outline-secondary ai-help-btn"-->
+  <!--                    @click="showAIHelp('board-description', boardSettings)"-->
+  <!--                    :title="'AI Help for Board Description'"-->
+  <!--                  >-->
+  <!--                    <Sparkles size="16" class="text-warning"/>-->
+  <!--                  </button>-->
+  <!--                </div>-->
+  <!--              </div>-->
+  <!--            </div>-->
+
+  <!--            &lt;!&ndash; Visibility Settings Tab &ndash;&gt;-->
+  <!--            <div v-if="activeSettingsTab === 'visibility'" class="tab-pane fade show active">-->
+  <!--              <h6 class="mb-3">Board Visibility</h6>-->
+  <!--              <div class="mb-4">-->
+  <!--                <div class="form-check mb-3">-->
+  <!--                  <input-->
+  <!--                    class="form-check-input"-->
+  <!--                    type="radio"-->
+  <!--                    name="visibility"-->
+  <!--                    id="visibilityPrivate"-->
+  <!--                    value="private"-->
+  <!--                    v-model="boardSettings.visibility"-->
+  <!--                  >-->
+  <!--                  <label class="form-check-label" for="visibilityPrivate">-->
+  <!--                    <div class="d-flex align-items-center">-->
+  <!--                      <Lock size="18" class="me-2 text-danger"/>-->
+  <!--                      <div>-->
+  <!--                        <strong>Private</strong>-->
+  <!--                        <div class="text-muted small">Only board members can see and edit this board</div>-->
+  <!--                      </div>-->
+  <!--                    </div>-->
+  <!--                  </label>-->
+  <!--                </div>-->
+  <!--                <div class="form-check mb-3">-->
+  <!--                  <input-->
+  <!--                    class="form-check-input"-->
+  <!--                    type="radio"-->
+  <!--                    name="visibility"-->
+  <!--                    id="visibilityTeam"-->
+  <!--                    value="team"-->
+  <!--                    v-model="boardSettings.visibility"-->
+  <!--                  >-->
+  <!--                  <label class="form-check-label" for="visibilityTeam">-->
+  <!--                    <div class="d-flex align-items-center">-->
+  <!--                      <Users size="18" class="me-2 text-warning"/>-->
+  <!--                      <div>-->
+  <!--                        <strong>Team</strong>-->
+  <!--                        <div class="text-muted small">All team members can see this board, only members can edit</div>-->
+  <!--                      </div>-->
+  <!--                    </div>-->
+  <!--                  </label>-->
+  <!--                </div>-->
+  <!--                <div class="form-check mb-3">-->
+  <!--                  <input-->
+  <!--                    class="form-check-input"-->
+  <!--                    type="radio"-->
+  <!--                    name="visibility"-->
+  <!--                    id="visibilityPublic"-->
+  <!--                    value="public"-->
+  <!--                    v-model="boardSettings.visibility"-->
+  <!--                  >-->
+  <!--                  <label class="form-check-label" for="visibilityPublic">-->
+  <!--                    <div class="d-flex align-items-center">-->
+  <!--                      <Globe size="18" class="me-2 text-success"/>-->
+  <!--                      <div>-->
+  <!--                        <strong>Public</strong>-->
+  <!--                        <div class="text-muted small">Anyone with the link can view this board</div>-->
+  <!--                      </div>-->
+  <!--                    </div>-->
+  <!--                  </label>-->
+  <!--                </div>-->
+  <!--              </div>-->
+
+  <!--              <h6 class="mb-3">Additional Options</h6>-->
+  <!--              <div class="form-check mb-3">-->
+  <!--                <input type="checkbox" class="form-check-input" id="allowComments"-->
+  <!--                       v-model="boardSettings.allowComments">-->
+  <!--                <label class="form-check-label" for="allowComments">-->
+  <!--                  Allow comments from viewers-->
+  <!--                </label>-->
+  <!--              </div>-->
+  <!--              <div class="form-check mb-3">-->
+  <!--                <input type="checkbox" class="form-check-input" id="allowVoting" v-model="boardSettings.allowVoting">-->
+  <!--                <label class="form-check-label" for="allowVoting">-->
+  <!--                  Allow voting (likes/dislikes) from viewers-->
+  <!--                </label>-->
+  <!--              </div>-->
+  <!--              <div class="form-check">-->
+  <!--                <input type="checkbox" class="form-check-input" id="showMemberList"-->
+  <!--                       v-model="boardSettings.showMemberList">-->
+  <!--                <label class="form-check-label" for="showMemberList">-->
+  <!--                  Show member list to viewers-->
+  <!--                </label>-->
+  <!--              </div>-->
+  <!--            </div>-->
+
+  <!--            &lt;!&ndash; Permissions Settings Tab &ndash;&gt;-->
+  <!--            <div v-if="activeSettingsTab === 'permissions'" class="tab-pane fade show active">-->
+  <!--              <h6 class="mb-3">Member Permissions</h6>-->
+  <!--              <div class="mb-4">-->
+  <!--                <div class="form-check mb-3">-->
+  <!--                  <input type="checkbox" class="form-check-input" id="membersCanAddCards"-->
+  <!--                         v-model="boardSettings.membersCanAddCards">-->
+  <!--                  <label class="form-check-label" for="membersCanAddCards">-->
+  <!--                    Members can add cards-->
+  <!--                  </label>-->
+  <!--                </div>-->
+  <!--                <div class="form-check mb-3">-->
+  <!--                  <input type="checkbox" class="form-check-input" id="membersCanEditCards"-->
+  <!--                         v-model="boardSettings.membersCanEditCards">-->
+  <!--                  <label class="form-check-label" for="membersCanEditCards">-->
+  <!--                    Members can edit cards-->
+  <!--                  </label>-->
+  <!--                </div>-->
+  <!--                <div class="form-check mb-3">-->
+  <!--                  <input type="checkbox" class="form-check-input" id="membersCanDeleteCards"-->
+  <!--                         v-model="boardSettings.membersCanDeleteCards">-->
+  <!--                  <label class="form-check-label" for="membersCanDeleteCards">-->
+  <!--                    Members can delete cards-->
+  <!--                  </label>-->
+  <!--                </div>-->
+  <!--                <div class="form-check mb-3">-->
+  <!--                  <input type="checkbox" class="form-check-input" id="membersCanAddColumns"-->
+  <!--                         v-model="boardSettings.membersCanAddColumns">-->
+  <!--                  <label class="form-check-label" for="membersCanAddColumns">-->
+  <!--                    Members can add columns-->
+  <!--                  </label>-->
+  <!--                </div>-->
+  <!--                <div class="form-check mb-3">-->
+  <!--                  <input type="checkbox" class="form-check-input" id="membersCanInvite"-->
+  <!--                         v-model="boardSettings.membersCanInvite">-->
+  <!--                  <label class="form-check-label" for="membersCanInvite">-->
+  <!--                    Members can invite others-->
+  <!--                  </label>-->
+  <!--                </div>-->
+  <!--              </div>-->
+
+  <!--              <h6 class="mb-3">Board Members</h6>-->
+  <!--              <div class="members-list">-->
+  <!--                <div v-for="member in boardMembers" :key="member.id"-->
+  <!--                     class="d-flex align-items-center justify-content-between mb-3 p-3 border rounded">-->
+  <!--                  <div class="d-flex align-items-center">-->
+  <!--                    <img :src="member.avatar" :alt="member.name" class="rounded-circle me-3" width="40" height="40">-->
+  <!--                    <div>-->
+  <!--                      <div class="fw-bold">{{ member.name }}</div>-->
+  <!--                      <small class="text-muted">{{ member.email }}</small>-->
+  <!--                    </div>-->
+  <!--                  </div>-->
+  <!--                  <div class="d-flex align-items-center gap-2">-->
+  <!--                    <select class="form-select form-select-sm" v-model="member.role" style="width: 120px;">-->
+  <!--                      <option value="owner">Owner</option>-->
+  <!--                      <option value="admin">Admin</option>-->
+  <!--                      <option value="member">Member</option>-->
+  <!--                      <option value="viewer">Viewer</option>-->
+  <!--                    </select>-->
+  <!--                    <button v-if="member.role !== 'owner'" class="btn btn-sm btn-outline-danger">-->
+  <!--                      <Trash2 size="14"/>-->
+  <!--                    </button>-->
+  <!--                  </div>-->
+  <!--                </div>-->
+  <!--                <button class="btn btn-outline-primary w-100">-->
+  <!--                  <UserPlus size="16" class="me-2"/>-->
+  <!--                  Invite Member-->
+  <!--                </button>-->
+  <!--              </div>-->
+  <!--            </div>-->
+  <!--          </div>-->
+  <!--        </div>-->
+  <!--        <div class="modal-footer">-->
+  <!--          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">-->
+  <!--            {{ t('board.cancel') }}-->
+  <!--          </button>-->
+  <!--          <button type="button" class="btn btn-primary" @click="saveSettings">-->
+  <!--            {{ t('board.save') }}-->
+  <!--          </button>-->
+  <!--        </div>-->
+  <!--      </div>-->
+  <!--    </div>-->
+  <!--  </div>-->
+
+
   <div class="modal fade" id="settingsModal" tabindex="-1" aria-hidden="true" ref="settingsModal">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -511,11 +771,195 @@
     </div>
   </div>
 
+
+  <!-- AI Chat Offcanvas -->
+  <div
+    class="offcanvas offcanvas-end ai-chat-offcanvas"
+    tabindex="-1"
+    id="aiChatOffcanvas"
+    ref="aiChatOffcanvas"
+    data-bs-backdrop="false"
+  >
+    <div class="offcanvas-header border-bottom">
+      <div class="d-flex align-items-center gap-3">
+        <div class="ai-avatar-chat">
+          <Sparkles size="20" class="text-primary"/>
+        </div>
+        <div>
+          <h5 class="offcanvas-title mb-0">AI Assistant</h5>
+          <small class="text-muted">Ask me anything about your board</small>
+        </div>
+      </div>
+      <button type="button" class="btn-close" @click="closeAIChat" aria-label="Close"></button>
+    </div>
+
+    <div class="offcanvas-body d-flex flex-column p-0">
+      <!-- Chat Messages -->
+      <div class="chat-messages flex-grow-1 p-3" ref="chatMessagesContainer">
+        <!-- Welcome Message -->
+        <div class="chat-message ai-message mb-3">
+          <div class="d-flex align-items-start gap-3">
+            <div class="ai-avatar-small">
+              <Sparkles size="16" class="text-primary"/>
+            </div>
+            <div class="message-content">
+              <div class="message-bubble ai-bubble">
+                <p class="mb-2">{{ t('board.aiAssist.greeting') }}</p>
+                <p class="mb-0">{{ t('board.aiAssist.helpIntro') }}</p>
+                <ul class="mb-0 mt-2">
+                  <li>{{ t('board.aiAssist.items.progress') }}</li>
+                  <li>{{ t('board.aiAssist.items.suggestions') }}</li>
+                  <li>{{ t('board.aiAssist.items.questions') }}</li>
+                  <li>{{ t('board.aiAssist.items.tips') }}</li>
+                </ul>
+
+              </div>
+              <small class="text-muted">{{t('board.aiAssist.justNow')}}</small>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chat Messages List -->
+        <div v-for="message in chatMessages" :key="message.id" class="chat-message mb-3"
+             :class="message.type + '-message'">
+          <div class="d-flex align-items-start gap-3" :class="{ 'flex-row-reverse': message.type === 'user' }">
+            <div v-if="message.type === 'ai'" class="ai-avatar-small">
+              <Sparkles size="16" class="text-primary"/>
+            </div>
+            <div v-else class="user-avatar-small">
+              <img :src="avatar" alt="You" class="rounded-circle" width="32" height="32"/>
+            </div>
+            <div class="message-content" :class="{ 'text-end': message.type === 'user' }">
+              <div class="message-bubble" :class="message.type + '-bubble'">
+                {{ message.content }}
+              </div>
+              <small class="text-muted">{{ formatMessageTime(message.timestamp) }}</small>
+            </div>
+          </div>
+        </div>
+
+        <!-- Typing Indicator -->
+        <div v-if="aiTyping" class="chat-message ai-message mb-3">
+          <div class="d-flex align-items-start gap-3">
+            <div class="ai-avatar-small">
+              <Sparkles size="16" class="text-primary"/>
+            </div>
+            <div class="message-content">
+              <div class="message-bubble ai-bubble">
+                <div class="typing-indicator">
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="quick-actions p-3 border-top bg-light">
+        <h6 class="small text-muted mb-2">{{ t('board.aiAssist.quickQuestionsText') }}</h6>
+        <div class="d-flex flex-wrap gap-2">
+          <button
+            v-for="quickAction in quickActions"
+            :key="quickAction.id"
+            class="btn btn-sm btn-outline-primary"
+            @click="sendQuickMessage(t(`board.aiAssist.questions.${quickAction.id}.message`))"
+          >
+            {{ t(`board.aiAssist.questions.${quickAction.id}.label`)}}
+          </button>
+        </div>
+      </div>
+
+      <!-- Chat Input -->
+      <div class="chat-input p-3 border-top">
+        <div class="input-group">
+          <input
+            type="text"
+            class="form-control"
+            :placeholder="t('board.aiAssist.chatInputLabel')"
+            v-model="newMessage"
+            @keypress.enter="sendMessage"
+            :disabled="aiTyping"
+          />
+          <button
+            class="btn btn-primary"
+            type="button"
+            @click="sendMessage"
+            :disabled="!newMessage.trim() || aiTyping"
+          >
+            <Send size="16"/>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="modal fade p-3 m-2" id="aiHelpModal" tabindex="-1" aria-hidden="true" ref="aiHelpModal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title d-flex align-items-center gap-2">
+            <Sparkles size="20" class="text-primary"/>
+            AI Assistant
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="ai-help-content">
+            <div class="d-flex align-items-start gap-3 mb-4">
+              <div class="ai-avatar bg-primary bg-opacity-10 rounded-circle p-2">
+                <Sparkles size="20" class="text-primary"/>
+              </div>
+              <div class="flex-grow-1">
+                <h6 class="mb-2">AI Suggestion for {{ aiHelpContext.type }}</h6>
+                <div class="ai-suggestion bg-light p-3 rounded">
+                  <div v-if="aiHelpLoading" class="d-flex align-items-center gap-2">
+                    <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
+                    <span class="text-muted">Generating suggestion...</span>
+                  </div>
+                  <div v-else>
+                    <p class="mb-2">{{ aiHelpSuggestion }}</p>
+                    <div class="d-flex gap-2">
+                      <button class="btn btn-sm btn-primary" @click="applySuggestion">
+                        Apply Suggestion
+                      </button>
+                      <button class="btn btn-sm btn-outline-secondary" @click="generateNewSuggestion">
+                        <RefreshCw size="14" class="me-1"/>
+                        Try Again
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="ai-tips">
+              <h6 class="text-muted mb-2">💡 Tips for better results:</h6>
+              <ul class="list-unstyled small text-muted">
+                <li class="mb-1">• Be specific about your project context</li>
+                <li class="mb-1">• Include relevant keywords for your industry</li>
+                <li class="mb-1">• Consider your team's workflow and goals</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </template>
 <script setup>
-import {ref, reactive, onMounted} from 'vue';
+import {ref, reactive, onMounted, nextTick} from 'vue';
 import {useRoute, useRouter} from 'vue-router';
-import {Modal} from 'bootstrap';
+import {Modal, Offcanvas} from 'bootstrap';
 import Parse from 'parse/dist/parse.min.js';
 import {uniqueId} from "@/utils/uuid";
 import {configDefault} from "@/utils/templates"
@@ -537,13 +981,17 @@ import {
   GripVertical,
   BarChart2,
   Settings,
-  AlertTriangle
+  AlertTriangle,
+  MessageCircle,
+  Send,
+  Sparkles
 } from 'lucide-vue-next';
 import {useSwal} from '@/utils/swal';
 import draggable from 'vuedraggable';
 import {useAuthStore} from "@/stores/auth";
 import {getFirstAndLastName} from '@/utils/utils'
 import {useCloudFunctions} from '@/composables/useCloudFunctions';
+import api from "@/utils/api";
 // Initialize Parse
 Parse.initialize(import.meta.env.VITE_PARSE_APP_ID);
 Parse.serverURL = import.meta.env.VITE_BACKEND_URL;
@@ -580,13 +1028,28 @@ const board = reactive({
   _created_at: null,
 });
 const auth = useAuthStore();
-const { callFunction } = useCloudFunctions();
+const {callFunction} = useCloudFunctions();
 
 const boardConfig = reactive(Object.assign({}, configDefault))
 
 const user = reactive(auth.user || {id: "demo", name: "Frederico Ferreira", email: "demo@email.com",});
 
 const avatar = ref(user?.avatar ? user?.avatar : `https://ui-avatars.com/api/?background=0D8ABC&color=fff&name=${getFirstAndLastName(user)}`);
+
+const activeSettingsTab = ref('general');
+let aiHelpModalInstance = null;
+let aiChatOffcanvasInstance = null;
+const aiHelpModal = ref(null);
+const aiChatOffcanvas = ref(null);
+const chatMessagesContainer = ref(null);
+
+const quickActions = [
+  {id: 'boardProgress'},
+  {id: 'bottlenecks'},
+  {id: 'suggestions'},
+  {id: 'teamPerformance'},
+  {id: 'boardSummary'}
+];
 
 // Comments state
 const selectedCard = ref(null);
@@ -1396,6 +1859,208 @@ const getLabelClass = (label) => {
   return `bg-${['primary', 'success', 'info', 'warning', 'danger', 'secondary'][index]}`;
 };
 
+
+// AI Help state
+const aiHelpLoading = ref(false);
+const aiHelpSuggestion = ref('');
+const aiHelpContext = ref({type: '', target: null});
+
+// AI Chat state
+const aiChatOpen = ref(false);
+const chatMessages = ref([]);
+const newMessage = ref('');
+const aiTyping = ref(false);
+
+// AI Chat functions
+const toggleAIChat = () => {
+  if (aiChatOpen.value) {
+    closeAIChat();
+  } else {
+    openAIChat();
+  }
+};
+
+const openAIChat = () => {
+  aiChatOpen.value = true;
+  aiChatOffcanvasInstance.show();
+};
+
+const closeAIChat = () => {
+  aiChatOpen.value = false;
+  aiChatOffcanvasInstance.hide();
+};
+
+const sendMessage = async () => {
+  if (!newMessage.value.trim() || aiTyping.value) return;
+
+  const userMessage = {
+    id: Date.now(),
+    type: 'user',
+    content: newMessage.value,
+    timestamp: new Date()
+  };
+
+  chatMessages.value.push(userMessage);
+  newMessage.value = '';
+
+  await nextTick(() => {
+    scrollChatToBottom();
+  });
+
+  aiTyping.value = true;
+  const aiResponse = await generateAIResponse(userMessage.content);
+
+  await new Promise(r => setTimeout(r, 200));
+
+  let displayedText = '';
+  const id = Date.now() + 1;
+
+  chatMessages.value.push({
+    id,
+    type: 'ai',
+    content: displayedText,
+    timestamp: new Date()
+  });
+
+  aiTyping.value = false;
+
+  for (let i = 0; i < aiResponse.length; i++) {
+    await new Promise(r => setTimeout(r, 30));
+    displayedText += aiResponse[i];
+    const msgIndex = chatMessages.value.findIndex(m => m.id === id);
+    if (msgIndex !== -1) {
+      chatMessages.value[msgIndex].content = displayedText;
+    }
+  }
+
+  await nextTick(() => {
+    scrollChatToBottom();
+  });
+};
+
+const sendQuickMessage = async (message) => {
+  newMessage.value = message;
+  await sendMessage();
+};
+
+
+const generateAIResponse = async (userMessage) => {
+  return api.post(`boards/${route.params.id}/questions`, {question: userMessage}).then((response) => {
+    const {data} = response
+    return data.reply
+  }).catch(error => {
+    console.log(error)
+  })
+}
+
+const scrollChatToBottom = () => {
+  if (chatMessagesContainer.value) {
+    chatMessagesContainer.value.scrollTop = chatMessagesContainer.value.scrollHeight;
+    console.log(chatMessagesContainer.value.scrollTop)
+  }
+};
+
+const formatMessageTime = (timestamp) => {
+  return timestamp.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'});
+};
+
+// AI Help functions
+const showAIHelp = (type, target) => {
+  aiHelpContext.value = {type, target};
+  aiHelpLoading.value = true;
+  aiHelpModalInstance.show();
+
+  // Simulate AI generation
+  setTimeout(() => {
+    generateAISuggestion(type, target);
+  }, 1500);
+};
+
+const generateAISuggestion = (type, target) => {
+  const suggestions = {
+    boardTitle: [
+      'Project Alpha - Development Sprint',
+      'Marketing Campaign Q2 2024',
+      'Product Launch Roadmap',
+      'Team Collaboration Hub'
+    ],
+    columnTitle: [
+      'Backlog Items',
+      'In Progress',
+      'Under Review',
+      'Ready for Testing',
+      'Completed Tasks'
+    ],
+    cardTitle: [
+      'Implement user authentication system',
+      'Design landing page mockups',
+      'Set up CI/CD pipeline',
+      'Conduct user research interviews',
+      'Optimize database queries'
+    ],
+    cardTitleModal: [
+      'Create responsive navigation component',
+      'Integrate payment gateway',
+      'Write unit tests for API endpoints',
+      'Design mobile app wireframes'
+    ],
+    cardDescription: [
+      'This task involves creating a comprehensive user authentication system with login, registration, and password reset functionality. Include social login options and two-factor authentication for enhanced security.',
+      'Design and develop responsive mockups for the main landing page, focusing on user experience and conversion optimization. Include A/B testing variations.',
+      'Set up automated CI/CD pipeline using GitHub Actions to streamline deployment process and ensure code quality through automated testing.'
+    ],
+    cardDescriptionModal: [
+      'Develop a fully responsive navigation component that works seamlessly across all device sizes. Include dropdown menus, mobile hamburger menu, and accessibility features.',
+      'Integrate a secure payment gateway solution supporting multiple payment methods including credit cards, PayPal, and digital wallets. Ensure PCI compliance.'
+    ]
+  };
+
+  const randomSuggestion = suggestions[type][Math.floor(Math.random() * suggestions[type].length)];
+  aiHelpSuggestion.value = randomSuggestion;
+  aiHelpLoading.value = false;
+};
+
+const generateNewSuggestion = () => {
+  aiHelpLoading.value = true;
+  setTimeout(() => {
+    generateAISuggestion(aiHelpContext.value.type, aiHelpContext.value.target);
+  }, 1000);
+};
+
+const applySuggestion = () => {
+  const {type, target} = aiHelpContext.value;
+
+  switch (type) {
+    case 'boardTitle':
+      console.log('Applying board title:', aiHelpSuggestion.value);
+      break;
+    case 'columnTitle':
+      if (target) {
+        target.title = aiHelpSuggestion.value;
+      }
+      break;
+    case 'cardTitle':
+      if (target) {
+        target.title = aiHelpSuggestion.value;
+      }
+      break;
+    case 'cardTitleModal':
+      cardForm.title = aiHelpSuggestion.value;
+      break;
+    case 'cardDescription':
+      if (target) {
+        target.description = aiHelpSuggestion.value;
+      }
+      break;
+    case 'cardDescriptionModal':
+      cardForm.description = aiHelpSuggestion.value;
+      break;
+  }
+
+  aiHelpModalInstance.hide();
+};
+
+
 onMounted(() => {
   getBoard();
   realTimeBoard();
@@ -1406,6 +2071,8 @@ onMounted(() => {
   modalCardDescription = new Modal(document.getElementById('modalCardDescription'));
   modalComments = new Modal(document.getElementById('modalComments'));
   settingsModalInstance = new Modal(document.getElementById('settingsModal'));
+  aiHelpModalInstance = new Modal(aiHelpModal.value);
+  aiChatOffcanvasInstance = new Offcanvas(aiChatOffcanvas.value);
 });
 </script>
 <style scoped>
@@ -1580,6 +2247,148 @@ html {
 .kanban-column::-webkit-scrollbar-thumb:hover,
 .card-list::-webkit-scrollbar-thumb:hover {
   background: #a8a8a8;
+}
+
+/* Chat Messages */
+.chat-messages {
+  max-height: calc(100vh - 300px);
+  overflow-y: auto;
+  scroll-behavior: smooth;
+}
+
+.message-bubble {
+  padding: 0.75rem 1rem;
+  border-radius: 1rem;
+  max-width: 280px;
+  word-wrap: break-word;
+}
+
+.ai-bubble {
+  background-color: #f8f9fa;
+  border: 1px solid #e9ecef;
+}
+
+.user-bubble {
+  background: linear-gradient(45deg, var(--bs-primary), #3b82f6);
+  color: white;
+}
+
+.ai-message .message-content {
+  margin-right: 2rem;
+}
+
+.user-message .message-content {
+  margin-left: 2rem;
+}
+
+/* Typing Indicator */
+.typing-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.5rem 0;
+}
+
+.typing-indicator span {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--bs-primary);
+  animation: typing 1.4s infinite ease-in-out;
+}
+
+.typing-indicator span:nth-child(1) {
+  animation-delay: -0.32s;
+}
+
+.typing-indicator span:nth-child(2) {
+  animation-delay: -0.16s;
+}
+
+@keyframes typing {
+  0%, 80%, 100% {
+    transform: scale(0.8);
+    opacity: 0.5;
+  }
+  40% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Quick Actions */
+.quick-actions {
+  background-color: #f8f9fa;
+}
+
+/* Chat Input */
+.chat-input {
+  background-color: white;
+}
+
+/* AI Help Button Styles */
+.ai-help-btn {
+  opacity: 0.7;
+  transition: all 0.2s ease;
+  border: 1px solid var(--bs-primary);
+  background: linear-gradient(45deg, var(--bs-primary), #3b82f6);
+  color: white;
+  position: relative;
+  overflow: hidden;
+}
+
+.ai-help-btn:hover {
+  opacity: 1;
+  transform: scale(1.05);
+  box-shadow: 0 2px 8px rgba(var(--bs-primary-rgb), 0.3);
+}
+
+.ai-help-btn:before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.ai-help-btn:hover:before {
+  left: 100%;
+}
+
+/* AI Modal Styles */
+.ai-avatar {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ai-suggestion {
+  border-left: 4px solid var(--bs-primary);
+  position: relative;
+}
+
+.ai-tips {
+  background-color: #f8f9fa;
+  padding: 1rem;
+  border-radius: 0.375rem;
+  border: 1px solid #e9ecef;
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
 }
 
 </style>
