@@ -191,6 +191,7 @@ export default {
       cta: 'Criar Primeira Coluna'
     },
     aiAssist: {
+      title: "Assistente de IA",
       chatInputLabel: "Pergunte qualquer coisa sobre o quadro...",
       quickQuestionsText: "Perguntas rápidas",
       justNow: "Agora mesmo",

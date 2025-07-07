@@ -190,6 +190,7 @@ export default {
       cta: "Create First Column"
     },
     aiAssist: {
+      title: "AI Assist",
       chatInputLabel: "Ask me anything about yout board...",
       quickQuestionsText: "Quick Questions",
       justNow: "Just now",

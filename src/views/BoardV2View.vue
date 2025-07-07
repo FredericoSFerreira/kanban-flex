@@ -33,7 +33,7 @@
             title="Chat with AI Assistant"
           >
             <MessageCircle size="18" class="me-2"/>
-            AI Assistant
+            {{t('board.aiAssist.title')}}
           </button>
           <button class="btn btn-primary" @click="showBoardSettings">
             <Settings size="18"/>
@@ -246,7 +246,7 @@
 
 
   <!-- Modal -->
-  <div class="modal fade modal-lg" id="modalCardName" tabindex="-1" aria-labelledby="exampleModalLabel"
+  <div class="modal fade modal-md" id="modalCardName" tabindex="-1" aria-labelledby="exampleModalLabel"
        aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -349,7 +349,7 @@
   </div>
 
 
-  <div class="modal fade modal-lg" id="modalCardDescription" tabindex="-1" aria-labelledby="exampleModalLabel"
+  <div class="modal fade modal-md" id="modalCardDescription" tabindex="-1" aria-labelledby="exampleModalLabel"
        aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -786,8 +786,8 @@
           <Sparkles size="20" class="text-primary"/>
         </div>
         <div>
-          <h5 class="offcanvas-title mb-0">AI Assistant</h5>
-          <small class="text-muted">Ask me anything about your board</small>
+          <h5 class="offcanvas-title mb-0">{{t('board.aiAssist.title')}}</h5>
+          <small class="text-muted">{{t('board.aiAssist.chatInputLabel')}}</small>
         </div>
       </div>
       <button type="button" class="btn-close" @click="closeAIChat" aria-label="Close"></button>
