@@ -49,6 +49,7 @@
                       :preferred-countries="['BR', 'US']"
                       :input-classes="['form-control', 'form-control-lg']"
                       @validate="validatePhone"
+                      @on-input="inputPhone"
                     ></vue-tel-input>
 
                     <div v-if="!isPhoneValid && phone" class="text-danger small mt-1">
@@ -147,7 +148,7 @@
 </template>
 
 <script setup lang="ts">
-import {ref, computed} from 'vue';
+import {ref, computed, reactive} from 'vue';
 import {useI18n} from 'vue-i18n';
 import {Trello, ArrowLeft} from 'lucide-vue-next';
 import {VueTelInput} from 'vue-tel-input';
@@ -158,14 +159,7 @@ import {useRoute, useRouter} from "vue-router";
 import {jwtDecode} from "jwt-decode";
 import {useAuthStore} from "@/stores/auth";
 import {sleep} from "@/utils/utils";
-
-
-type JwtPayload = {
-  id: string
-  name: string
-  email: string
-  exp: number
-}
+import type { JwtPayload, PhoneType} from '@/utils/types';
 
 const router = useRouter()
 const route = useRoute()
@@ -178,6 +172,7 @@ const otpDigits = ref(Array(6).fill(''));
 const resendTimer = ref(0);
 const otpInputs = ref<HTMLInputElement[]>([]);
 const phone = ref(null);
+const phoneObject: PhoneType = reactive({})  as PhoneType;
 const isPhoneValid = ref(false);
 const showSpinner = ref(false);
 const Swal = useSwal();
@@ -202,7 +197,7 @@ const defaultCountry = computed(() => {
 const requestOTP = () => {
   if (!isValidForm.value) return;
   showSpinner.value = true;
-  api.post('/register', {email: email.value, name: name.value, phone: phone.value})
+  api.post('/register', {email: email.value, name: name.value, phone: phoneObject.number, phoneObject})
     .then((response) => {
       console.log(response);
       step.value = 2;
@@ -320,6 +315,10 @@ const handleOtpPaste = (event: ClipboardEvent) => {
 
 const validatePhone = ({valid}: { valid: boolean }) => {
   isPhoneValid.value = valid;
+};
+
+const inputPhone = (_: string, phoneObj: PhoneType) => {
+  Object.assign(phoneObject, phoneObj);
 };
 </script>
 

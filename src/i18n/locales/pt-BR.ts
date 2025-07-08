@@ -195,7 +195,7 @@ export default {
       chatInputLabel: "Pergunte qualquer coisa sobre o quadro...",
       quickQuestionsText: "Perguntas rápidas",
       justNow: "Agora mesmo",
-      "greeting": "👋 Olá! Sou seu assistente de IA para este quadro Kanban.",
+      "greeting": "👋 Olá! Sou a Kira sua assistente de IA para este quadro Kanban.",
       "helpIntro": "Posso te ajudar com:",
       "items": {
         "progress": "Analisar o progresso do seu quadro",

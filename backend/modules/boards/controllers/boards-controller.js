@@ -92,6 +92,7 @@ const getBoardQuestion = async (req, res) => {
   try {
     const id = req.params.id;
     const question = req.body.question
+    const acceptLanguage = req.headers['accept-language'] || 'pt-BR';
     if (!id) return res.status(400).send("Invalid id");
     if (!question) return res.status(400).send("Invalid question");
 
@@ -100,8 +101,7 @@ const getBoardQuestion = async (req, res) => {
     const aiResponse = await getAIBoardSummary([
       {
         role: "system",
-        content: "Você é um chat bot especialista em boards kanban. Responda com base no contexto fornecido. Mas sem falar que essa informação e do contexto." +
-          " Responda no mesmo idioma que a Pergunta do usuario foi fornecida. Tente responder de forma mais breve é resumida."
+        content: `Você é um especialista em boards kanban, seu nome é Kira. ** Responda de forma mais breve e resumida. Não mencione que a informação é do contexto. Responda apenas no idioma ${acceptLanguage}.`
       },
       {role: 'user', content: `Contexto: ${context}\n\nPergunta: ${question}`}
     ], 'llama-3.3-70b-versatile')
