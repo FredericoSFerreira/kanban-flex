@@ -33,7 +33,7 @@
             title="Chat with AI Assistant"
           >
             <MessageCircle size="18" class="me-2"/>
-            {{t('board.aiAssist.title')}}
+            {{ t('board.aiAssist.title') }}
           </button>
           <button class="btn btn-primary" @click="showBoardSettings">
             <Settings size="18"/>
@@ -786,8 +786,8 @@
           <Sparkles size="20" class="text-primary"/>
         </div>
         <div>
-          <h5 class="offcanvas-title mb-0">{{t('board.aiAssist.title')}}</h5>
-          <small class="text-muted">{{t('board.aiAssist.chatInputLabel')}}</small>
+          <h5 class="offcanvas-title mb-0">{{ t('board.aiAssist.title') }}</h5>
+          <small class="text-muted">{{ t('board.aiAssist.chatInputLabel') }}</small>
         </div>
       </div>
       <button type="button" class="btn-close" @click="closeAIChat" aria-label="Close"></button>
@@ -814,7 +814,7 @@
                 </ul>
 
               </div>
-              <small class="text-muted">{{t('board.aiAssist.justNow')}}</small>
+              <small class="text-muted">{{ t('board.aiAssist.justNow') }}</small>
             </div>
           </div>
         </div>
@@ -867,7 +867,7 @@
             class="btn btn-sm btn-outline-primary"
             @click="sendQuickMessage(t(`board.aiAssist.questions.${quickAction.id}.message`))"
           >
-            {{ t(`board.aiAssist.questions.${quickAction.id}.label`)}}
+            {{ t(`board.aiAssist.questions.${quickAction.id}.label`) }}
           </button>
         </div>
       </div>
@@ -1925,11 +1925,14 @@ const sendMessage = async () => {
   aiTyping.value = false;
 
   for (let i = 0; i < aiResponse.length; i++) {
-    await new Promise(r => setTimeout(r, 30));
+    await new Promise(r => setTimeout(r, 20));
     displayedText += aiResponse[i];
     const msgIndex = chatMessages.value.findIndex(m => m.id === id);
     if (msgIndex !== -1) {
       chatMessages.value[msgIndex].content = displayedText;
+      await nextTick(() => {
+        scrollChatToBottom();
+      });
     }
   }
 

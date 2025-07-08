@@ -70,6 +70,7 @@
                       :preferred-countries="['BR', 'US']"
                       :input-classes="['form-control', 'form-control-lg']"
                       @validate="validatePhone"
+                      @on-input="inputPhone"
                     ></vue-tel-input>
 
                     <div v-if="!isPhoneValid && profile.phone" class="text-danger small mt-1">
@@ -191,12 +192,14 @@ import {formatDate, formatTime} from "@/utils/utils";
 import {VueTelInput} from "vue-tel-input";
 import {toast} from "vue3-toastify";
 import {Modal} from 'bootstrap';
+import type { PhoneType} from '@/utils/types';
 
 const {locale, t} = useI18n();
 const user = useAuthStore().user
 let accessLogs = ref([])
 const showSpinner = ref(false)
 const isPhoneValid = ref(false);
+const phoneObject: PhoneType = reactive({})  as PhoneType;
 
 const profile = reactive({
   id: user?.id,
@@ -209,6 +212,10 @@ const profile = reactive({
 
 const validatePhone = ({valid}: { valid: boolean }) => {
   isPhoneValid.value = valid;
+};
+
+const inputPhone = (_: string, phoneObj: PhoneType) => {
+  Object.assign(phoneObject, phoneObj);
 };
 
 onMounted(() => {
@@ -249,11 +256,10 @@ const activeTab = ref('profile');
 const saveProfile = () => {
   showSpinner.value = true;
 
-  api.put('/user', {...profile}).then(res => {
-    const token = useAuthStore().token
+  api.put('/user', {...profile, phone: phoneObject.number,phoneObject}).then(res => {
     accessLogs.value = res.data
     showSpinner.value = false;
-    useAuthStore().updateUser(profile)
+    useAuthStore().updateUser({...profile, phone: phoneObject.number})
     toast.success(t('myProfile.saveProfile'), {
       position: toast.POSITION.TOP_CENTER,
     });
@@ -265,7 +271,6 @@ const saveProfile = () => {
   console.log('Profile saved:', profile);
 };
 
-// Function to show the delete account confirmation modal
 const confirmDeleteAccount = () => {
   const modalElement = document.getElementById('deleteAccountModal');
   if (modalElement) {
@@ -274,11 +279,9 @@ const confirmDeleteAccount = () => {
   }
 };
 
-// Function to delete the account (set active=false)
 const deleteAccount = () => {
   showSpinner.value = true;
 
-  // Create a copy of the profile with active=false
   const deactivatedProfile = {
     ...profile,
     active: false
@@ -294,7 +297,6 @@ const deleteAccount = () => {
       modal?.hide();
     }
 
-    // Show success message
     toast.success(t('myProfile.accountDeactivated'), {
       position: toast.POSITION.TOP_CENTER,
     });

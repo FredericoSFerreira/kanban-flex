@@ -194,7 +194,7 @@ export default {
       chatInputLabel: "Ask me anything about yout board...",
       quickQuestionsText: "Quick Questions",
       justNow: "Just now",
-      "greeting": "👋 Hello! I'm your AI assistant for this Kanban board.",
+      "greeting": "👋 Hello! My name is Kira I'm your AI assistant for this Kanban board.",
       "helpIntro": "I can help you with:",
       "items": {
         "progress": "Analyzing your board progress",
