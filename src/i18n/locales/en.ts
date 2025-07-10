@@ -78,11 +78,20 @@ export default {
     logout: 'Logout',
   },
   hero: {
+    myBoard: 'My Board',
+    new: "New: Integrated AI for maximum productivity",
     title: 'Visualize Your Workflow with',
     subtitle: 'Visible work, incredible results. Simplify your management with our Kanban board.',
     getStarted: 'Get Started',
     watchDemo: 'Watch Demo',
     subtitle_footer: 'Is a web modern board, open-source application based in columns and cards.',
+    textVariations: [
+      "Visualize your Workflow with",
+      "Organize your Tasks with",
+      "Manage your Projects with",
+      "Collaborate with your Team using",
+      "Boost your Productivity with"
+    ]
   },
   features: {
     title: "Features that make your workflow smoother",
@@ -665,5 +674,4 @@ export default {
     back:
       'Back'
   }
-}
-;
+};

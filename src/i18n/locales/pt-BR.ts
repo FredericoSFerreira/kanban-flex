@@ -78,11 +78,20 @@ export default {
     logout: 'Sair',
   },
   hero: {
+    myBoard: 'Meu Quadro',
+    new: 'Novo: IA integrada para produtividade máxima',
     title: 'Visualize seu Fluxo de Trabalho com',
     subtitle: 'Trabalho visível, resultados incríveis. Simplifique sua gestão com nosso quadro Kanban',
     getStarted: 'Começar Agora',
     watchDemo: 'Ver Demonstração',
-    subtitle_footer: 'É um quadro web moderno, aplicativo de código aberto baseado em colunas e cartões.'
+    subtitle_footer: 'É um quadro web moderno, aplicativo de código aberto baseado em colunas e cartões.',
+    textVariations: [
+    "Visualize seu Fluxo de Trabalho com",
+    "Organize suas Tarefas com",
+    "Gerencie seus Projetos com",
+    "Colabore com sua Equipe usando",
+    "Aumente sua Produtividade com"
+  ]
   },
   features: {
     title: 'Recursos que tornam seu fluxo de trabalho mais suave',
