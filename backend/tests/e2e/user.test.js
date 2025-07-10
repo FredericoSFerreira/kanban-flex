@@ -4,6 +4,11 @@ jest.unstable_mockModule('./utils/parse-utils.js', () => ({
   callFunction: mockCallFunction
 }));
 
+jest.unstable_mockModule('./service/email-service.js', () => ({
+  default: jest.fn().mockResolvedValue(true)
+}));
+
+
 jest.unstable_mockModule('./middleware/auth.js', () => ({
   verifyToken: (req, res, next) => {
     const authHeader = req.headers.authorization;
@@ -79,4 +84,26 @@ describe('User Endpoint', () => {
     expect(response.status).toBe(500);
     expect(response.text).toBe('Occurred error in update otp');
   });
+
+
+    it('should return 201 Inactive User', async () => {
+    const userData = {
+      email: 'test@example.com',
+      name: 'Test User',
+      phone: '1234567890',
+      active: false
+    };
+    mockCallFunction.mockResolvedValue({ status: 'success' });
+
+    const response = await request(app)
+      .put('/user')
+      .set('Authorization', 'Bearer fake-token')
+      .send(userData);
+
+    expect(response.status).toBe(201);
+    expect(response.text).toBe('OK');
+
+  });
+
+
 });

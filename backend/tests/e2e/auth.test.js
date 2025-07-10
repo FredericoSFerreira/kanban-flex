@@ -97,9 +97,7 @@ describe('Send Otp Endpoint', () => {
 
   it('should return 201 Created with success send otp code', async () => {
 
-
     Parse.Cloud.run.mockResolvedValue({name: 'Jose'});
-
     const response = await request(app)
       .post('/send-otp')
       .send(userData);
@@ -108,6 +106,17 @@ describe('Send Otp Endpoint', () => {
     expect(mockSet).toHaveBeenCalledTimes(1);
     expect(mockSave).toHaveBeenCalledTimes(1);
   });
+
+    it('should return 406 with error in send otp code for user incative', async () => {
+
+    Parse.Cloud.run.mockResolvedValue({name: 'Jose', active: false});
+    const response = await request(app)
+      .post('/send-otp')
+      .send(userData);
+
+    expect(response.status).toBe(406);
+  });
+
 
 
   it('should return 404 when user not exists', async () => {
@@ -213,6 +222,29 @@ describe('Auth Google Endpoint', () => {
       .send(userData);
 
     expect(response.status).toBe(200);
+  });
+
+
+  it('should return 406 in auth user inactive', async () => {
+
+    const fakeUser = {
+      sub: '1234567890',
+      name: 'João da Silva',
+      email: 'joao@gmail.com',
+      picture: 'https://foto.com/avatar.jpg',
+    };
+
+    nock('https://www.googleapis.com')
+      .get('/oauth2/v3/userinfo')
+      .reply(200, fakeUser);
+
+    Parse.Cloud.run.mockResolvedValue({name: 'Jose', phone: null, id: '123', active: false});
+
+    const response = await request(app)
+      .post('/auth/google')
+      .send(userData);
+
+    expect(response.status).toBe(406);
   });
 
 
