@@ -34,7 +34,7 @@
                 <!--                </button>-->
               </div>
 
-              <div class="hero-stats d-flex flex-wrap gap-4" v-if="1 == 1">
+              <div class="hero-stats d-flex flex-wrap gap-4" v-if="1 === 2">
                 <div class="stat-item">
                   <div class="stat-number">50K+</div>
                   <div class="stat-label">Usuários Ativos</div>
