@@ -483,7 +483,6 @@ Parse.Cloud.define("saveOtp", async (request) => {
     const otpData = await otpQuery.first();
     if (otpData) {
       if (request.params.phone) otpData.set("phone", request.params.phone);
-      if (request.params.phoneObject) otpData.set("phoneObject", request.params.phoneObject);
       if (request.params.picture) otpData.set("avatar", request.params.picture);
       await otpData.save();
       await saveLog(request, otpData, 'login')
@@ -612,7 +611,6 @@ Parse.Cloud.define("updateUserOtp", async (request) => {
   query.first().then((otp) => {
 
     if (otp.id !== request.params.id) throw new Error("Invalid update User")
-    if (request.params.phoneObject) otp.set("phoneObject", request.params.phoneObject);
     otp.set('name', request.params.name)
     otp.set('phone', request.params.phone)
     otp.set('active', request.params.active === undefined ? true : request.params.active)

@@ -406,3 +406,111 @@ describe('Get Board Summary Endpoint', () => {
   });
 });
 
+describe('Get Board Question Endpoint', () => {
+  beforeEach(() => {
+    mockCallFunction.mockReset();
+    jest.clearAllMocks();
+  });
+
+  it('should return 200 OK with AI response when authenticated', async () => {
+    const mockBoard = {
+      attributes: {
+        name: 'test',
+        columns: [{
+          name: 'xpto',
+          itens: [
+            {
+              title: 'xpto',
+              description: 'xpto',
+              labels: [],
+              name: 'Test User'
+            }
+          ]
+        }]
+      }
+    };
+
+    mockCallFunction.mockResolvedValue(mockBoard);
+
+    const fakeAIResult = {
+      "id": "chatcmpl",
+      "object": "chat.completion",
+      "created": 1750873447,
+      "model": "llama-3.3-70b-versatile",
+      "choices": [
+        {
+          "index": 0,
+          "message": {
+            "role": "assistant",
+            "content": "This is the answer to your question about the board."
+          },
+          "logprobs": null,
+          "finish_reason": "stop"
+        }
+      ],
+      "usage": {},
+      "usage_breakdown": null,
+      "system_fingerprint": null,
+      "x_groq": {}
+    };
+
+    nock('https://api.groq.com')
+      .post('/openai/v1/chat/completions')
+      .reply(200, fakeAIResult);
+
+    const response = await request(app)
+      .post('/boards/123/questions')
+      .set('Authorization', 'Bearer fake-token')
+      .set('Accept-Language', 'en-US')
+      .send({ question: 'What is this board about?' });
+
+    expect(response.status).toBe(200);
+    expect(response.body).toHaveProperty('reply');
+    expect(response.body.reply).toBe('This is the answer to your question about the board.');
+
+    expect(mockCallFunction).toHaveBeenCalledWith(
+      'getBoardById',
+      { id: '123' },
+      'fake-token'
+    );
+  });
+
+  it('should return 400 when question is missing', async () => {
+    const response = await request(app)
+      .post('/boards/123/questions')
+      .set('Authorization', 'Bearer fake-token')
+      .send({});
+
+    expect(response.status).toBe(400);
+    expect(response.text).toBe('Invalid question');
+    expect(mockCallFunction).not.toHaveBeenCalled();
+  });
+
+  it('should return 401 when not authenticated', async () => {
+    const response = await request(app)
+      .post('/boards/123/questions')
+      .send({ question: 'What is this board about?' });
+
+    expect(response.status).toBe(401);
+    expect(response.body).toHaveProperty('msg', 'Token not pass');
+    expect(mockCallFunction).not.toHaveBeenCalled();
+  });
+
+  it('should return 500 when an error occurs', async () => {
+    mockCallFunction.mockRejectedValue(new Error('Database error'));
+
+    const response = await request(app)
+      .post('/boards/123/questions')
+      .set('Authorization', 'Bearer fake-token')
+      .send({ question: 'What is this board about?' });
+
+    expect(response.status).toBe(500);
+    expect(response.text).toBe('Occurred error in get board summary');
+
+    expect(mockCallFunction).toHaveBeenCalledWith(
+      'getBoardById',
+      { id: '123' },
+      'fake-token'
+    );
+  });
+});

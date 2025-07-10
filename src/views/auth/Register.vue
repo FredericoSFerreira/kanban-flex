@@ -197,7 +197,7 @@ const defaultCountry = computed(() => {
 const requestOTP = () => {
   if (!isValidForm.value) return;
   showSpinner.value = true;
-  api.post('/register', {email: email.value, name: name.value, phone: phoneObject.number, phoneObject})
+  api.post('/register', {email: email.value, name: name.value, phone: phoneObject.number})
     .then((response) => {
       console.log(response);
       step.value = 2;

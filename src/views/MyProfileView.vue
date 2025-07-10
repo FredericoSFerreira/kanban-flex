@@ -256,7 +256,7 @@ const activeTab = ref('profile');
 const saveProfile = () => {
   showSpinner.value = true;
 
-  api.put('/user', {...profile, phone: phoneObject.number,phoneObject}).then(res => {
+  api.put('/user', {...profile, phone: phoneObject.number}).then(res => {
     accessLogs.value = res.data
     showSpinner.value = false;
     useAuthStore().updateUser({...profile, phone: phoneObject.number})

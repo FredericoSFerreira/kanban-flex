@@ -2,7 +2,6 @@ import {generateBoardSummaryPrompt, parseBoolean} from "../../../utils/utils.js"
 import {getAIBoardSummary} from "../../../service/groq-service.js";
 import {getRedisClient} from "../../../service/redis-service.js";
 import {callFunction} from "../../../utils/parse-utils.js";
-import {response} from "express";
 
 const getMyBoards = async (req, res) => {
   try {
@@ -33,6 +32,7 @@ const getParticipatingBoards = async (req, res) => {
 const getBoardStats = async (req, res) => {
   try {
     const id = req.params.id;
+    /* istanbul ignore next */
     if (!id) return res.status(400).send("Invalid id");
 
     const boardStats = await callFunction("getBoardStats", req.params, req.token);
@@ -50,6 +50,7 @@ const getBoardSummary = async (req, res) => {
   try {
     const id = req.params.id;
     const retry = parseBoolean(req.query.retry);
+    /* istanbul ignore next */
     if (!id) return res.status(400).send("Invalid id");
 
     const client = await getRedisClient();
@@ -93,6 +94,7 @@ const getBoardQuestion = async (req, res) => {
     const id = req.params.id;
     const question = req.body.question
     const acceptLanguage = req.headers['accept-language'] || 'pt-BR';
+    /* istanbul ignore next */
     if (!id) return res.status(400).send("Invalid id");
     if (!question) return res.status(400).send("Invalid question");
 

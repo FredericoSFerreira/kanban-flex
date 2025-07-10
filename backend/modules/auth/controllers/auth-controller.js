@@ -10,7 +10,6 @@ const register = async (req, res) => {
     const email = req.body.email;
     const name = req.body.name;
     const phone = req.body.phone;
-    const phoneObject = req.body.phoneObject || {}
     const {ip, userAgent} = req.clientInfo;
     const resultSave = await Parse.Cloud.run("saveOtp", {
       email,
@@ -18,7 +17,6 @@ const register = async (req, res) => {
       phone,
       ip,
       userAgent,
-      phoneObject
     });
     const {conflict} = resultSave;
     if (conflict) {
