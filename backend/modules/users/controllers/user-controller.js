@@ -6,7 +6,6 @@ const updateUser = async (req, res) => {
     const email = req.body.email;
     const name = req.body.name;
     const phone = req.body.phone;
-    const phoneObject = req.body.phoneObject || {}
     const active = req.body.active;
     await callFunction("updateUserOtp", {
       name,
@@ -14,7 +13,6 @@ const updateUser = async (req, res) => {
       email,
       active,
       id: req.user.id,
-      phoneObject
     }, req.token);
 
     // If account is being deactivated, send an email notification
