@@ -1,4 +1,10 @@
 export default {
+  "date": {
+    "now": "Agora mesmo",
+    "hoursAgo": "{hours}h atrás",
+    "yesterday": "Ontem",
+    "daysAgo": "{days} dias atrás"
+  },
   nav: {
     home: 'Início',
     board: 'Quadro',
@@ -404,10 +410,11 @@ export default {
   boardV2: {
     statistics: 'Estatísticas',
     newCard: 'Novo Card',
+    newCardDescription: 'Crie um novo card para o seu quadro',
     title: 'Título',
     description: 'Descrição',
-    labels: 'Labels (separados por vírgula)',
-    labelsPlaceholder: 'Exemplo: importante, bug, feature',
+    labels: 'Tag',
+    labelsPlaceholder: 'Digite uma tag é pressione Enter...',
     close: 'Fechar',
     save: 'Salvar',
     identify: 'Identifique-se',
@@ -430,7 +437,7 @@ export default {
       oops: 'Oops...',
       nameRequired: 'Você precisa informar o seu nome!',
       emailRequired: 'Você precisa informar um email válido!',
-      descriptionRequired: 'Você precisa informar a descrição do card!',
+      titleRequired: 'Você precisa informar o titulo do card!',
       columnNameRequired: 'Você precisa informar o nome da coluna!'
     },
     confirmations: {

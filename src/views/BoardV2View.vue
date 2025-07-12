@@ -124,7 +124,7 @@
               </div>
             </div>
             <div class="p-2 border-bottom">
-              <button class="btn btn-sm btn btn-light-new-card add-task w-100" @click="newCard(column.id)">
+              <button class="btn btn-sm btn btn-light-new-card add-task w-100" @click="openCardModal(null, column.id, 'activity')">
                 <Plus size="16" class="me-1"/>
                 {{ $t('board.addCard') }}
               </button>
@@ -159,10 +159,10 @@
                           </div>
                         </div>
                         <div>
-                          <div class="d-flex gap-2 " v-if="checkPermission(card.user_id)">
+                          <div class="d-flex gap-2 " v-if="checkPermission(card.user_id, true)">
                             <button
                               class="btn btn-sm btn-outline-primary p-1"
-                              @click="editCardDescription(column.id, card.id, card.description, card.title, card.labels)"
+                              @click="openCardModal(card, column.id)"
                               :title="$t('board.editCard')"
                             >
                               <Edit2 size="14"/>
@@ -225,7 +225,7 @@
                           </button>
                           <button
                             class="btn btn-sm btn-outline-secondary d-flex align-items-center gap-1"
-                            @click="showComments(column.id, card.id)"
+                            @click="openCardModal(card, column.id, 'comments')"
                           >
                             <MessageSquare size="14"/>
                             <span>{{ card.comments?.length || 0 }}</span>
@@ -709,69 +709,6 @@
     </div>
   </div>
 
-  <!-- Comments Modal -->
-  <div class="modal fade" id="modalComments" tabindex="-1" aria-labelledby="commentsModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="commentsModalLabel">{{ $t('boardV2.comments') }}</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <div class="comments-list mb-4">
-            <div v-if="!selectedCard?.comments || selectedCard.comments.length === 0"
-                 class="text-center text-muted py-4">
-              {{ $t('boardV2.noComments') }}
-            </div>
-            <div v-else v-for="comment in selectedCard.comments" :key="comment.id" class="comment mb-3">
-              <div class="d-flex gap-3">
-                <img v-if="comment.avatar" :src="comment.avatar" :alt="comment.userName" class="rounded-circle"
-                     width="32" height="32">
-                <div class="flex-grow-1">
-                  <div class="d-flex justify-content-between align-items-start">
-                    <h6 class="mb-1">{{ comment.userName }}</h6>
-                    <small class="text-muted">{{ formatDate(comment.createdAt) }}</small>
-                  </div>
-                  <p class="mb-1">{{ comment.text }}</p>
-                  <div class="d-flex gap-2">
-                    <button
-                      v-if="comment.userId === user.id"
-                      class="btn btn-sm btn-link p-0 text-danger text-decoration-none"
-                      @click="deleteComment(comment.id)"
-                    >
-                      {{ $t('boardV2.delete') }}
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="add-comment">
-            <div class="d-flex gap-3">
-              <img :src="avatar" alt="Current User" class="rounded-circle" width="32" height="32">
-              <div class="flex-grow-1">
-                <textarea
-                  class="form-control mb-2"
-                  v-model="newComment"
-                  :placeholder="$t('boardV2.writeComment')"
-                  rows="2"
-                ></textarea>
-                <button
-                  class="btn btn-primary"
-                  @click="addComment()"
-                  :disabled="!newComment.trim()"
-                >
-                  {{ $t('boardV2.addComment') }}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-
   <!-- AI Chat Offcanvas -->
   <div
     class="offcanvas offcanvas-end ai-chat-offcanvas"
@@ -955,6 +892,21 @@
     </div>
   </div>
 
+
+  <!-- Card Modal -->
+  <!--    :cardData="selectedCard"-->
+  <CardModal
+    :is-editing="isEditingCard"
+    :card-data="selectedCard"
+    :column-id="selectedColumnId"
+    :initial-tab="initialTab"
+    @edit="newSaveEditCard"
+    @save="saveCard"
+    @delete="removeCard"
+    @saveComment="addComment"
+    @deleteComment="deleteComment"
+  />
+
 </template>
 <script setup>
 import {ref, reactive, onMounted, nextTick} from 'vue';
@@ -989,9 +941,10 @@ import {
 import {useSwal} from '@/utils/swal';
 import draggable from 'vuedraggable';
 import {useAuthStore} from "@/stores/auth";
-import {getFirstAndLastName} from '@/utils/utils'
+import {getUserLoggedAvatar} from '@/utils/utils'
 import {useCloudFunctions} from '@/composables/useCloudFunctions';
 import api from "@/utils/api";
+import CardModal from '../components/CardModal.vue';
 // Initialize Parse
 Parse.initialize(import.meta.env.VITE_PARSE_APP_ID);
 Parse.serverURL = import.meta.env.VITE_BACKEND_URL;
@@ -1027,6 +980,12 @@ const board = reactive({
   columns: [],
   _created_at: null,
 });
+
+const isEditingCard = ref(false);
+// const selectedCard = ref(null);
+// const selectedColumnId = ref(null);
+const initialTab = ref('details');
+
 const auth = useAuthStore();
 const {callFunction} = useCloudFunctions();
 
@@ -1034,7 +993,7 @@ const boardConfig = reactive(Object.assign({}, configDefault))
 
 const user = reactive(auth.user || {id: "demo", name: "Frederico Ferreira", email: "demo@email.com",});
 
-const avatar = ref(user?.avatar ? user?.avatar : `https://ui-avatars.com/api/?background=0D8ABC&color=fff&name=${getFirstAndLastName(user)}`);
+const avatar = ref(getUserLoggedAvatar());
 
 const activeSettingsTab = ref('general');
 let aiHelpModalInstance = null;
@@ -1052,8 +1011,12 @@ const quickActions = [
 ];
 
 // Comments state
-const selectedCard = ref(null);
-const selectedColumnId = ref(null);
+const selectedCard = ref({
+  title: '',
+  description: '',
+  labels: [],
+});
+const selectedColumnId = ref("");
 const newComment = ref("");
 const settingsModal = ref(null);
 
@@ -1063,9 +1026,21 @@ let modalCardName = null;
 let modalEditColumnName = null;
 let modalBoardName = null;
 let modalCardDescription = null;
-let modalComments = null;
 let subscriptionBoard = null;
 let settingsModalInstance = null;
+let modalEditCard = null
+
+
+const openCardModal = (card = null, columnId = null, tab = 'activity') => {
+  isEditingCard.value = !!card;
+  selectedCard.value = card ? {checklist: [], ...card} : undefined;
+  cardSelectedId.value = card ? card.id : null;
+  selectedColumnId.value = columnId;
+  columnSelectedId.value = columnId;
+  initialTab.value = tab;
+  modalEditCard.show();
+};
+
 
 // Methods
 const orderByOnChange = (event) => {
@@ -1233,6 +1208,73 @@ const saveCardVotes = (idColumn, idCard, upVote = false, downVote = false) => {
   });
 };
 
+
+const newSaveEditCard = (data) => {
+  const columns = board.columns;
+
+  if (!data || !data.description || !data.title) {
+    return $swal.fire({
+      icon: "error",
+      title: t('boardV2.errors.oops'),
+      text: t('boardV2.errors.descriptionAndTitleRequired'),
+    });
+  }
+
+  const [column, columnIndex] = findColumn(columns, columnSelectedId.value);
+  console.log(column, '56465')
+  if (!column) return;
+
+  const [card, cardIndex] = findCard(column, data.id);
+  if (!card) return;
+
+  const originalDescription = card.description;
+  const originalTitle = card.title;
+  const originalLabels = card.labels ? [...card.labels] : [];
+
+  const labels = data.labels ? data.labels.map(label => label.trim()).filter(Boolean) : [];
+  const checklist = data.checklist ? data.checklist : [];
+
+  card.description = data.description;
+  card.title = data.title;
+  card.labels = labels;
+
+  callFunction('updateCard', {
+    boardId: route.params.id,
+    columnId: columnSelectedId.value,
+    cardId: data.id,
+    updates: {
+      description: data.description,
+      title: data.title,
+      labels: labels,
+      checklist: checklist
+    }
+  }).then(result => {
+    console.log("Card update result:", result);
+    modalEditCard.hide();
+    if (!result.success) {
+      card.description = originalDescription;
+      card.title = originalTitle;
+      card.labels = originalLabels;
+      toast.error(t('boardV2.notifications.failedToUpdateCard'), {
+        position: toast.POSITION.TOP_CENTER,
+      });
+    }
+  }).catch(error => {
+    console.error("Error updating card:", error);
+    card.description = originalDescription;
+    card.title = originalTitle;
+    card.labels = originalLabels;
+    toast.error(t('boardV2.notifications.errorUpdatingCard'), {
+      position: toast.POSITION.TOP_CENTER,
+    });
+  }).finally(() => {
+    cardEditDescription.value = null;
+    cardEditTitle.value = null;
+    cardEditLabels.value = null;
+    modalCardDescription.hide();
+  });
+};
+
 const saveEditCard = () => {
   if (!cardEditDescription.value && boardConfig.showDescription) {
     return $swal.fire({
@@ -1312,7 +1354,8 @@ const updateBoardProperties = (updateData) => {
   });
 }
 
-const checkPermission = (idUser = null) => {
+const checkPermission = (idUser = null, byPass = false) => {
+  if (byPass) return true;
   if (user.id === board.owner_id) {
     return true;
   } else if (idUser && idUser === user.id) {
@@ -1322,6 +1365,7 @@ const checkPermission = (idUser = null) => {
 };
 
 const removeCard = (columnId, cardId) => {
+  console.log(columnId, cardId);
   $swal.fire({
     title: t('boardV2.confirmations.removeCard'),
     icon: "question",
@@ -1331,6 +1375,7 @@ const removeCard = (columnId, cardId) => {
     denyButtonText: t('boardV2.confirmations.no')
   }).then((result) => {
     if (result.isConfirmed) {
+      modalEditCard.hide();
       const columns = board.columns;
       const [column, columnIndex] = findColumn(columns, columnId);
       if (!column) return;
@@ -1489,12 +1534,12 @@ const saveColumn = () => {
   });
 };
 
-const saveCard = () => {
-  if (!cardName.value && boardConfig.showDescription) {
+const saveCard = (data) => {
+  if (!data.title && boardConfig.showDescription) {
     return $swal.fire({
       icon: "error",
       title: t('boardV2.errors.oops'),
-      text: t('boardV2.errors.descriptionRequired'),
+      text: t('boardV2.errors.titleRequired'),
     });
   }
 
@@ -1509,14 +1554,15 @@ const saveCard = () => {
     name: user.name,
     user_id: user.id,
     avatar: avatar.value,
-    title: cardTitle.value,
-    description: cardName.value,
-    labels: cardLabels.value ? cardLabels.value.split(',').map(label => label.trim()).filter(Boolean) : [],
+    title: data.title,
+    description: data.description,
+    labels: data.labels ? data.labels.map(label => label.trim()).filter(Boolean) : [],
     up_vote: 0,
     down_vote: 0,
     up_vote_users: [],
     down_vote_users: [],
-    comments: []
+    comments: [],
+    checklist: []
   };
 
   // Update local state optimistically
@@ -1530,6 +1576,7 @@ const saveCard = () => {
     card: newCard
   }).then(result => {
     console.log("Card add result:", result);
+    modalEditCard.hide();
     if (!result.success) {
       // Revert optimistic update if server update failed
       column.itens.pop(); // Remove the last card (the one we just added)
@@ -1602,6 +1649,16 @@ const setBoard = (boardAttr) => {
   });
 
   console.log("NOVO BOARD", board);
+  try {
+    const [column, columnIndex] = findColumn(board.columns, columnSelectedId.value);
+    if (!column) return;
+    const [card, cardIndex] = findCard(column, cardSelectedId.value);
+    if (!card) return;
+    selectedCard.value = {...card}
+  } catch (e) {
+    console.log(e)
+  }
+
 
   if (orderBy.value !== 'default') {
     sortItemsByLike();
@@ -1636,11 +1693,14 @@ const realTimeBoard = async () => {
     console.log('board opened');
   });
 
+  let updateDebounceTimer;
+
   subscriptionBoard.on('update', (board) => {
     console.log("update attr", board);
-    setTimeout(() => {
+    clearTimeout(updateDebounceTimer);
+    updateDebounceTimer = setTimeout(() => {
       getBoard();
-    }, 1);
+    }, 300);
   });
 
   subscriptionBoard.on('close', () => {
@@ -1755,92 +1815,45 @@ const onDrop = (evt, columnDropId) => {
   });
 };
 
-// Comments functions
-const showComments = (columnId, cardId) => {
-  const columns = board.columns;
-  const [column, columnIndex] = findColumn(columns, columnId);
-  if (!column) return;
+const addComment = (comment, data) => {
 
-  const [card, cardIndex] = findCard(column, cardId);
-  if (!card) return;
-
-  selectedCard.value = card;
-  selectedColumnId.value = columnId;
-  newComment.value = '';
-  modalComments.show();
-};
-
-const addComment = () => {
-  if (!newComment.value.trim()) return;
-
-  const comment = {
-    id: uniqueId(),
-    userId: user.id,
-    userName: user.name,
-    text: newComment.value,
-    avatar: avatar.value,
-    createdAt: new Date().toISOString()
-  };
-
-  if (!selectedCard.value.comments) {
-    selectedCard.value.comments = [];
+  if (!data.comments) {
+    data.comments = [];
   }
-
-  selectedCard.value.comments.push(comment);
 
   callFunction('updateCard', {
     boardId: route.params.id,
     columnId: selectedColumnId.value,
-    cardId: selectedCard.value.id,
-    updates: {comments: selectedCard.value.comments}
+    cardId: data.id,
+    updates: {comments: data.comments}
   }).then(result => {
     console.log("Comment add result:", result);
-    if (!result.success) {
-      selectedCard.value.comments.pop();
-      toast.error("Falha ao adicionar comentário", {
-        position: toast.POSITION.TOP_CENTER,
-      });
-    }
   }).catch(error => {
     console.error("Error adding comment:", error);
-    selectedCard.value.comments.pop();
     toast.error("Erro ao adicionar comentário", {
       position: toast.POSITION.TOP_CENTER,
     });
   }).finally(() => {
-    newComment.value = '';
   });
 };
 
-const deleteComment = (commentId) => {
-  if (!selectedCard.value.comments) return;
-
-  const commentIndex = selectedCard.value.comments.findIndex(c => c.id === commentId);
+const deleteComment = (data) => {
+  const commentIndex = data.comments.findIndex(c => c.id === data.commentId);
   if (commentIndex === -1) return;
-  const originalComments = JSON.parse(JSON.stringify(selectedCard.value.comments));
-  selectedCard.value.comments.splice(commentIndex, 1);
+  data.comments.splice(commentIndex, 1);
 
   callFunction('updateCard', {
     boardId: route.params.id,
     columnId: selectedColumnId.value,
-    cardId: selectedCard.value.id,
-    updates: {comments: selectedCard.value.comments}
+    cardId: data.id,
+    updates: {comments: data.comments}
   }).then(result => {
     console.log("Comment delete result:", result);
-    if (!result.success) {
-      // Revert optimistic update if server update failed
-      selectedCard.value.comments = originalComments;
-      toast.error("Falha ao remover comentário", {
-        position: toast.POSITION.TOP_CENTER,
-      });
-    } else {
-      toast.success("Comentário removido com sucesso!", {
-        position: toast.POSITION.TOP_CENTER,
-      });
-    }
+    toast.success("Comentário removido com sucesso!", {
+      position: toast.POSITION.TOP_CENTER,
+    })
   }).catch(error => {
     console.error("Error deleting comment:", error);
-    selectedCard.value.comments = originalComments;
     toast.error("Erro ao remover comentário", {
       position: toast.POSITION.TOP_CENTER,
     });
@@ -2072,10 +2085,10 @@ onMounted(() => {
   modalEditColumnName = new Modal(document.getElementById('modalEditColumnName'));
   modalBoardName = new Modal(document.getElementById('modalBoardName'));
   modalCardDescription = new Modal(document.getElementById('modalCardDescription'));
-  modalComments = new Modal(document.getElementById('modalComments'));
   settingsModalInstance = new Modal(document.getElementById('settingsModal'));
   aiHelpModalInstance = new Modal(aiHelpModal.value);
   aiChatOffcanvasInstance = new Offcanvas(aiChatOffcanvas.value);
+  modalEditCard = new Modal(document.getElementById('cardModal'));
 });
 </script>
 <style scoped>

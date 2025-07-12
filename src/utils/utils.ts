@@ -1,6 +1,8 @@
+import {useAuthStore} from "@/stores/auth";
+
 function removePathFromUrl(url: string): string {
-    const lastSlashIndex = url.lastIndexOf('/');
-    return lastSlashIndex !== -1 ? url.substring(0, lastSlashIndex) : url;
+  const lastSlashIndex = url.lastIndexOf('/');
+  return lastSlashIndex !== -1 ? url.substring(0, lastSlashIndex) : url;
 }
 
 function sleep(ms: number = 2000) {
@@ -19,6 +21,11 @@ const getFirstAndLastName = (user): string => {
 }
 
 
+const getUserLoggedAvatar = () => {
+  const auth = useAuthStore();
+  return auth.user?.avatar ? auth.user?.avatar : `https://ui-avatars.com/api/?background=0D8ABC&color=fff&name=${getFirstAndLastName(user)}`;
+}
+
 const formatDate = (dateString: string) => {
   return new Date(dateString).toLocaleDateString();
 };
@@ -27,5 +34,5 @@ const formatTime = (dateString: string) => {
   return new Date(dateString).toLocaleTimeString();
 };
 
-export { removePathFromUrl, sleep, getFirstAndLastName, formatDate, formatTime }
+export {removePathFromUrl, sleep, getFirstAndLastName, formatDate, formatTime, getUserLoggedAvatar}
 

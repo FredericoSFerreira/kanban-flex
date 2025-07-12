@@ -1,4 +1,10 @@
 export default {
+  "date": {
+    "now": "Just now",
+    "hoursAgo": "{hours}h ago",
+    "yesterday": "Yesterday",
+    "daysAgo": "{days} days ago"
+  },
   nav: {
     home: 'Home',
     board: 'Board',
@@ -267,9 +273,9 @@ export default {
     status: {
       title: "Status/Help",
       link1:
-        "API Status",
+        "Having an issue?",
       link2:
-        "Having an issue?"
+        "API Status"
     }
     ,
     "copyright":
@@ -505,16 +511,17 @@ export default {
   ,
   boardV2: {
     statistics: 'Statistics',
-    newCard:
-      'New Card',
+    newCard: 'New Card',
+    newCardDescription: 'Create a new card for you board',
+    editCardDescription: 'Update your card information',
     title:
       'Title',
     description:
       'Description',
     labels:
-      'Labels (separated by comma)',
+      'Tags',
     labelsPlaceholder:
-      'Example: important, bug, feature',
+      'Digite uma tag é pressione Enter...',
     close:
       'Close',
     save:
@@ -558,8 +565,8 @@ export default {
           'You need to provide your name!',
         emailRequired:
           'You need to provide a valid email!',
-        descriptionRequired:
-          'You need to provide the card description!',
+        titleRequired:
+          'You need to provide the card title!',
         columnNameRequired:
           'You need to provide the column name!'
       }
