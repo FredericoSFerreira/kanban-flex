@@ -23,7 +23,7 @@ const getFirstAndLastName = (user): string => {
 
 const getUserLoggedAvatar = () => {
   const auth = useAuthStore();
-  return auth.user?.avatar ? auth.user?.avatar : `https://ui-avatars.com/api/?background=0D8ABC&color=fff&name=${getFirstAndLastName(user)}`;
+  return auth.user?.avatar ? auth.user?.avatar : `https://ui-avatars.com/api/?background=0D8ABC&color=fff&name=${getFirstAndLastName(auth.user)}`;
 }
 
 const formatDate = (dateString: string) => {

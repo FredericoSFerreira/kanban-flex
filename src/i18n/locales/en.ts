@@ -514,50 +514,58 @@ export default {
     newCard: 'New Card',
     newCardDescription: 'Create a new card for you board',
     editCardDescription: 'Update your card information',
-    title:
-      'Title',
-    description:
-      'Description',
-    labels:
-      'Tags',
-    labelsPlaceholder:
-      'Digite uma tag é pressione Enter...',
-    close:
-      'Close',
-    save:
-      'Save',
-    identify:
-      'Identify Yourself',
-    name:
-      'Name',
-    email:
-      'Email',
-    enterAsAnonymous:
-      'Enter as Anonymous',
-    editBoardName:
-      'Edit board name',
-    boardName:
-      'Board name',
-    newColumn:
-      'New column',
-    columnName:
-      'Column name',
-    editColumn:
-      'Edit column',
-    editCard:
-      'Edit card',
-    comments:
-      'Comments',
-    noComments:
-      'No comments yet.',
-    delete:
-      'Delete',
-    writeComment:
-      'Write a comment...',
-    addComment:
-      'Add Comment',
-    cardHideText:
-      'Hold on, curious one! The card content is hidden. And remember, curiosity killed the cat.',
+    title: 'Title',
+    titlePlaceholder: 'Enter card title...',
+    description: 'Description',
+    descriptionPlaceholder: 'Describe the card details...',
+    labels: 'Tags',
+    labelsPlaceholder: 'Type a tag and press Enter...',
+    close: 'Close',
+    save: 'Save',
+    identify: 'Identify Yourself',
+    name: 'Name',
+    email: 'Email',
+    enterAsAnonymous: 'Enter as Anonymous',
+    editBoardName: 'Edit board name',
+    boardName: 'Board name',
+    newColumn: 'New column',
+    columnName: 'Column name',
+    editColumn: 'Edit column',
+    editCard: 'Edit card',
+    comments: 'Comments',
+    noComments: 'No comments yet.',
+    delete: 'Delete',
+    writeComment: 'Write a comment...',
+    addComment: 'Add Comment',
+    cardHideText: 'Hold on, curious one! The card content is hidden. And remember, curiosity killed the cat.',
+    priority: 'Priority',
+    selectPriority: 'Select priority',
+    priorityLow: 'Low',
+    priorityMedium: 'Medium',
+    priorityHigh: 'High',
+    priorityUrgent: 'Urgent',
+    dueDate: 'Due Date',
+    assignedMembers: 'Assigned Members',
+    searchMembers: 'Search members...',
+    attachments: 'Attachments',
+    dragFilesHere: 'Drag files here or click to select',
+    selectFiles: 'Select Files',
+    activity: 'Activity',
+    noActivity: 'No activity recorded',
+    createdCard: 'Created the card.',
+    movedCard: 'Moved the card from "{source}" to "{target}"',
+    addItemPlaceholder: 'Add item...',
+    progress: 'Progress',
+    noChecklistItems: 'No items in the list',
+    checklist: 'Checklist',
+    details: 'Details',
+    createdOn: 'Created on',
+    lastUpdate: 'Last update',
+    createdBy: 'Created by',
+    cardId: 'Card ID',
+    deleteCard: 'Delete Card',
+    cancel: 'Cancel',
+    createCard: 'Create Card',
     errors:
       {
         oops: 'Oops...',
@@ -568,7 +576,8 @@ export default {
         titleRequired:
           'You need to provide the card title!',
         columnNameRequired:
-          'You need to provide the column name!'
+          'You need to provide the column name!',
+        descriptionRequired: 'You need to provide the card description!',
       }
     ,
     confirmations: {

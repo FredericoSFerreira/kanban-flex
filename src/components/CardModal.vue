@@ -32,7 +32,7 @@
                     type="text"
                     class="form-control form-control-lg"
                     v-model="cardData.title"
-                    placeholder="Digite o título do card..."
+                    :placeholder="$t('boardV2.titlePlaceholder')"
                   />
                 </div>
 
@@ -46,7 +46,7 @@
                     class="form-control"
                     rows="4"
                     v-model="cardData.description"
-                    placeholder="Descreva os detalhes do card..."
+                    :placeholder="$t('boardV2.descriptionPlaceholder')"
                   ></textarea>
                 </div>
 
@@ -55,20 +55,20 @@
                 <!--                  <div class="col-md-6">-->
                 <!--                    <label class="form-label fw-semibold">-->
                 <!--                      <AlertCircle size="16" class="me-2"/>-->
-                <!--                      Prioridade-->
+                <!--                      {{ $t('boardV2.priority') }}-->
                 <!--                    </label>-->
                 <!--                    <select class="form-select" v-model="cardData.priority">-->
-                <!--                      <option value="">Selecionar prioridade</option>-->
-                <!--                      <option value="low">🟢 Baixa</option>-->
-                <!--                      <option value="medium">🟡 Média</option>-->
-                <!--                      <option value="high">🔴 Alta</option>-->
-                <!--                      <option value="urgent">🚨 Urgente</option>-->
+                <!--                      <option value="">{{ $t('boardV2.selectPriority') }}</option>-->
+                <!--                      <option value="low">🟢 {{ $t('boardV2.priorityLow') }}</option>-->
+                <!--                      <option value="medium">🟡 {{ $t('boardV2.priorityMedium') }}</option>-->
+                <!--                      <option value="high">🔴 {{ $t('boardV2.priorityHigh') }}</option>-->
+                <!--                      <option value="urgent">🚨 {{ $t('boardV2.priorityUrgent') }}</option>-->
                 <!--                    </select>-->
                 <!--                  </div>-->
                 <!--                  <div class="col-md-6">-->
                 <!--                    <label class="form-label fw-semibold">-->
                 <!--                      <Calendar size="16" class="me-2"/>-->
-                <!--                      Data de Vencimento-->
+                <!--                      {{ $t('boardV2.dueDate') }}-->
                 <!--                    </label>-->
                 <!--                    <input-->
                 <!--                      type="date"-->
@@ -124,7 +124,7 @@
                 <!--                <div class="mb-4">-->
                 <!--                  <label class="form-label fw-semibold">-->
                 <!--                    <Users size="16" class="me-2"/>-->
-                <!--                    Membros Atribuídos-->
+                <!--                    {{ $t('boardV2.assignedMembers') }}-->
                 <!--                  </label>-->
 
                 <!--                  &lt;!&ndash; Selected Members &ndash;&gt;-->
@@ -164,7 +164,7 @@
                 <!--                        class="form-control"-->
                 <!--                        v-model="memberSearch"-->
                 <!--                        @input="searchMembers"-->
-                <!--                        placeholder="Buscar membros..."-->
+                <!--                        :placeholder="$t('boardV2.searchMembers')"-->
                 <!--                      />-->
                 <!--                    </div>-->
 
@@ -203,13 +203,13 @@
                 <!--                <div class="mb-4">-->
                 <!--                  <label class="form-label fw-semibold">-->
                 <!--                    <Paperclip size="16" class="me-2"/>-->
-                <!--                    Anexos-->
+                <!--                    {{ $t('boardV2.attachments') }}-->
                 <!--                  </label>-->
                 <!--                  <div class="attachment-area border border-dashed rounded p-3 text-center">-->
                 <!--                    <Upload size="32" class="text-muted mb-2"/>-->
-                <!--                    <p class="text-muted mb-2">Arraste arquivos aqui ou clique para selecionar</p>-->
+                <!--                    <p class="text-muted mb-2">{{ $t('boardV2.dragFilesHere') }}</p>-->
                 <!--                    <button type="button" class="btn btn-outline-primary btn-sm">-->
-                <!--                      Selecionar Arquivos-->
+                <!--                      {{ $t('boardV2.selectFiles') }}-->
                 <!--                    </button>-->
                 <!--                  </div>-->
                 <!--                </div>-->
@@ -256,7 +256,7 @@
                               class="form-control"
                               rows="3"
                               v-model="newComment"
-                              placeholder="Escreva um comentário..."
+                              :placeholder="$t('boardV2.writeComment')"
                             ></textarea>
                             <div class="d-flex justify-content-end mt-2">
                               <button
@@ -265,7 +265,7 @@
                                 :disabled="!newComment.trim()"
                               >
                                 <Send size="14" class="me-1"/>
-                                Comentar
+                                {{ $t('boardV2.addComment') }}
                               </button>
                             </div>
                           </div>
@@ -277,7 +277,7 @@
                         <div v-if="cardData.comments && cardData.comments.length === 0"
                              class="text-center text-muted py-4">
                           <MessageSquare size="32" class="mb-2"/>
-                          <p>Nenhum comentário ainda</p>
+                          <p>{{ $t('boardV2.noComments') }}</p>
                         </div>
                         <div v-else>
 
@@ -322,7 +322,7 @@
                     <div class="activity-section">
                       <div v-if="cardData.history.length === 0" class="text-center text-muted py-4">
                         <Activity size="32" class="mb-2"/>
-                        <p>Nenhuma atividade registrada</p>
+                        <p>{{ $t('boardV2.noActivity') }}</p>
                       </div>
                       <div v-else class="activity-timeline">
                         <div
@@ -345,10 +345,10 @@
                             <div class="activity-content">
                               <span class="fw-semibold">{{ activity.user.name }}</span>
                               <div v-if="activity.action == 'create_card'">
-                                    Criou o card.
+                                    {{ $t('boardV2.createdCard') }}
                               </div>
                               <div v-else>
-                                Movel o card de "{{ activity.data?.source.columnName }}" para "{{ activity.data?.target.columnName}}"
+                                {{ $t('boardV2.movedCard', { source: activity.data?.source.columnName, target: activity.data?.target.columnName }) }}
                               </div>
 
                             </div>
@@ -370,7 +370,7 @@
                             class="form-control"
                             v-model="newChecklistItem"
                             @keydown.enter.prevent="addChecklistItem"
-                            placeholder="Adicionar item..."
+                            :placeholder="$t('boardV2.addItemPlaceholder')"
                           />
                           <button
                             class="btn btn-outline-primary"
@@ -386,7 +386,7 @@
                       <!-- Progress Bar -->
                       <div v-if="cardData?.checklist && cardData.checklist.length > 0" class="checklist-progress mb-3">
                         <div class="d-flex justify-content-between align-items-center mb-2">
-                          <span class="fw-semibold">Progresso</span>
+                          <span class="fw-semibold">{{ $t('boardV2.progress') }}</span>
                           <span class="text-muted">{{ completedItems }}/{{ cardData.checklist.length }}</span>
                         </div>
                         <div class="progress">
@@ -401,7 +401,7 @@
                       <div class="checklist-items">
                         <div v-if="cardData?.checklist && cardData.checklist.length === 0" class="text-center text-muted py-4">
                           <CheckSquare size="32" class="mb-2"/>
-                          <p>Nenhum item na lista</p>
+                          <p>{{ $t('boardV2.noChecklistItems') }}</p>
                         </div>
                         <div v-else>
                           <div
@@ -445,7 +445,7 @@
                       <div class="detail-item mb-3" v-if="cardData.createdAt">
                         <div class="detail-label">
                           <Calendar size="16" class="me-2"/>
-                          Criado em
+                          {{ $t('boardV2.createdOn') }}
                         </div>
                         <div class="detail-value">{{ formatDate(cardData.createdAt) }}</div>
                       </div>
@@ -453,7 +453,7 @@
                       <div class="detail-item mb-3" v-if="cardData.updatedAt">
                         <div class="detail-label">
                           <Clock size="16" class="me-2"/>
-                          Última atualização
+                          {{ $t('boardV2.lastUpdate') }}
                         </div>
                         <div class="detail-value">{{ formatDate(cardData.updatedAt) }}</div>
                       </div>
@@ -461,7 +461,7 @@
                       <div class="detail-item mb-3">
                         <div class="detail-label">
                           <User size="16" class="me-2"/>
-                          Criado por
+                          {{ $t('boardV2.createdBy') }}
                         </div>
                         <div class="detail-value d-flex align-items-center">
                           <img
@@ -478,7 +478,7 @@
                       <div class="detail-item mb-3">
                         <div class="detail-label">
                           <Hash size="16" class="me-2"/>
-                          ID do Card
+                          {{ $t('boardV2.cardId') }}
                         </div>
                         <div class="detail-value">
                           <code>{{ cardData.id }}</code>
@@ -498,16 +498,16 @@
             <div class="d-flex gap-2">
               <button v-if="isEditing" type="button" class="btn btn-outline-danger" @click="handleDelete">
                 <Trash2 size="16" class="me-2"/>
-                Excluir Card
+                {{ $t('boardV2.deleteCard') }}
               </button>
             </div>
             <div class="d-flex gap-2">
               <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-                Cancelar
+                {{ $t('boardV2.cancel') }}
               </button>
               <button type="button" class="btn btn-primary" @click="handleSave">
                 <Save size="16" class="me-2"/>
-                {{ isEditing ? t('boardV2.save') : 'Criar Card' }}
+                {{ isEditing ? t('boardV2.save') : t('boardV2.createCard') }}
               </button>
             </div>
           </div>
@@ -573,6 +573,30 @@ const handleSave = () => {
     emit('edit', {...props.cardData});
   } else {
     emit('save', {...props.cardData});
+    // Reset do cardData após criar um novo card
+    setTimeout(() => {
+      const defaultCardData = {
+        id: '',
+        title: '',
+        description: '',
+        labels: [],
+        createdAt: '',
+        updatedAt: '',
+        comments: [],
+        history: [],
+        checklist: []
+      };
+
+      Object.keys(defaultCardData).forEach(key => {
+        if (props.cardData[key] !== undefined) {
+          if (Array.isArray(defaultCardData[key])) {
+            props.cardData[key] = [];
+          } else {
+            props.cardData[key] = defaultCardData[key];
+          }
+        }
+      });
+    }, 100);
   }
 }
 
@@ -638,28 +662,28 @@ const tabs = computed(() => {
   const tabsAarray = [
     {
       id: 'comments',
-      name: 'Comentários',
+      name: t('boardV2.comments'),
       icon: MessageSquare,
       count: props.cardData?.comments ? props.cardData.comments?.length : 0,
       visible: props.isEditing
     },
     {
       id: 'activity',
-      name: 'Atividade',
+      name: t('boardV2.activity'),
       icon: Activity,
       count: props.cardData?.history ? props.cardData?.history.length : 0,
       visible: true
     },
     {
       id: 'checklist',
-      name: 'Checklist',
+      name: t('boardV2.checklist'),
       icon: CheckSquare,
       count: props.cardData?.checklist ? props.cardData?.checklist.length : 0,
       visible: props.isEditing
     },
     {
       id: 'details',
-      name: 'Detalhes',
+      name: t('boardV2.details'),
       icon: FileText,
       visible: props.isEditing
     }
@@ -788,6 +812,33 @@ const onModalHide = () => {
   console.log('Modal hidden');
   // Resetar o estado do modal
   resetModalState();
+
+  // Limpar o cardData se não estiver em modo de edição
+  if (!props.isEditing) {
+    // Criar um objeto com valores padrão para o cardData
+    const defaultCardData = {
+      id: '',
+      title: '',
+      description: '',
+      labels: [],
+      createdAt: '',
+      updatedAt: '',
+      comments: [],
+      history: [],
+      checklist: []
+    };
+
+    // Atualizar os valores do cardData para os valores padrão
+    Object.keys(defaultCardData).forEach(key => {
+      if (props.cardData[key] !== undefined) {
+        if (Array.isArray(defaultCardData[key])) {
+          props.cardData[key] = [];
+        } else {
+          props.cardData[key] = defaultCardData[key];
+        }
+      }
+    });
+  }
 };
 
 const onModalShow = () => {

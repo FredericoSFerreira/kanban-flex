@@ -1,5 +1,6 @@
 import {UAParser} from 'ua-parser-js';
 import {verifyTokenParseCloudFunction} from "../middleware/auth.js";
+import {generateTrackingHistory} from "../utils/utils.js";
 
 
 // Apply JWT validation to all cloud functions
@@ -91,14 +92,8 @@ Parse.Cloud.define("moveCardBetweenColumns", async (request) => {
     }
 
     // Adiciona o evento de movimentação ao histórico
-    card.history.push({
-      user: {
-        name: request.user?.name || 'Sistema',
-        avatar: request.user?.avatar || null,
-      },
-      action: 'move_card',
-      timestamp: new Date(),
-      data: {
+    card.history.push(
+      generateTrackingHistory(request, 'move_card', {
         source: {
           columnId: sourceColumnId,
           columnName: sourceColumn.name
@@ -107,8 +102,7 @@ Parse.Cloud.define("moveCardBetweenColumns", async (request) => {
           columnId: targetColumnId,
           columnName: targetColumn.name
         }
-      }
-    })
+      }))
 
     // Remove card from source column
     sourceColumn.itens.splice(cardIndex, 1);
@@ -181,15 +175,7 @@ Parse.Cloud.define("addCard", async (request) => {
       card.history = [];
     }
 
-    card.history.push({
-      user: {
-        name: request.user?.name || 'Sistema',
-        avatar: request.user?.avatar || null
-      },
-      action: 'create_card',
-      timestamp: new Date(),
-      data: {}
-    });
+    card.history.push(generateTrackingHistory(request, 'create_card', {}));
 
     // Add card to column
     board.add(`columns.${columnIndex}.itens`, card);

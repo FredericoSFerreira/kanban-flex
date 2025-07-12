@@ -1033,7 +1033,7 @@ let modalEditCard = null
 
 const openCardModal = (card = null, columnId = null, tab = 'activity') => {
   isEditingCard.value = !!card;
-  selectedCard.value = card ? {checklist: [], ...card} : undefined;
+  selectedCard.value = card ? {checklist: [], history: [], ...card} : undefined;
   cardSelectedId.value = card ? card.id : null;
   selectedColumnId.value = columnId;
   columnSelectedId.value = columnId;
@@ -1212,11 +1212,11 @@ const saveCardVotes = (idColumn, idCard, upVote = false, downVote = false) => {
 const newSaveEditCard = (data) => {
   const columns = board.columns;
 
-  if (!data || !data.description || !data.title) {
+  if (!data || (!data.description && boardConfig.showDescription)) {
     return $swal.fire({
       icon: "error",
       title: t('boardV2.errors.oops'),
-      text: t('boardV2.errors.descriptionAndTitleRequired'),
+      text: t('boardV2.errors.titleRequired'),
     });
   }
 
@@ -1535,11 +1535,11 @@ const saveColumn = () => {
 };
 
 const saveCard = (data) => {
-  if (!data.title && boardConfig.showDescription) {
+  if (!data.description && boardConfig.showDescription) {
     return $swal.fire({
       icon: "error",
       title: t('boardV2.errors.oops'),
-      text: t('boardV2.errors.titleRequired'),
+      text: t('boardV2.errors.descriptionRequired'),
     });
   }
 
