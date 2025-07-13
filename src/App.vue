@@ -5,7 +5,7 @@
          :class="isDarkMode ? 'navbar-dark bg-dark' : 'navbar-light bg-white shadow-sm'">
       <div class="container">
         <router-link class="navbar-brand d-flex align-items-center" to="/">
-          <img src="@/assets/logo-kanbanflex.png"  alt="logo" height="32px">
+          <img src="@/assets/logo-kanbanflex.png" alt="logo" height="32px">
           <span class="ms-2 fw-bold">KanbanFlex</span>
         </router-link>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -125,7 +125,7 @@
         <div class="row g-4">
           <div class="col-lg-4 col-md-4">
             <div class="d-flex align-items-center mb-3">
-              <img src="@/assets/logo-kanbanflex.png"  alt="logo" height="32px">
+              <img src="@/assets/logo-kanbanflex.png" alt="logo" height="32px">
               <span class="ms-2 h5 fw-bold mb-0">KanbanFlex</span>
             </div>
             <p class="text-light">
@@ -148,7 +148,7 @@
 
         <div class="border-top border-secondary mt-3 pt-4 text-center text-light">
           <p>{{ t('footer.copyright') }}</p>       <a href="https://github.com/FredericoSFerreira/kanban-flex"
-                                                       class="text-light hover-opacity">
+                                                      class="text-light hover-opacity">
           <Github :size="24"/>
         </a>
         </div>
@@ -479,6 +479,95 @@ const footerColumns = [
 
 .dark-mode .shadow-sm {
   box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.15) !important;
+}
+
+.dark-mode .tabs-container {
+  background-color: #2d2d2d !important;
+}
+
+/* Scrollbar styles for dark mode */
+.dark-mode .comments-list::-webkit-scrollbar-track,
+.chat-messages::-webkit-scrollbar-track {
+  background: #2d2d2d !important;
+}
+
+.dark-mode .comments-list::-webkit-scrollbar-thumb,
+.chat-messages::-webkit-scrollbar-thumb {
+  background: #4a4a4a !important;
+}
+
+.dark-mode .comments-list::-webkit-scrollbar-thumb:hover,
+.chat-messages::-webkit-scrollbar-thumb:hover {
+  background: #5a5a5a !important;
+}
+
+.dark-mode .comment-item {
+  background-color: #2d2d2d !important;
+}
+
+.dark-mode .checklist-item {
+  background-color: #2d2d2d !important;
+}
+
+.dark-mode .detail-item {
+  background-color: #2d2d2d !important;
+}
+
+.dark-mode .border-bottom, .border-end {
+  border-bottom: var(--bs-border-width) var(--bs-border-style) #2d2d2d !important;
+  border-right: var(--bs-border-width) var(--bs-border-style) #2d2d2d !important;
+}
+
+.dark-mode table {
+  background-color: #1e1e1e !important;
+  color: #e0e0e0 !important;
+}
+
+.dark-mode table thead {
+  background-color: #2c2c2c !important;
+  color: #ffffff !important;
+}
+
+.dark-mode table tbody tr {
+  border-color: #444 !important;
+}
+
+.dark-mode table tbody tr:nth-child(even) {
+  background-color: #2a2a2a !important;
+}
+
+.dark-mode table tbody tr:nth-child(odd) {
+  background-color: #242424 !important;
+}
+
+.dark-mode table tbody tr:hover {
+  background-color: #3a3a3a !important;
+}
+
+.dark-mode table td,
+.dark-mode table th {
+  border-color: #555 !important;
+  color: #e0e0e0 !important;
+  background-color: transparent !important;
+}
+
+
+
+.dark-mode .detail-label, .detail-value {
+  color: #ffffff !important;
+}
+
+.dark-mode .tabs-container {
+  background-color: #2d2d2d !important;
+}
+
+.dark-mode .tab-nav {
+  background-color: #1e1e1e !important;
+}
+
+.dark-mode .nav-tabs .nav-link.active {
+  background-color: #1e1e1e !important;
+  color: var(--bs-primary) !important;
 }
 
 /* Navigation link cursor */

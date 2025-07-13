@@ -121,7 +121,7 @@
               <span class="visually-hidden">Loading...</span>
             </div>
           </div>
-          <div class="table-responsive">
+          <div class="table-responsive security-logs-table">
             <table class="table">
               <thead>
               <tr>

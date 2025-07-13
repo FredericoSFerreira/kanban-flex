@@ -13,7 +13,7 @@ const boardQuestionsRateLimit =  Number(process.env.BOARD_QUESTIONS_RATE_LIMIT) 
 
 const boardsRouter = express.Router();
 
-boardsRouter.get("/my-boards", verifyToken, getMyBoards);
+boardsRouter.get("/boards", verifyToken, getMyBoards);
 boardsRouter.get("/boards/participating", verifyToken, getParticipatingBoards);
 
 boardsRouter.get("/boards/stats/:id", verifyToken, getBoardStats);

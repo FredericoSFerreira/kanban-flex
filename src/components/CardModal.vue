@@ -1062,12 +1062,6 @@ onUnmounted(() => {
     color: var(--bs-primary);
   }
 
-  .comment-item,
-  .checklist-item,
-  .detail-item {
-    background-color: #2d2d2d;
-  }
-
   .member-chip {
     background-color: #2d2d2d;
     border-color: #404040;

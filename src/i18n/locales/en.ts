@@ -40,6 +40,14 @@ export default {
     members: 'members',
     columns: 'columns',
     items: 'items',
+    search: {
+      placeholder: 'Search boards...',
+      clear: 'Clear search',
+      results: 'Showing {count} of {total} boards for "{query}"',
+      showAll: 'Show All Boards',
+      noResults: 'No boards found',
+      noResultsDesc: 'No boards match your search for "{query}". Try a different search term.'
+    },
     emptyState: {
       title: 'No boards yet',
       description: 'Create your first board to start organizing your projects.',

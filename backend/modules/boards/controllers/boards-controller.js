@@ -5,7 +5,11 @@ import {callFunction} from "../../../utils/parse-utils.js";
 
 const getMyBoards = async (req, res) => {
   try {
-    const userData = await callFunction("getMyBoards", req.user, req.token);
+    const params = { ...req.user };
+    if (req.query.search) {
+      params.search = req.query.search;
+    }
+    const userData = await callFunction("getMyBoards", params, req.token);
     res.status(200);
     res.json(userData);
   } catch (e) {
@@ -18,6 +22,9 @@ const getMyBoards = async (req, res) => {
 const getParticipatingBoards = async (req, res) => {
   try {
     const params = {userId: req.user.id};
+    if (req.query.search) {
+      params.search = req.query.search;
+    }
     const boardsData = await callFunction("getParticipatingBoards", params, req.token);
     res.status(200);
     res.json(boardsData);

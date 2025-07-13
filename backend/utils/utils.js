@@ -67,4 +67,8 @@ function generateTrackingHistory(request, action, data) {
 
 }
 
-export {generateOtp, generateToken, generateBoardSummaryPrompt, parseBoolean, getFirstAndLastName, generateTrackingHistory}
+function escapeRegex(text) {
+  return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+export {generateOtp, generateToken, generateBoardSummaryPrompt, parseBoolean, getFirstAndLastName, generateTrackingHistory, escapeRegex}
