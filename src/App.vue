@@ -513,9 +513,44 @@ const footerColumns = [
   background-color: #2d2d2d !important;
 }
 
-.dark-mode .border-bottom {
-    border-bottom: var(--bs-border-width) var(--bs-border-style) #2d2d2d !important;
+.dark-mode .border-bottom, .border-end {
+  border-bottom: var(--bs-border-width) var(--bs-border-style) #2d2d2d !important;
+  border-right: var(--bs-border-width) var(--bs-border-style) #2d2d2d !important;
 }
+
+.dark-mode table {
+  background-color: #1e1e1e !important;
+  color: #e0e0e0 !important;
+}
+
+.dark-mode table thead {
+  background-color: #2c2c2c !important;
+  color: #ffffff !important;
+}
+
+.dark-mode table tbody tr {
+  border-color: #444 !important;
+}
+
+.dark-mode table tbody tr:nth-child(even) {
+  background-color: #2a2a2a !important;
+}
+
+.dark-mode table tbody tr:nth-child(odd) {
+  background-color: #242424 !important;
+}
+
+.dark-mode table tbody tr:hover {
+  background-color: #3a3a3a !important;
+}
+
+.dark-mode table td,
+.dark-mode table th {
+  border-color: #555 !important;
+  color: #e0e0e0 !important;
+  background-color: transparent !important;
+}
+
 
 
 .dark-mode .detail-label, .detail-value {
