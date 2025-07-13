@@ -71,4 +71,4 @@ function escapeRegex(text) {
   return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
-export {generateOtp, generateToken, generateBoardSummaryPrompt, parseBoolean, getFirstAndLastName, generateTrackingHistory, escapeRegex}
+export {generateOtp, generateToken, generateBoardSummaryPrompt, parseBoolean, getFirstAndLastName, getDefaultUrlAvatar, generateTrackingHistory, escapeRegex}
