@@ -503,4 +503,25 @@ const footerColumns = [
 .dropdown-item:focus {
   outline: none;
 }
+
+
+.btn.btn-primary {
+  background: linear-gradient(90deg, #0d6efd, #0b5ed7); /* Gradiente azul */
+  border: none;
+  color: white;
+  transition: background 0.3s ease;
+}
+
+/* Efeito hover */
+.btn.btn-primary:hover {
+  background: linear-gradient(90deg, #0b5ed7, #0a58ca);
+  color: white;
+}
+
+/* Efeito ativo (click) */
+.btn.btn-primary:active {
+  background: linear-gradient(90deg, #0a58ca, #084298);
+  color: white;
+}
+
 </style>

@@ -1,4 +1,10 @@
 export default {
+  "date": {
+    "now": "Just now",
+    "hoursAgo": "{hours}h ago",
+    "yesterday": "Yesterday",
+    "daysAgo": "{days} days ago"
+  },
   nav: {
     home: 'Home',
     board: 'Board',
@@ -267,9 +273,9 @@ export default {
     status: {
       title: "Status/Help",
       link1:
-        "API Status",
+        "Having an issue?",
       link2:
-        "Having an issue?"
+        "API Status"
     }
     ,
     "copyright":
@@ -505,52 +511,61 @@ export default {
   ,
   boardV2: {
     statistics: 'Statistics',
-    newCard:
-      'New Card',
-    title:
-      'Title',
-    description:
-      'Description',
-    labels:
-      'Labels (separated by comma)',
-    labelsPlaceholder:
-      'Example: important, bug, feature',
-    close:
-      'Close',
-    save:
-      'Save',
-    identify:
-      'Identify Yourself',
-    name:
-      'Name',
-    email:
-      'Email',
-    enterAsAnonymous:
-      'Enter as Anonymous',
-    editBoardName:
-      'Edit board name',
-    boardName:
-      'Board name',
-    newColumn:
-      'New column',
-    columnName:
-      'Column name',
-    editColumn:
-      'Edit column',
-    editCard:
-      'Edit card',
-    comments:
-      'Comments',
-    noComments:
-      'No comments yet.',
-    delete:
-      'Delete',
-    writeComment:
-      'Write a comment...',
-    addComment:
-      'Add Comment',
-    cardHideText:
-      'Hold on, curious one! The card content is hidden. And remember, curiosity killed the cat.',
+    newCard: 'New Card',
+    newCardDescription: 'Create a new card for you board',
+    editCardDescription: 'Update your card information',
+    title: 'Title',
+    titlePlaceholder: 'Enter card title...',
+    description: 'Description',
+    descriptionPlaceholder: 'Describe the card details...',
+    labels: 'Tags',
+    labelsPlaceholder: 'Type a tag and press Enter...',
+    close: 'Close',
+    save: 'Save',
+    identify: 'Identify Yourself',
+    name: 'Name',
+    email: 'Email',
+    enterAsAnonymous: 'Enter as Anonymous',
+    editBoardName: 'Edit board name',
+    boardName: 'Board name',
+    newColumn: 'New column',
+    columnName: 'Column name',
+    editColumn: 'Edit column',
+    editCard: 'Edit card',
+    comments: 'Comments',
+    noComments: 'No comments yet.',
+    delete: 'Delete',
+    writeComment: 'Write a comment...',
+    addComment: 'Add Comment',
+    cardHideText: 'Hold on, curious one! The card content is hidden. And remember, curiosity killed the cat.',
+    priority: 'Priority',
+    selectPriority: 'Select priority',
+    priorityLow: 'Low',
+    priorityMedium: 'Medium',
+    priorityHigh: 'High',
+    priorityUrgent: 'Urgent',
+    dueDate: 'Due Date',
+    assignedMembers: 'Assigned Members',
+    searchMembers: 'Search members...',
+    attachments: 'Attachments',
+    dragFilesHere: 'Drag files here or click to select',
+    selectFiles: 'Select Files',
+    activity: 'Activity',
+    noActivity: 'No activity recorded',
+    createdCard: 'Created the card.',
+    movedCard: 'Moved the card from "{source}" to "{target}"',
+    addItemPlaceholder: 'Add item...',
+    progress: 'Progress',
+    noChecklistItems: 'No items in the list',
+    checklist: 'Checklist',
+    details: 'Details',
+    createdOn: 'Created on',
+    lastUpdate: 'Last update',
+    createdBy: 'Created by',
+    cardId: 'Card ID',
+    deleteCard: 'Delete Card',
+    cancel: 'Cancel',
+    createCard: 'Create Card',
     errors:
       {
         oops: 'Oops...',
@@ -558,10 +573,11 @@ export default {
           'You need to provide your name!',
         emailRequired:
           'You need to provide a valid email!',
-        descriptionRequired:
-          'You need to provide the card description!',
+        titleRequired:
+          'You need to provide the card title!',
         columnNameRequired:
-          'You need to provide the column name!'
+          'You need to provide the column name!',
+        descriptionRequired: 'You need to provide the card description!',
       }
     ,
     confirmations: {

@@ -1,5 +1,6 @@
 import {UAParser} from 'ua-parser-js';
 import {verifyTokenParseCloudFunction} from "../middleware/auth.js";
+import {generateTrackingHistory} from "../utils/utils.js";
 
 
 // Apply JWT validation to all cloud functions
@@ -74,6 +75,8 @@ Parse.Cloud.define("moveCardBetweenColumns", async (request) => {
     const [sourceColumn, sourceColumnIndex] = findColumn(columns, sourceColumnId);
     const [targetColumn, targetColumnIndex] = findColumn(columns, targetColumnId);
 
+    console.log(sourceColumn, targetColumn, request.user, "#############")
+
     if (!sourceColumn || !targetColumn) {
       throw new Error("Column not found");
     }
@@ -82,6 +85,24 @@ Parse.Cloud.define("moveCardBetweenColumns", async (request) => {
     if (!card) {
       throw new Error("Card not found");
     }
+
+    // Inicializa o histórico se não existir
+    if (!card.history) {
+      card.history = [];
+    }
+
+    // Adiciona o evento de movimentação ao histórico
+    card.history.push(
+      generateTrackingHistory(request, 'move_card', {
+        source: {
+          columnId: sourceColumnId,
+          columnName: sourceColumn.name
+        },
+        target: {
+          columnId: targetColumnId,
+          columnName: targetColumn.name
+        }
+      }))
 
     // Remove card from source column
     sourceColumn.itens.splice(cardIndex, 1);
@@ -147,6 +168,15 @@ Parse.Cloud.define("addCard", async (request) => {
       throw new Error("Column not found");
     }
 
+    card.createdAt = new Date();
+
+    // Inicializa o histórico para novos cards
+    if (!card.history) {
+      card.history = [];
+    }
+
+    card.history.push(generateTrackingHistory(request, 'create_card', {}));
+
     // Add card to column
     board.add(`columns.${columnIndex}.itens`, card);
 
@@ -184,6 +214,31 @@ Parse.Cloud.define("updateCard", async (request) => {
       throw new Error("Card not found");
     }
 
+    if (!card.history) {
+      board.set(`columns.${columnIndex}.itens.${cardIndex}.history`, []);
+    }
+
+    // if (Object.keys(updates).some(key => !['updatedAt'].includes(key))) {
+    //   const historyEntry = {
+    //     user: {
+    //       name: request.user?.name || 'Sistema',
+    //       avatar: request.user?.avatar || null
+    //     },
+    //     action: 'update_card',
+    //     timestamp: new Date(),
+    //     data: {
+    //       updates: Object.keys(updates)
+    //         .filter(key => !['updatedAt', 'history', 'comments'].includes(key))
+    //         .reduce((obj, key) => {
+    //           obj[key] = updates[key];
+    //           return obj;
+    //         }, {})
+    //     }
+    //   };
+    //   board.add(`columns.${columnIndex}.itens.${cardIndex}.history`, historyEntry);
+    // }
+
+    updates.updatedAt = new Date();
     // Update card properties
     Object.keys(updates).forEach(key => {
       board.set(`columns.${columnIndex}.itens.${cardIndex}.${key}`, updates[key]);
@@ -222,9 +277,8 @@ Parse.Cloud.define("removeCard", async (request) => {
     if (!card) {
       throw new Error("Card not found");
     }
-
-    // Remove card from column
-    board.remove(`columns.${columnIndex}.itens`, card);
+    columns[columnIndex].itens.splice(cardIndex, 1);
+    board.set(`columns.${columnIndex}.itens`, columns[columnIndex].itens);
 
     const result = await board.save(null, {useMasterKey: true});
     return {success: true, result};
@@ -314,8 +368,10 @@ Parse.Cloud.define("removeColumn", async (request) => {
       throw new Error("Column not found");
     }
 
-    // Remove column from board
-    board.remove("columns", column);
+    // Remove column from board usando splice para remover pelo índice
+    columns.splice(columnIndex, 1);
+    // Atualizar o array de colunas completo
+    board.set('columns', columns);
 
     const result = await board.save(null, {useMasterKey: true});
     return {success: true, result};
@@ -574,10 +630,10 @@ Parse.Cloud.define("getMyBoards", async (request) => {
           created_at: 1
         }
       },
-     {$sort: {created_at: -1}},
+      {$sort: {created_at: -1}},
     ];
 
-    return  await query.aggregate(pipeline);
+    return await query.aggregate(pipeline);
   } catch (error) {
     console.log('Failed to getMyBoards, with error code: ' + error.message);
     throw error
@@ -759,36 +815,36 @@ Parse.Cloud.define("getParticipatingBoards", async (request) => {
     const pipeline = [
       {
         $match: {
-          "owner_id": { $not: { $eq: userId } },
+          "owner_id": {$not: {$eq: userId}},
           "columns.itens.user_id": userId
         }
       },
       {
         $addFields: {
-          totalColumns: { $size: "$columns" },
+          totalColumns: {$size: "$columns"},
           totalItems: {
             $sum: {
               $map: {
                 input: "$columns",
                 as: "col",
-                in: { $size: "$$col.itens" }
+                in: {$size: "$$col.itens"}
               }
             }
           }
         }
       },
       {
-        $unwind: { path: "$columns", preserveNullAndEmptyArrays: true }
+        $unwind: {path: "$columns", preserveNullAndEmptyArrays: true}
       },
       {
-        $unwind: { path: "$columns.itens", preserveNullAndEmptyArrays: true }
+        $unwind: {path: "$columns.itens", preserveNullAndEmptyArrays: true}
       },
       {
         $group: {
           _id: "$_id",
-          name: { $first: "$name" },
-          totalColumns: { $first: "$totalColumns" },
-          totalItems: { $first: "$totalItems" },
+          name: {$first: "$name"},
+          totalColumns: {$first: "$totalColumns"},
+          totalItems: {$first: "$totalItems"},
           unique_users: {
             $addToSet: "$columns.itens.user_id"
           },
@@ -803,11 +859,11 @@ Parse.Cloud.define("getParticipatingBoards", async (request) => {
           name: 1,
           totalColumns: 1,
           totalItems: 1,
-          totalUsers: { $size: "$unique_users" },
+          totalUsers: {$size: "$unique_users"},
           created_at: 1
         }
       },
-      { $sort: { created_at: -1 } }
+      {$sort: {created_at: -1}}
     ];
 
     return await query.aggregate(pipeline);
@@ -822,7 +878,7 @@ Parse.Cloud.define("updateBoardName", async (request) => {
     // Validate JWT token
     await verifyTokenParseCloudFunction(request);
 
-    const { boardId, name } = request.params;
+    const {boardId, name} = request.params;
     const queryBoard = new Parse.Query("boards");
     queryBoard.equalTo('objectId', boardId);
 
@@ -847,7 +903,7 @@ Parse.Cloud.define("removeBoard", async (request) => {
     // Validate JWT token
     await verifyTokenParseCloudFunction(request);
 
-    const { boardId } = request.params;
+    const {boardId} = request.params;
     const queryBoard = new Parse.Query("boards");
     queryBoard.equalTo('objectId', boardId);
 
@@ -870,7 +926,7 @@ Parse.Cloud.define("createBoard", async (request) => {
     // Validate JWT token
     await verifyTokenParseCloudFunction(request);
 
-    const { template } = request.params;
+    const {template} = request.params;
     const Boards = Parse.Object.extend("boards");
     const board = new Boards();
 

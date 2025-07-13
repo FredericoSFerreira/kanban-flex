@@ -39,4 +39,32 @@ function parseBoolean(value) {
   return value === 'true' ? true : value === 'false' ? false : undefined;
 }
 
-export {generateOtp, generateToken, generateBoardSummaryPrompt, parseBoolean}
+function getFirstAndLastName (user) {
+  const parts = user?.name?.trim().split(/\s+/) || '';
+  if (parts.length === 1) {
+    return parts[0];
+  }
+  const first = parts[0];
+  const last = parts[parts.length - 1];
+  return `${first} ${last}`;
+}
+
+
+function getDefaultUrlAvatar(user) {
+  return `https://ui-avatars.com/api/?background=0D8ABC&color=fff&name=${getFirstAndLastName(user)}`;
+}
+
+function generateTrackingHistory(request, action, data) {
+  return {
+      user: {
+        name: request.user?.name || 'Sistema',
+        avatar: request.user?.avatar || getDefaultUrlAvatar(request.user)
+      },
+      action,
+      timestamp: new Date(),
+      data
+    }
+
+}
+
+export {generateOtp, generateToken, generateBoardSummaryPrompt, parseBoolean, getFirstAndLastName, generateTrackingHistory}
