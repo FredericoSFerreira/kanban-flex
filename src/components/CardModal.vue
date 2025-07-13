@@ -23,7 +23,7 @@
             <div class="col-lg-8 border-end">
               <div class="p-4">
                 <!-- Card Title -->
-                <div class="mb-4">
+                <div class="mb-4" v-if="boardConfig.showTitle">
                   <label class="form-label fw-semibold">
                     <FileText size="16" class="me-2"/>
                     {{$t('boardV2.title')}}
@@ -37,7 +37,7 @@
                 </div>
 
                 <!-- Card Description -->
-                <div class="mb-4">
+                <div class="mb-4" v-if="boardConfig.showDescription">
                   <label class="form-label fw-semibold">
                     <AlignLeft size="16" class="me-2"/>
                     {{ $t('boardV2.description') }}
@@ -79,7 +79,7 @@
                 <!--                </div>-->
 
                 <!-- Labels -->
-                <div class="mb-4">
+                <div class="mb-4" v-if="boardConfig.showTags">
                   <label class="form-label fw-semibold">
                     <Tag size="16" class="me-2"/>
                     {{$t('boardV2.labels')}}
@@ -528,6 +528,7 @@ import {useI18n} from 'vue-i18n';
 import {useAuthStore} from "@/stores/auth";
 import {getUserLoggedAvatar} from "@/utils/utils";
 import {uniqueId} from "@/utils/uuid";
+import {configDefault} from "@/utils/templates";
 
 const auth = useAuthStore();
 const {t, locale} = useI18n();
@@ -551,6 +552,10 @@ const props = defineProps({
         history: [],
         checklist: []
       })
+  },
+    boardConfig: {
+    type: Object,
+    default: () => (configDefault)
   },
   columnId: {
     type: [String, Number],

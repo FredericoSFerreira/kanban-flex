@@ -399,256 +399,256 @@
   </div>
 
 
-  <!--   Settings Modal with Tabs-->
-  <!--  <div class="modal fade" id="settingsModal" tabindex="-1" aria-hidden="true" ref="settingsModal">-->
-  <!--    <div class="modal-dialog modal-lg">-->
-  <!--      <div class="modal-content">-->
-  <!--        <div class="modal-header">-->
-  <!--          <h5 class="modal-title">{{ t('board.settings') }}</h5>-->
-  <!--          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>-->
-  <!--        </div>-->
-  <!--        <div class="modal-body p-0">-->
-  <!--          &lt;!&ndash; Settings Tabs &ndash;&gt;-->
-  <!--          <ul class="nav nav-tabs" role="tablist">-->
-  <!--            <li class="nav-item" role="presentation">-->
-  <!--              <button-->
-  <!--                class="nav-link"-->
-  <!--                :class="{ active: activeSettingsTab === 'general' }"-->
-  <!--                @click="activeSettingsTab = 'general'"-->
-  <!--                type="button"-->
-  <!--              >-->
-  <!--                <Settings size="16" class="me-2"/>-->
-  <!--                General-->
-  <!--              </button>-->
-  <!--            </li>-->
-  <!--            <li class="nav-item" role="presentation">-->
-  <!--              <button-->
-  <!--                class="nav-link"-->
-  <!--                :class="{ active: activeSettingsTab === 'visibility' }"-->
-  <!--                @click="activeSettingsTab = 'visibility'"-->
-  <!--                type="button"-->
-  <!--              >-->
-  <!--                <Eye size="16" class="me-2"/>-->
-  <!--                Visibility-->
-  <!--              </button>-->
-  <!--            </li>-->
-  <!--            <li class="nav-item" role="presentation">-->
-  <!--              <button-->
-  <!--                class="nav-link"-->
-  <!--                :class="{ active: activeSettingsTab === 'permissions' }"-->
-  <!--                @click="activeSettingsTab = 'permissions'"-->
-  <!--                type="button"-->
-  <!--              >-->
-  <!--                <Shield size="16" class="me-2"/>-->
-  <!--                Permissions-->
-  <!--              </button>-->
-  <!--            </li>-->
-  <!--          </ul>-->
+<!--     Settings Modal with Tabs-->
+<!--    <div class="modal fade" id="settingsModal" tabindex="-1" aria-hidden="true" ref="settingsModal">-->
+<!--      <div class="modal-dialog modal-lg">-->
+<!--        <div class="modal-content">-->
+<!--          <div class="modal-header">-->
+<!--            <h5 class="modal-title">{{ t('board.settings') }}</h5>-->
+<!--            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>-->
+<!--          </div>-->
+<!--          <div class="modal-body p-0">-->
+<!--            &lt;!&ndash; Settings Tabs &ndash;&gt;-->
+<!--            <ul class="nav nav-tabs" role="tablist">-->
+<!--              <li class="nav-item" role="presentation">-->
+<!--                <button-->
+<!--                  class="nav-link"-->
+<!--                  :class="{ active: activeSettingsTab === 'general' }"-->
+<!--                  @click="activeSettingsTab = 'general'"-->
+<!--                  type="button"-->
+<!--                >-->
+<!--                  <Settings size="16" class="me-2"/>-->
+<!--                  General-->
+<!--                </button>-->
+<!--              </li>-->
+<!--              <li class="nav-item" role="presentation">-->
+<!--                <button-->
+<!--                  class="nav-link"-->
+<!--                  :class="{ active: activeSettingsTab === 'visibility' }"-->
+<!--                  @click="activeSettingsTab = 'visibility'"-->
+<!--                  type="button"-->
+<!--                >-->
+<!--                  <Eye size="16" class="me-2"/>-->
+<!--                  Visibility-->
+<!--                </button>-->
+<!--              </li>-->
+<!--              <li class="nav-item" role="presentation">-->
+<!--                <button-->
+<!--                  class="nav-link"-->
+<!--                  :class="{ active: activeSettingsTab === 'permissions' }"-->
+<!--                  @click="activeSettingsTab = 'permissions'"-->
+<!--                  type="button"-->
+<!--                >-->
+<!--                  <Shield size="16" class="me-2"/>-->
+<!--                  Permissions-->
+<!--                </button>-->
+<!--              </li>-->
+<!--            </ul>-->
 
-  <!--          &lt;!&ndash; Tab Content &ndash;&gt;-->
-  <!--          <div class="tab-content p-4">-->
-  <!--            &lt;!&ndash; General Settings Tab &ndash;&gt;-->
-  <!--            <div v-if="activeSettingsTab === 'general'" class="tab-pane fade show active">-->
-  <!--              <h6 class="mb-3">Board Configuration</h6>-->
-  <!--              <div class="mb-3">-->
-  <!--                <label for="boardTitle" class="form-label">Board Title</label>-->
-  <!--                <div class="d-flex align-items-center gap-2">-->
-  <!--                  <input type="text" class="form-control" id="boardTitle" v-model="board.name">-->
-  <!--                  <button-->
-  <!--                    type="button"-->
-  <!--                    class="btn btn-outline-secondary ai-help-btn"-->
-  <!--                    @click="showAIHelp('board-title', boardSettings)"-->
-  <!--                    :title="'AI Help for Board Title'"-->
-  <!--                  >-->
-  <!--                    <Sparkles size="16" class="text-warning"/>-->
-  <!--                  </button>-->
-  <!--                </div>-->
-  <!--              </div>-->
-  <!--              <div class="mb-3">-->
-  <!--                <label for="boardDescription" class="form-label">Board Description</label>-->
-  <!--                <div class="d-flex align-items-start gap-2">-->
-  <!--                  <textarea class="form-control" id="boardDescription" v-model="board.description" rows="3"></textarea>-->
-  <!--                  <button-->
-  <!--                    type="button"-->
-  <!--                    class="btn btn-outline-secondary ai-help-btn"-->
-  <!--                    @click="showAIHelp('board-description', boardSettings)"-->
-  <!--                    :title="'AI Help for Board Description'"-->
-  <!--                  >-->
-  <!--                    <Sparkles size="16" class="text-warning"/>-->
-  <!--                  </button>-->
-  <!--                </div>-->
-  <!--              </div>-->
-  <!--            </div>-->
+<!--            &lt;!&ndash; Tab Content &ndash;&gt;-->
+<!--            <div class="tab-content p-4">-->
+<!--              &lt;!&ndash; General Settings Tab &ndash;&gt;-->
+<!--              <div v-if="activeSettingsTab === 'general'" class="tab-pane fade show active">-->
+<!--                <h6 class="mb-3">Board Configuration</h6>-->
+<!--                <div class="mb-3">-->
+<!--                  <label for="boardTitle" class="form-label">Board Title</label>-->
+<!--                  <div class="d-flex align-items-center gap-2">-->
+<!--                    <input type="text" class="form-control" id="boardTitle" v-model="board.name">-->
+<!--                    <button-->
+<!--                      type="button"-->
+<!--                      class="btn btn-outline-secondary ai-help-btn"-->
+<!--                      @click="showAIHelp('board-title', boardSettings)"-->
+<!--                      :title="'AI Help for Board Title'"-->
+<!--                    >-->
+<!--                      <Sparkles size="16" class="text-warning"/>-->
+<!--                    </button>-->
+<!--                  </div>-->
+<!--                </div>-->
+<!--                <div class="mb-3">-->
+<!--                  <label for="boardDescription" class="form-label">Board Description</label>-->
+<!--                  <div class="d-flex align-items-start gap-2">-->
+<!--                    <textarea class="form-control" id="boardDescription" v-model="board.description" rows="3"></textarea>-->
+<!--                    <button-->
+<!--                      type="button"-->
+<!--                      class="btn btn-outline-secondary ai-help-btn"-->
+<!--                      @click="showAIHelp('board-description', 'boardSettings')"-->
+<!--                      :title="'AI Help for Board Description'"-->
+<!--                    >-->
+<!--                      <Sparkles size="16" class="text-warning"/>-->
+<!--                    </button>-->
+<!--                  </div>-->
+<!--                </div>-->
+<!--              </div>-->
 
-  <!--            &lt;!&ndash; Visibility Settings Tab &ndash;&gt;-->
-  <!--            <div v-if="activeSettingsTab === 'visibility'" class="tab-pane fade show active">-->
-  <!--              <h6 class="mb-3">Board Visibility</h6>-->
-  <!--              <div class="mb-4">-->
-  <!--                <div class="form-check mb-3">-->
-  <!--                  <input-->
-  <!--                    class="form-check-input"-->
-  <!--                    type="radio"-->
-  <!--                    name="visibility"-->
-  <!--                    id="visibilityPrivate"-->
-  <!--                    value="private"-->
-  <!--                    v-model="boardSettings.visibility"-->
-  <!--                  >-->
-  <!--                  <label class="form-check-label" for="visibilityPrivate">-->
-  <!--                    <div class="d-flex align-items-center">-->
-  <!--                      <Lock size="18" class="me-2 text-danger"/>-->
-  <!--                      <div>-->
-  <!--                        <strong>Private</strong>-->
-  <!--                        <div class="text-muted small">Only board members can see and edit this board</div>-->
-  <!--                      </div>-->
-  <!--                    </div>-->
-  <!--                  </label>-->
-  <!--                </div>-->
-  <!--                <div class="form-check mb-3">-->
-  <!--                  <input-->
-  <!--                    class="form-check-input"-->
-  <!--                    type="radio"-->
-  <!--                    name="visibility"-->
-  <!--                    id="visibilityTeam"-->
-  <!--                    value="team"-->
-  <!--                    v-model="boardSettings.visibility"-->
-  <!--                  >-->
-  <!--                  <label class="form-check-label" for="visibilityTeam">-->
-  <!--                    <div class="d-flex align-items-center">-->
-  <!--                      <Users size="18" class="me-2 text-warning"/>-->
-  <!--                      <div>-->
-  <!--                        <strong>Team</strong>-->
-  <!--                        <div class="text-muted small">All team members can see this board, only members can edit</div>-->
-  <!--                      </div>-->
-  <!--                    </div>-->
-  <!--                  </label>-->
-  <!--                </div>-->
-  <!--                <div class="form-check mb-3">-->
-  <!--                  <input-->
-  <!--                    class="form-check-input"-->
-  <!--                    type="radio"-->
-  <!--                    name="visibility"-->
-  <!--                    id="visibilityPublic"-->
-  <!--                    value="public"-->
-  <!--                    v-model="boardSettings.visibility"-->
-  <!--                  >-->
-  <!--                  <label class="form-check-label" for="visibilityPublic">-->
-  <!--                    <div class="d-flex align-items-center">-->
-  <!--                      <Globe size="18" class="me-2 text-success"/>-->
-  <!--                      <div>-->
-  <!--                        <strong>Public</strong>-->
-  <!--                        <div class="text-muted small">Anyone with the link can view this board</div>-->
-  <!--                      </div>-->
-  <!--                    </div>-->
-  <!--                  </label>-->
-  <!--                </div>-->
-  <!--              </div>-->
+<!--              &lt;!&ndash; Visibility Settings Tab &ndash;&gt;-->
+<!--              <div v-if="activeSettingsTab === 'visibility'" class="tab-pane fade show active">-->
+<!--                <h6 class="mb-3">Board Visibility</h6>-->
+<!--                <div class="mb-4">-->
+<!--                  <div class="form-check mb-3">-->
+<!--                    <input-->
+<!--                      class="form-check-input"-->
+<!--                      type="radio"-->
+<!--                      name="visibility"-->
+<!--                      id="visibilityPrivate"-->
+<!--                      value="private"-->
+<!--                      v-model="boardConfig"-->
+<!--                    >-->
+<!--                    <label class="form-check-label" for="visibilityPrivate">-->
+<!--                      <div class="d-flex align-items-center">-->
+<!--                        <Lock size="18" class="me-2 text-danger"/>-->
+<!--                        <div>-->
+<!--                          <strong>Private</strong>-->
+<!--                          <div class="text-muted small">Only board members can see and edit this board</div>-->
+<!--                        </div>-->
+<!--                      </div>-->
+<!--                    </label>-->
+<!--                  </div>-->
+<!--                  <div class="form-check mb-3">-->
+<!--                    <input-->
+<!--                      class="form-check-input"-->
+<!--                      type="radio"-->
+<!--                      name="visibility"-->
+<!--                      id="visibilityTeam"-->
+<!--                      value="team"-->
+<!--                      v-model="boardSettings.visibility"-->
+<!--                    >-->
+<!--                    <label class="form-check-label" for="visibilityTeam">-->
+<!--                      <div class="d-flex align-items-center">-->
+<!--                        <Users size="18" class="me-2 text-warning"/>-->
+<!--                        <div>-->
+<!--                          <strong>Team</strong>-->
+<!--                          <div class="text-muted small">All team members can see this board, only members can edit</div>-->
+<!--                        </div>-->
+<!--                      </div>-->
+<!--                    </label>-->
+<!--                  </div>-->
+<!--                  <div class="form-check mb-3">-->
+<!--                    <input-->
+<!--                      class="form-check-input"-->
+<!--                      type="radio"-->
+<!--                      name="visibility"-->
+<!--                      id="visibilityPublic"-->
+<!--                      value="public"-->
+<!--                      v-model="boardSettings.visibility"-->
+<!--                    >-->
+<!--                    <label class="form-check-label" for="visibilityPublic">-->
+<!--                      <div class="d-flex align-items-center">-->
+<!--                        <Globe size="18" class="me-2 text-success"/>-->
+<!--                        <div>-->
+<!--                          <strong>Public</strong>-->
+<!--                          <div class="text-muted small">Anyone with the link can view this board</div>-->
+<!--                        </div>-->
+<!--                      </div>-->
+<!--                    </label>-->
+<!--                  </div>-->
+<!--                </div>-->
 
-  <!--              <h6 class="mb-3">Additional Options</h6>-->
-  <!--              <div class="form-check mb-3">-->
-  <!--                <input type="checkbox" class="form-check-input" id="allowComments"-->
-  <!--                       v-model="boardSettings.allowComments">-->
-  <!--                <label class="form-check-label" for="allowComments">-->
-  <!--                  Allow comments from viewers-->
-  <!--                </label>-->
-  <!--              </div>-->
-  <!--              <div class="form-check mb-3">-->
-  <!--                <input type="checkbox" class="form-check-input" id="allowVoting" v-model="boardSettings.allowVoting">-->
-  <!--                <label class="form-check-label" for="allowVoting">-->
-  <!--                  Allow voting (likes/dislikes) from viewers-->
-  <!--                </label>-->
-  <!--              </div>-->
-  <!--              <div class="form-check">-->
-  <!--                <input type="checkbox" class="form-check-input" id="showMemberList"-->
-  <!--                       v-model="boardSettings.showMemberList">-->
-  <!--                <label class="form-check-label" for="showMemberList">-->
-  <!--                  Show member list to viewers-->
-  <!--                </label>-->
-  <!--              </div>-->
-  <!--            </div>-->
+<!--                <h6 class="mb-3">Additional Options</h6>-->
+<!--                <div class="form-check mb-3">-->
+<!--                  <input type="checkbox" class="form-check-input" id="allowComments"-->
+<!--                         v-model="boardSettings.allowComments">-->
+<!--                  <label class="form-check-label" for="allowComments">-->
+<!--                    Allow comments from viewers-->
+<!--                  </label>-->
+<!--                </div>-->
+<!--                <div class="form-check mb-3">-->
+<!--                  <input type="checkbox" class="form-check-input" id="allowVoting" v-model="boardSettings.allowVoting">-->
+<!--                  <label class="form-check-label" for="allowVoting">-->
+<!--                    Allow voting (likes/dislikes) from viewers-->
+<!--                  </label>-->
+<!--                </div>-->
+<!--                <div class="form-check">-->
+<!--                  <input type="checkbox" class="form-check-input" id="showMemberList"-->
+<!--                         v-model="boardSettings.showMemberList">-->
+<!--                  <label class="form-check-label" for="showMemberList">-->
+<!--                    Show member list to viewers-->
+<!--                  </label>-->
+<!--                </div>-->
+<!--              </div>-->
 
-  <!--            &lt;!&ndash; Permissions Settings Tab &ndash;&gt;-->
-  <!--            <div v-if="activeSettingsTab === 'permissions'" class="tab-pane fade show active">-->
-  <!--              <h6 class="mb-3">Member Permissions</h6>-->
-  <!--              <div class="mb-4">-->
-  <!--                <div class="form-check mb-3">-->
-  <!--                  <input type="checkbox" class="form-check-input" id="membersCanAddCards"-->
-  <!--                         v-model="boardSettings.membersCanAddCards">-->
-  <!--                  <label class="form-check-label" for="membersCanAddCards">-->
-  <!--                    Members can add cards-->
-  <!--                  </label>-->
-  <!--                </div>-->
-  <!--                <div class="form-check mb-3">-->
-  <!--                  <input type="checkbox" class="form-check-input" id="membersCanEditCards"-->
-  <!--                         v-model="boardSettings.membersCanEditCards">-->
-  <!--                  <label class="form-check-label" for="membersCanEditCards">-->
-  <!--                    Members can edit cards-->
-  <!--                  </label>-->
-  <!--                </div>-->
-  <!--                <div class="form-check mb-3">-->
-  <!--                  <input type="checkbox" class="form-check-input" id="membersCanDeleteCards"-->
-  <!--                         v-model="boardSettings.membersCanDeleteCards">-->
-  <!--                  <label class="form-check-label" for="membersCanDeleteCards">-->
-  <!--                    Members can delete cards-->
-  <!--                  </label>-->
-  <!--                </div>-->
-  <!--                <div class="form-check mb-3">-->
-  <!--                  <input type="checkbox" class="form-check-input" id="membersCanAddColumns"-->
-  <!--                         v-model="boardSettings.membersCanAddColumns">-->
-  <!--                  <label class="form-check-label" for="membersCanAddColumns">-->
-  <!--                    Members can add columns-->
-  <!--                  </label>-->
-  <!--                </div>-->
-  <!--                <div class="form-check mb-3">-->
-  <!--                  <input type="checkbox" class="form-check-input" id="membersCanInvite"-->
-  <!--                         v-model="boardSettings.membersCanInvite">-->
-  <!--                  <label class="form-check-label" for="membersCanInvite">-->
-  <!--                    Members can invite others-->
-  <!--                  </label>-->
-  <!--                </div>-->
-  <!--              </div>-->
+<!--              &lt;!&ndash; Permissions Settings Tab &ndash;&gt;-->
+<!--              <div v-if="activeSettingsTab === 'permissions'" class="tab-pane fade show active">-->
+<!--                <h6 class="mb-3">Member Permissions</h6>-->
+<!--                <div class="mb-4">-->
+<!--                  <div class="form-check mb-3">-->
+<!--                    <input type="checkbox" class="form-check-input" id="membersCanAddCards"-->
+<!--                           v-model="boardSettings.membersCanAddCards">-->
+<!--                    <label class="form-check-label" for="membersCanAddCards">-->
+<!--                      Members can add cards-->
+<!--                    </label>-->
+<!--                  </div>-->
+<!--                  <div class="form-check mb-3">-->
+<!--                    <input type="checkbox" class="form-check-input" id="membersCanEditCards"-->
+<!--                           v-model="boardSettings.membersCanEditCards">-->
+<!--                    <label class="form-check-label" for="membersCanEditCards">-->
+<!--                      Members can edit cards-->
+<!--                    </label>-->
+<!--                  </div>-->
+<!--                  <div class="form-check mb-3">-->
+<!--                    <input type="checkbox" class="form-check-input" id="membersCanDeleteCards"-->
+<!--                           v-model="boardSettings.membersCanDeleteCards">-->
+<!--                    <label class="form-check-label" for="membersCanDeleteCards">-->
+<!--                      Members can delete cards-->
+<!--                    </label>-->
+<!--                  </div>-->
+<!--                  <div class="form-check mb-3">-->
+<!--                    <input type="checkbox" class="form-check-input" id="membersCanAddColumns"-->
+<!--                           v-model="boardSettings.membersCanAddColumns">-->
+<!--                    <label class="form-check-label" for="membersCanAddColumns">-->
+<!--                      Members can add columns-->
+<!--                    </label>-->
+<!--                  </div>-->
+<!--                  <div class="form-check mb-3">-->
+<!--                    <input type="checkbox" class="form-check-input" id="membersCanInvite"-->
+<!--                           v-model="boardSettings.membersCanInvite">-->
+<!--                    <label class="form-check-label" for="membersCanInvite">-->
+<!--                      Members can invite others-->
+<!--                    </label>-->
+<!--                  </div>-->
+<!--                </div>-->
 
-  <!--              <h6 class="mb-3">Board Members</h6>-->
-  <!--              <div class="members-list">-->
-  <!--                <div v-for="member in boardMembers" :key="member.id"-->
-  <!--                     class="d-flex align-items-center justify-content-between mb-3 p-3 border rounded">-->
-  <!--                  <div class="d-flex align-items-center">-->
-  <!--                    <img :src="member.avatar" :alt="member.name" class="rounded-circle me-3" width="40" height="40">-->
-  <!--                    <div>-->
-  <!--                      <div class="fw-bold">{{ member.name }}</div>-->
-  <!--                      <small class="text-muted">{{ member.email }}</small>-->
-  <!--                    </div>-->
-  <!--                  </div>-->
-  <!--                  <div class="d-flex align-items-center gap-2">-->
-  <!--                    <select class="form-select form-select-sm" v-model="member.role" style="width: 120px;">-->
-  <!--                      <option value="owner">Owner</option>-->
-  <!--                      <option value="admin">Admin</option>-->
-  <!--                      <option value="member">Member</option>-->
-  <!--                      <option value="viewer">Viewer</option>-->
-  <!--                    </select>-->
-  <!--                    <button v-if="member.role !== 'owner'" class="btn btn-sm btn-outline-danger">-->
-  <!--                      <Trash2 size="14"/>-->
-  <!--                    </button>-->
-  <!--                  </div>-->
-  <!--                </div>-->
-  <!--                <button class="btn btn-outline-primary w-100">-->
-  <!--                  <UserPlus size="16" class="me-2"/>-->
-  <!--                  Invite Member-->
-  <!--                </button>-->
-  <!--              </div>-->
-  <!--            </div>-->
-  <!--          </div>-->
-  <!--        </div>-->
-  <!--        <div class="modal-footer">-->
-  <!--          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">-->
-  <!--            {{ t('board.cancel') }}-->
-  <!--          </button>-->
-  <!--          <button type="button" class="btn btn-primary" @click="saveSettings">-->
-  <!--            {{ t('board.save') }}-->
-  <!--          </button>-->
-  <!--        </div>-->
-  <!--      </div>-->
-  <!--    </div>-->
-  <!--  </div>-->
+<!--                <h6 class="mb-3">Board Members</h6>-->
+<!--                <div class="members-list">-->
+<!--                  <div v-for="member in boardMembers" :key="member.id"-->
+<!--                       class="d-flex align-items-center justify-content-between mb-3 p-3 border rounded">-->
+<!--                    <div class="d-flex align-items-center">-->
+<!--                      <img :src="member.avatar" :alt="member.name" class="rounded-circle me-3" width="40" height="40">-->
+<!--                      <div>-->
+<!--                        <div class="fw-bold">{{ member.name }}</div>-->
+<!--                        <small class="text-muted">{{ member.email }}</small>-->
+<!--                      </div>-->
+<!--                    </div>-->
+<!--                    <div class="d-flex align-items-center gap-2">-->
+<!--                      <select class="form-select form-select-sm" v-model="member.role" style="width: 120px;">-->
+<!--                        <option value="owner">Owner</option>-->
+<!--                        <option value="admin">Admin</option>-->
+<!--                        <option value="member">Member</option>-->
+<!--                        <option value="viewer">Viewer</option>-->
+<!--                      </select>-->
+<!--                      <button v-if="member.role !== 'owner'" class="btn btn-sm btn-outline-danger">-->
+<!--                        <Trash2 size="14"/>-->
+<!--                      </button>-->
+<!--                    </div>-->
+<!--                  </div>-->
+<!--                  <button class="btn btn-outline-primary w-100">-->
+<!--                    <UserPlus size="16" class="me-2"/>-->
+<!--                    Invite Member-->
+<!--                  </button>-->
+<!--                </div>-->
+<!--              </div>-->
+<!--            </div>-->
+<!--          </div>-->
+<!--          <div class="modal-footer">-->
+<!--            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">-->
+<!--              {{ t('board.cancel') }}-->
+<!--            </button>-->
+<!--            <button type="button" class="btn btn-primary" @click="saveSettings">-->
+<!--              {{ t('board.save') }}-->
+<!--            </button>-->
+<!--          </div>-->
+<!--        </div>-->
+<!--      </div>-->
+<!--    </div>-->
 
 
   <div class="modal fade" id="settingsModal" tabindex="-1" aria-hidden="true" ref="settingsModal">
@@ -900,6 +900,7 @@
     :card-data="selectedCard"
     :column-id="selectedColumnId"
     :initial-tab="initialTab"
+    :board-config="boardConfig"
     @edit="newSaveEditCard"
     @save="saveCard"
     @delete="removeCard"
