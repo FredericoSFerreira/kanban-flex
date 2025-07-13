@@ -161,7 +161,7 @@ describe('My Boards Endpoint', () => {
     mockCallFunction.mockResolvedValue(mockBoards);
 
     const response = await request(app)
-      .get('/my-boards')
+      .get('/boards')
       .set('Authorization', 'Bearer fake-token');
 
     expect(response.status).toBe(200);
@@ -181,7 +181,7 @@ describe('My Boards Endpoint', () => {
   });
 
   it('should return 401 when not authenticated', async () => {
-    const response = await request(app).get('/my-boards');
+    const response = await request(app).get('/boards');
 
     expect(response.status).toBe(401);
     expect(response.body).toHaveProperty('msg', 'Token not pass');
@@ -193,7 +193,7 @@ describe('My Boards Endpoint', () => {
     mockCallFunction.mockRejectedValue(new Error('Database error'));
 
     const response = await request(app)
-      .get('/my-boards')
+      .get('/boards')
       .set('Authorization', 'Bearer fake-token');
 
     expect(response.status).toBe(500);
@@ -202,6 +202,25 @@ describe('My Boards Endpoint', () => {
     expect(mockCallFunction).toHaveBeenCalledWith(
       'getMyBoards',
       {id: 'mock-user-id', name: 'Mock User'},
+      'fake-token'
+    );
+  });
+
+  it('should pass search parameter to cloud function when provided', async () => {
+    mockCallFunction.mockResolvedValue([mockBoards[0]]); // Only return the first board that matches the search
+
+    const response = await request(app)
+      .get('/boards?search=Retrospective 1')
+      .set('Authorization', 'Bearer fake-token');
+
+    expect(response.status).toBe(200);
+    expect(response.body).toBeInstanceOf(Array);
+    expect(response.body.length).toBe(1);
+    expect(response.body[0]).toHaveProperty('name', 'Sprint Retrospective 1');
+
+    expect(mockCallFunction).toHaveBeenCalledWith(
+      'getMyBoards',
+      {id: 'mock-user-id', name: 'Mock User', search: 'Retrospective 1'},
       'fake-token'
     );
   });
@@ -252,6 +271,25 @@ describe('Participating Boards Endpoint', () => {
     expect(mockCallFunction).toHaveBeenCalledWith(
       'getParticipatingBoards',
       {userId: 'mock-user-id'},
+      'fake-token'
+    );
+  });
+
+  it('should pass search parameter to cloud function when provided', async () => {
+    mockCallFunction.mockResolvedValue([mockParticipatingBoards[0]]); // Only return the first board that matches the search
+
+    const response = await request(app)
+      .get('/boards/participating?search=Gestão de Projetos')
+      .set('Authorization', 'Bearer fake-token');
+
+    expect(response.status).toBe(200);
+    expect(response.body).toBeInstanceOf(Array);
+    expect(response.body.length).toBe(1);
+    expect(response.body[0]).toHaveProperty('name', 'Modelo - Gestão de Projetos');
+
+    expect(mockCallFunction).toHaveBeenCalledWith(
+      'getParticipatingBoards',
+      {userId: 'mock-user-id', search: 'Gestão de Projetos'},
       'fake-token'
     );
   });

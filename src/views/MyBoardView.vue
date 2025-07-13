@@ -1,10 +1,26 @@
 <template>
   <div class="container py-5" style="padding-bottom: 10rem !important;">
-    <div class="d-flex justify-content-between align-items-center mb-4" v-if="boards.length > 0">
+    <div class="d-flex justify-content-between align-items-center mb-4" v-if="boards.length > 0 || searchTerm">
       <h1 class="h2 mb-0">{{ $t('myBoards.title') }}</h1>
       <button class="btn btn-primary" @click="openCreateBoardModal()">
         {{ $t('myBoards.createBoard') }}
       </button>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="mb-4" v-if="boards.length > 0 || searchTerm">
+      <div class="input-group">
+        <input
+          type="text"
+          class="form-control"
+          v-model="searchTerm"
+          :placeholder="$t('myBoards.search.placeholder')"
+          @input="handleSearchInput"
+        >
+        <button class="btn btn-outline-secondary" type="button" @click="getBoards()">
+          <Search :size="18"/>
+        </button>
+      </div>
     </div>
 
     <div class="text-center py-5" v-if="showSpinner">
@@ -14,12 +30,22 @@
     </div>
 
     <!-- Empty State -->
-    <div v-if="boards.length === 0 && !showSpinner" class="text-center py-5">
+    <div v-if="boards.length === 0 && !showSpinner && !searchTerm" class="text-center py-5">
       <Layout :size=70 class="text-primary mb-3"/>
       <h2 class="h3 mb-4">{{ $t('myBoards.emptyState.title') }}</h2>
       <p class="text-muted mb-5">{{ $t('myBoards.emptyState.description') }}</p>
       <button class="btn btn-primary" @click="openCreateBoardModal()">
         {{ $t('myBoards.emptyState.cta') }}
+      </button>
+    </div>
+
+    <!-- No Search Results -->
+    <div v-else-if="searchTerm && boardsParticipating.length === 0" class="text-center py-5">
+      <SearchX size="48" class="text-muted mb-3"/>
+      <h2 class="h4 mb-3">{{ $t('myBoards.search.noResults') }}</h2>
+      <p class="text-muted mb-4">{{ $t('myBoards.search.noResultsDesc', {query: searchTerm}) }}</p>
+      <button class="btn btn-outline-primary" @click="clearSearch">
+        {{ $t('myBoards.search.showAll') }}
       </button>
     </div>
 
@@ -29,7 +55,7 @@
         <div class="card h-100 board-card">
           <div class="card-body">
             <div class="d-flex justify-content-between align-items-start mb-3">
-              <h3 class="h5 mb-0">{{ board.name }}</h3>
+              <h3 class="h5 mb-0" v-html="highlightSearchTerm(board.name)"></h3>
               <div class="dropdown">
                 <button
                   class="btn btn-link p-0"
@@ -81,7 +107,7 @@
         <div class="card h-100 board-card">
           <div class="card-body">
             <div class="d-flex justify-content-between align-items-start mb-3">
-              <h3 class="h5 mb-0">{{ board.name }}</h3>
+              <h3 class="h5 mb-0" v-html="highlightSearchTerm(board.name)"></h3>
               <div class="dropdown">
                 <button
                   class="btn btn-link p-0"
@@ -127,18 +153,38 @@
 </template>
 <script setup lang="ts">
 import {ref, onMounted} from 'vue';
-import {Layout, MoreVertical, Eye, Trash2, Calendar, Users, BarChart} from 'lucide-vue-next';
+import {Layout, MoreVertical, Eye, Trash2, Calendar, Users, BarChart, Search, SearchX} from 'lucide-vue-next';
 import api from "@/utils/api";
 import {useSwal} from "@/utils/swal";
 import CreateBoardModal from "@/components/CreateBoardModal.vue";
-import { useCloudFunctions } from '@/composables/useCloudFunctions'
-const { callFunction } = useCloudFunctions()
+import {useCloudFunctions} from '@/composables/useCloudFunctions'
+
+const {callFunction} = useCloudFunctions()
 
 const Swal = useSwal();
 
 const boards = ref([]);
 const boardsParticipating = ref([]);
 const showSpinner = ref(false);
+const searchTerm = ref('');
+
+// Debounce function to prevent too many API calls
+let searchTimeout: number | null = null;
+const handleSearchInput = () => {
+  if (searchTimeout) {
+    clearTimeout(searchTimeout);
+  }
+  searchTimeout = setTimeout(() => {
+    getBoards();
+    getBoardsParticipating();
+  }, 500) as unknown as number;
+};
+
+const clearSearch = () => {
+  searchTerm.value = '';
+  getBoards();
+  getBoardsParticipating();
+};
 
 const createBoardModalComponent = ref(null);
 
@@ -190,7 +236,14 @@ const removeBoard = async (idBoard: string) => {
 const getBoards = async () => {
   try {
     showSpinner.value = true;
-    api.get('/my-boards')
+
+    // Build URL with search parameter if it exists
+    let url = '/boards';
+    if (searchTerm.value.trim()) {
+      url += `?search=${encodeURIComponent(searchTerm.value.trim())}`;
+    }
+
+    api.get(url)
       .then((response) => {
         console.log(response);
         boards.value = response.data.map((b: any) => ({'id': b.objectId, ...b}));
@@ -202,19 +255,23 @@ const getBoards = async () => {
         return Swal.fire({
           icon: "error",
           title: "Oops...",
-          text: "Ocorreu um erro ao enviar o código de autorização. Tente novamente.",
+          text: "Ocorreu um erro ao buscar os boards. Tente novamente.",
         });
       });
   } catch (error: unknown | any) {
-    console.log('Failed to create new object, with error code: ' + error.message);
+    console.log('Failed to fetch boards, with error code: ' + error.message);
   }
 };
 
 
 const getBoardsParticipating = async () => {
   try {
+    let url = '/boards/participating';
+    if (searchTerm.value.trim()) {
+      url += `?search=${encodeURIComponent(searchTerm.value.trim())}`;
+    }
     // showSpinner.value = true;
-    api.get('/boards/participating')
+    api.get(url)
       .then((response) => {
         console.log(response);
         boardsParticipating.value = response.data.map((b: any) => ({'id': b.objectId, ...b}));
@@ -229,6 +286,15 @@ const getBoardsParticipating = async () => {
   }
 };
 
+const highlightSearchTerm = (text: string) => {
+  if (!searchTerm.value.trim()) {
+    return text;
+  }
+  const query = searchTerm.value.trim();
+  const regex = new RegExp(`(${query})`, 'gi');
+  return text.replace(regex, '<mark class="search-highlight">$1</mark>');
+};
+
 // Lifecycle hook
 onMounted(async () => {
   // await getBoards();
@@ -237,4 +303,18 @@ onMounted(async () => {
 });
 </script>
 <style scoped>
+
+:deep(.search-highlight) {
+  background-color: #fff3cd;
+  color: #856404;
+  padding: 0.125rem 0.25rem;
+  border-radius: 0.25rem;
+  font-weight: 600;
+}
+
+.search-highlight {
+  background-color: #fbbf24;
+  color: #92400e;
+}
+
 </style>

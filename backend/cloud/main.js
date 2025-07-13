@@ -1,6 +1,6 @@
 import {UAParser} from 'ua-parser-js';
 import {verifyTokenParseCloudFunction} from "../middleware/auth.js";
-import {generateTrackingHistory} from "../utils/utils.js";
+import {escapeRegex, generateTrackingHistory} from "../utils/utils.js";
 
 
 // Apply JWT validation to all cloud functions
@@ -588,8 +588,16 @@ Parse.Cloud.define("getMyBoards", async (request) => {
     await verifyTokenParseCloudFunction(request);
     const query = new Parse.Query("boards");
 
+    // Build match condition
+    const matchCondition = { owner_email: request.params.email };
+
+    // Add search filter if provided
+    if (request.params.search) {
+      matchCondition.name = { $regex: escapeRegex(request.params.search), $options: 'i' };
+    }
+
     const pipeline = [
-      {$match: {owner_email: request.params.email}},
+      {$match: matchCondition},
       {
         $addFields: {
           totalColumns: {$size: "$columns"},
@@ -812,12 +820,20 @@ Parse.Cloud.define("getParticipatingBoards", async (request) => {
     const query = new Parse.Query("boards");
     const userId = request.params.userId;
 
+    // Build match condition
+    const matchCondition = {
+      "owner_id": {$not: {$eq: userId}},
+      "columns.itens.user_id": userId
+    };
+
+    // Add search filter if provided
+    if (request.params.search) {
+      matchCondition.name = { $regex: escapeRegex(request.params.search), $options: 'i' };
+    }
+
     const pipeline = [
       {
-        $match: {
-          "owner_id": {$not: {$eq: userId}},
-          "columns.itens.user_id": userId
-        }
+        $match: matchCondition
       },
       {
         $addFields: {

@@ -40,6 +40,14 @@ export default {
     members: 'membros',
     columns: 'colunas',
     items: 'itens',
+    search: {
+      placeholder: 'Buscar quadros...',
+      clear: 'Limpar busca',
+      results: 'Mostrando {count} de {total} quadros para "{query}"',
+      showAll: 'Mostrar Todos os Quadros',
+      noResults: 'Nenhum quadro encontrado',
+      noResultsDesc: 'Nenhum quadro corresponde à sua busca por "{query}". Tente um termo diferente.'
+    },
     emptyState: {
       title: 'Nenhum quadro ainda',
       description: 'Crie seu primeiro quadro para começar a organizar seus projetos.',
