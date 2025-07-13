@@ -44,7 +44,7 @@
                   </label>
                   <textarea
                     class="form-control"
-                    rows="4"
+                    rows="8"
                     v-model="cardData.description"
                     :placeholder="$t('boardV2.descriptionPlaceholder')"
                   ></textarea>
