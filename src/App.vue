@@ -513,8 +513,12 @@ const footerColumns = [
   background-color: #2d2d2d !important;
 }
 
-.dark-mode .border-bottom, .border-end {
+.dark-mode .border-bottom {
   border-bottom: var(--bs-border-width) var(--bs-border-style) #2d2d2d !important;
+
+}
+
+.dark-mode .border-end {
   border-right: var(--bs-border-width) var(--bs-border-style) #2d2d2d !important;
 }
 
@@ -550,7 +554,6 @@ const footerColumns = [
   color: #e0e0e0 !important;
   background-color: transparent !important;
 }
-
 
 
 .dark-mode .detail-label, .detail-value {
