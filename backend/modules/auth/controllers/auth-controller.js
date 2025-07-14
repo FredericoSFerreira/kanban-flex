@@ -137,14 +137,13 @@ const authGoogle = async (req, res) => {
 
     const jwtToken = await generateToken({
       email: email,
-      name: name,
+      name: resultSave.name,
       id: resultSave.id,
       phone: resultSave.phone || null,
       avatar: picture,
     });
 
 
-    console.log(resultSave)
     res.json({isValid: true, token: jwtToken});
   } catch (error) {
     console.error(error)
