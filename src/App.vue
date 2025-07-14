@@ -294,16 +294,15 @@ const footerColumns = [
 <style>
 /* Dark mode styles */
 .dark-mode {
-  background-color: #121212 !important;
+  background: linear-gradient(to bottom, #1e1e1e, #121212) !important;
   color: #ffffff !important;
 }
 
 .dark-mode .card {
-  background-color: #1e1e1e !important;
+  background: linear-gradient(to bottom, #1e1e1e, #2a2a2a) !important;
   border-color: #2d2d2d !important;
   color: #ffffff !important;
 }
-
 
 /* Kanban board structure styles */
 .dark-mode .kanban-header {
@@ -317,7 +316,7 @@ const footerColumns = [
 }
 
 .dark-mode .kanban-column {
-  background-color: #1e1e1e !important;
+  background: linear-gradient(to bottom, #1e1e1e, #1a1a1a) !important;
   border-color: #2d2d2d !important;
   color: #ffffff !important;
   box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.15);
@@ -502,7 +501,7 @@ const footerColumns = [
 }
 
 .dark-mode .comment-item {
-  background-color: #2d2d2d !important;
+  background-color: #1e1e1e !important;
 }
 
 .dark-mode .checklist-item {
@@ -556,7 +555,11 @@ const footerColumns = [
 }
 
 
-.dark-mode .detail-label, .detail-value {
+.dark-mode .detail-label {
+  color: #ffffff !important;
+}
+
+.dark-mode .detail-value {
   color: #ffffff !important;
 }
 
@@ -572,6 +575,41 @@ const footerColumns = [
   background-color: #1e1e1e !important;
   color: var(--bs-primary) !important;
 }
+
+/* Dark mode para todos os offcanvas */
+.dark-mode .offcanvas,
+.dark-mode .offcanvas-header,
+.dark-mode .offcanvas-body {
+  background-color: #1e1e1e !important;
+  color: #ffffff !important;
+  border-color: #3a3a3a !important;
+}
+
+/* Borda superior (caso tenha) */
+.dark-mode .offcanvas-header {
+  border-bottom: 1px solid #3a3a3a !important;
+}
+
+/* Título do header */
+.dark-mode .offcanvas-title {
+  color: #ffffff !important;
+}
+
+/* Botão de fechar */
+.dark-mode .offcanvas .btn-close {
+  filter: invert(1) grayscale(100%) brightness(150%) !important;
+}
+
+.dark-mode .ai-bubble {
+  background-color: #1e1e1e !important;
+  border: 1px solid #3a3a3a !important;
+  color: #f1f1f1 !important;
+}
+
+.dark-mode .chat-input {
+  background-color: #1e1e1e !important;
+}
+
 
 /* Navigation link cursor */
 .nav-link {
