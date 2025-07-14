@@ -294,16 +294,15 @@ const footerColumns = [
 <style>
 /* Dark mode styles */
 .dark-mode {
-  background-color: #121212 !important;
+  background: linear-gradient(to bottom, #1e1e1e, #121212) !important;
   color: #ffffff !important;
 }
 
 .dark-mode .card {
-  background-color: #1e1e1e !important;
+  background: linear-gradient(to bottom, #1e1e1e, #2a2a2a) !important;
   border-color: #2d2d2d !important;
   color: #ffffff !important;
 }
-
 
 /* Kanban board structure styles */
 .dark-mode .kanban-header {
@@ -317,7 +316,7 @@ const footerColumns = [
 }
 
 .dark-mode .kanban-column {
-  background-color: #1e1e1e !important;
+  background: linear-gradient(to bottom, #1e1e1e, #1a1a1a) !important;
   border-color: #2d2d2d !important;
   color: #ffffff !important;
   box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.15);
