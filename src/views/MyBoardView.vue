@@ -40,7 +40,7 @@
     </div>
 
     <!-- No Search Results -->
-    <div v-else-if="searchTerm && boardsParticipating.length === 0" class="text-center py-5">
+    <div v-else-if="searchTerm && boardsParticipating.length === 0 && boards.length === 0" class="text-center py-5">
       <SearchX size="48" class="text-muted mb-3"/>
       <h2 class="h4 mb-3">{{ $t('myBoards.search.noResults') }}</h2>
       <p class="text-muted mb-4">{{ $t('myBoards.search.noResultsDesc', {query: searchTerm}) }}</p>
