@@ -1,6 +1,4 @@
-# # KanbanFlex [![Netlify Status](https://api.netlify.com/api/v1/badges/08200383-b16d-4391-a914-37fe41309b3c/deploy-status)](https://app.netlify.com/sites/open-sprint-retro/deploys) [![codecov](https://codecov.io/gh/FredericoSFerreira/kanban-flex/branch/main/graph/badge.svg?flag=backend)](https://codecov.io/gh/FredericoSFerreira/kanban-flex) [![Backend Tests and Coverage](https://github.com/FredericoSFerreira/kanban-flex/actions/workflows/tests.yml/badge.svg)](https://github.com/FredericoSFerreira/kanban-flex/actions/workflows/tests.yml)
-
-
+#  <img src="public/logo-kanbanflex.png" alt="KanbanFlex Logo" width="50"> KanbanFlex [![Netlify Status](https://api.netlify.com/api/v1/badges/08200383-b16d-4391-a914-37fe41309b3c/deploy-status)](https://app.netlify.com/sites/open-sprint-retro/deploys) [![codecov](https://codecov.io/gh/FredericoSFerreira/kanban-flex/branch/main/graph/badge.svg?flag=backend)](https://codecov.io/gh/FredericoSFerreira/kanban-flex) [![Backend Tests and Coverage](https://github.com/FredericoSFerreira/kanban-flex/actions/workflows/tests.yml/badge.svg)](https://github.com/FredericoSFerreira/kanban-flex/actions/workflows/tests.yml)
 
 
 
@@ -25,6 +23,14 @@ KanbanFlex is built using cutting-edge technologies to ensure both performance a
   <img src="https://skillicons.dev/icons?i=nodejs,html,css,vuejs,typescript,mongodb">
   <br/>
   <br/>
+</div>
+
+---
+
+## 📷 Screenshot
+
+<div align="center">
+  <img src="public/screenshot.jpg" alt="KanbanFlex Logo" width="1024">
 </div>
 
 ---
