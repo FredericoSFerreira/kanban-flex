@@ -1003,11 +1003,21 @@ const completedItems = (card) => {
 
 const openCardModal = (card = null, columnId = null, tab = 'activity') => {
   isEditingCard.value = !!card;
-  selectedCard.value = card ? {checklist: [], history: [], ...card} : undefined;
-  cardSelectedId.value = card ? card.id : null;
+  if (card) {
+    selectedCard.value = {checklist: [], history: [], ...card};
+    cardSelectedId.value = card.id;
+  } else {
+    selectedCard.value = { checklist: [], history: [], title: '', description: '', labels: [] };
+    cardSelectedId.value = null;
+  }
   selectedColumnId.value = columnId;
   columnSelectedId.value = columnId;
   initialTab.value = tab;
+
+  cardEditDescription.value = '';
+  cardEditTitle.value = '';
+  cardEditLabels.value = '';
+
   modalEditCard.show();
 };
 

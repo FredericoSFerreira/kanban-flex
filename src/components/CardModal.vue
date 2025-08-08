@@ -578,30 +578,6 @@ const handleSave = () => {
     emit('edit', {...props.cardData});
   } else {
     emit('save', {...props.cardData});
-    // Reset do cardData após criar um novo card
-    setTimeout(() => {
-      const defaultCardData = {
-        id: '',
-        title: '',
-        description: '',
-        labels: [],
-        createdAt: '',
-        updatedAt: '',
-        comments: [],
-        history: [],
-        checklist: []
-      };
-
-      Object.keys(defaultCardData).forEach(key => {
-        if (props.cardData[key] !== undefined) {
-          if (Array.isArray(defaultCardData[key])) {
-            props.cardData[key] = [];
-          } else {
-            props.cardData[key] = defaultCardData[key];
-          }
-        }
-      });
-    }, 100);
   }
 }
 
