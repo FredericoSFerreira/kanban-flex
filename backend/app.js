@@ -7,6 +7,7 @@ import boardsRouter from "./modules/boards/routes/boards-routes.js";
 import authRouter from "./modules/auth/routes/auth-routes.js";
 import accessLogsRouter from "./modules/accessLogs/routes/access-logs-routes.js";
 import usersRouter from "./modules/users/routes/users-routes.js";
+import attachmentsRouter from "./modules/attachments/routes/attachments-routes.js";
 import helmet from 'helmet';
 
 const app = express();
@@ -31,6 +32,7 @@ app.use(boardsRouter);
 app.use(authRouter);
 app.use(accessLogsRouter);
 app.use(usersRouter);
+app.use(attachmentsRouter);
 
 
 export default app;

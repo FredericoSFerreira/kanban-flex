@@ -1532,7 +1532,8 @@ const saveCard = (data) => {
     up_vote_users: [],
     down_vote_users: [],
     comments: [],
-    checklist: []
+    checklist: [],
+    attachments: data.attachments || []
   };
 
   // Update local state optimistically

@@ -556,6 +556,8 @@ export default {
     assignedMembers: 'Assigned Members',
     searchMembers: 'Search members...',
     attachments: 'Attachments',
+    attachment: 'Attachment',
+    noAttachments: 'No attachments yet',
     dragFilesHere: 'Drag files here or click to select',
     selectFiles: 'Select Files',
     activity: 'Activity',
@@ -586,6 +588,7 @@ export default {
         columnNameRequired:
           'You need to provide the column name!',
         descriptionRequired: 'You need to provide the card description!',
+        uploadOnlyInEdit: 'Uploads are only available when editing an existing card',
       }
     ,
     confirmations: {

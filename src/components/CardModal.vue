@@ -26,7 +26,7 @@
                 <div class="mb-4" v-if="boardConfig.showTitle">
                   <label class="form-label fw-semibold">
                     <FileText size="16" class="me-2"/>
-                    {{$t('boardV2.title')}}
+                    {{ $t('boardV2.title') }}
                   </label>
                   <input
                     type="text"
@@ -44,7 +44,7 @@
                   </label>
                   <textarea
                     class="form-control"
-                    rows="8"
+                    rows="7"
                     v-model="cardData.description"
                     :placeholder="$t('boardV2.descriptionPlaceholder')"
                   ></textarea>
@@ -82,7 +82,7 @@
                 <div class="mb-4" v-if="boardConfig.showTags">
                   <label class="form-label fw-semibold">
                     <Tag size="16" class="me-2"/>
-                    {{$t('boardV2.labels')}}
+                    {{ $t('boardV2.labels') }}
                   </label>
                   <div class="labels-input-container">
                     <div class="selected-labels mb-2" v-if="cardData.labels.length > 0">
@@ -199,20 +199,51 @@
                 <!--                  </div>-->
                 <!--                </div>-->
 
-                <!-- Attachments -->
-                <!--                <div class="mb-4">-->
-                <!--                  <label class="form-label fw-semibold">-->
-                <!--                    <Paperclip size="16" class="me-2"/>-->
-                <!--                    {{ $t('boardV2.attachments') }}-->
-                <!--                  </label>-->
-                <!--                  <div class="attachment-area border border-dashed rounded p-3 text-center">-->
-                <!--                    <Upload size="32" class="text-muted mb-2"/>-->
-                <!--                    <p class="text-muted mb-2">{{ $t('boardV2.dragFilesHere') }}</p>-->
-                <!--                    <button type="button" class="btn btn-outline-primary btn-sm">-->
-                <!--                      {{ $t('boardV2.selectFiles') }}-->
-                <!--                    </button>-->
-                <!--                  </div>-->
-                <!--                </div>-->
+                <!--                 Attachments -->
+                <div class="mb-4">
+                  <label class="form-label fw-semibold">
+                    <Paperclip size="16" class="me-2"/>
+                    {{ $t('boardV2.attachments') }}
+                  </label>
+                  <div
+                    class="attachment-area border border-dashed rounded p-3 text-center"
+                    @dragover.prevent="onDragOver"
+                    @dragleave.prevent="onDragLeave"
+                    @drop.prevent="onFileDrop"
+                    :class="{ 'drag-over': isDragging }"
+                  >
+                    <input
+                      type="file"
+                      ref="fileInput"
+                      @change="onFileSelected"
+                      multiple
+                      class="d-none"
+                      accept=".jpg,.jpeg,.png,.webp,.pdf,.doc,.docx,.xlsx"
+                    />
+                    <Upload size="32" class="text-muted mb-2"/>
+                    <p class="text-muted mb-2">{{ $t('boardV2.dragFilesHere') }}</p>
+                    <button type="button" class="btn btn-outline-primary btn-sm" @click="triggerFileInput">
+                      {{ $t('boardV2.selectFiles') }}
+                    </button>
+                    <div v-if="uploadError" class="alert alert-danger mt-2">
+                      {{ uploadError }}
+                    </div>
+                    <div v-if="isUploading" class="mt-3">
+                      <div class="progress">
+                        <div
+                          class="progress-bar"
+                          role="progressbar"
+                          :style="{ width: `${uploadProgress}%` }"
+                          :aria-valuenow="uploadProgress"
+                          aria-valuemin="0"
+                          aria-valuemax="100"
+                        >
+                          {{ uploadProgress }}%
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -345,10 +376,15 @@
                             <div class="activity-content">
                               <span class="fw-semibold">{{ activity.user.name }}</span>
                               <div v-if="activity.action == 'create_card'">
-                                    {{ $t('boardV2.createdCard') }}
+                                {{ $t('boardV2.createdCard') }}
                               </div>
                               <div v-else>
-                                {{ $t('boardV2.movedCard', { source: activity.data?.source.columnName, target: activity.data?.target.columnName }) }}
+                                {{
+                                  $t('boardV2.movedCard', {
+                                    source: activity.data?.source.columnName,
+                                    target: activity.data?.target.columnName
+                                  })
+                                }}
                               </div>
 
                             </div>
@@ -399,7 +435,8 @@
 
                       <!-- Checklist Items -->
                       <div class="checklist-items">
-                        <div v-if="cardData?.checklist && cardData.checklist.length === 0" class="text-center text-muted py-4">
+                        <div v-if="cardData?.checklist && cardData.checklist.length === 0"
+                             class="text-center text-muted py-4">
                           <CheckSquare size="32" class="mb-2"/>
                           <p>{{ $t('boardV2.noChecklistItems') }}</p>
                         </div>
@@ -433,6 +470,108 @@
                             >
                               <Trash2 size="14"/>
                             </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Attachments Tab -->
+                  <div v-if="isEditing && activeTab === 'attachments'" class="tab-pane active">
+                    <div class="attachments-section">
+                      <!-- Add Attachment -->
+                      <!--                      <div class="add-attachment mb-4">-->
+                      <!--                        <div class="attachment-area border border-dashed rounded p-3 text-center"-->
+                      <!--                             @dragover.prevent="onDragOver"-->
+                      <!--                             @dragleave.prevent="onDragLeave"-->
+                      <!--                             @drop.prevent="onFileDrop"-->
+                      <!--                             :class="{ 'drag-over': isDragging }">-->
+                      <!--                          <input-->
+                      <!--                            type="file"-->
+                      <!--                            ref="fileInput"-->
+                      <!--                            @change="onFileSelected"-->
+                      <!--                            multiple-->
+                      <!--                            class="d-none"-->
+                      <!--                            accept=".jpg,.jpeg,.png,.webp,.pdf,.doc,.docx,.xlsx"-->
+                      <!--                          />-->
+                      <!--                          <Upload size="32" class="text-muted mb-2"/>-->
+                      <!--                          <p class="text-muted mb-2">{{ $t('boardV2.dragFilesHere') }}</p>-->
+                      <!--                          <button type="button" class="btn btn-outline-primary btn-sm" @click="triggerFileInput">-->
+                      <!--                            {{ $t('boardV2.selectFiles') }}-->
+                      <!--                          </button>-->
+                      <!--                        </div>-->
+                      <!--                        <div v-if="uploadError" class="alert alert-danger mt-2">-->
+                      <!--                          {{ uploadError }}-->
+                      <!--                        </div>-->
+                      <!--                        <div v-if="isUploading" class="mt-3">-->
+                      <!--                          <div class="progress">-->
+                      <!--                            <div-->
+                      <!--                              class="progress-bar"-->
+                      <!--                              role="progressbar"-->
+                      <!--                              :style="{ width: `${uploadProgress}%` }"-->
+                      <!--                              :aria-valuenow="uploadProgress"-->
+                      <!--                              aria-valuemin="0"-->
+                      <!--                              aria-valuemax="100"-->
+                      <!--                            >-->
+                      <!--                              {{ uploadProgress }}%-->
+                      <!--                            </div>-->
+                      <!--                          </div>-->
+                      <!--                        </div>-->
+                      <!--                      </div>-->
+
+                      <!-- Attachments List -->
+                      <div class="attachments-list">
+                        <div v-if="cardData?.attachments && cardData?.attachments?.length === 0"
+                             class="text-center text-muted py-4">
+                          <Paperclip size="32" class="mb-2"/>
+                          <p>{{ $t('boardV2.noAttachments') || 'No attachments yet' }}</p>
+                        </div>
+                        <div v-else>
+                          <h6 class="mb-3">{{ cardData?.attachments?.length }}
+                            {{
+                              cardData?.attachments?.length === 1 ? $t('boardV2.attachment') : $t('boardV2.attachments')
+                            }}</h6>
+
+                          <div v-for="attachment in cardData.attachments" :key="attachment.id"
+                               class="attachment-item mb-3">
+                            <div class="card">
+                              <div class="card-body p-3">
+                                <div class="d-flex align-items-center">
+                                  <div
+                                    class="attachment-icon me-3 d-flex align-items-center justify-content-center bg-light rounded"
+                                    style="width: 60px; height: 60px;">
+                                    <FileText v-if="attachment.type === 'application/pdf'" size="24"
+                                              class="text-danger"/>
+                                    <FileImage v-else-if="attachment.type.includes('image')" size="24"
+                                               class="text-gray-200"/>
+                                    <FileText v-else-if="attachment.type.includes('word')" size="24"
+                                              class="text-primary"/>
+                                    <FileText v-else-if="attachment.type.includes('excel')" size="24"
+                                              class="text-success"/>
+                                    <File v-else size="24" class="text-secondary"/>
+                                  </div>
+
+                                  <div class="flex-grow-1">
+                                    <h6 class="mb-1">{{ attachment.name }}</h6>
+                                    <div class="d-flex align-items-center text-muted small">
+                                      <span class="me-2">{{ formatFileSize(attachment.size) }}</span>
+                                      <span>{{ formatDate(attachment.createdAt) }}</span>
+                                    </div>
+                                  </div>
+
+                                  <div class="attachment-actions">
+                                    <button @click="downloadAttachment(attachment.id)"
+                                            class="btn btn-sm btn-outline-primary me-1">
+                                      <Download size="14"/>
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-outline-danger"
+                                            @click="removeAttachment(attachment.id)">
+                                      <Trash2 size="14"/>
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -522,16 +661,20 @@ import {ref, computed, onMounted, onUnmounted, defineProps, defineEmits, watch} 
 import {
   CreditCard, FileText, AlignLeft, AlertCircle, Calendar, Tag, Users, Search,
   Plus, Check, Paperclip, Upload, MessageSquare, Send, Activity, CheckSquare,
-  Trash2, Save, Clock, User, BarChart3, Hash, ArrowRight, Edit, Move
+  Trash2, Save, Clock, User, BarChart3, Hash, ArrowRight, Edit, Move,
+  File, Download, FileImage
 } from 'lucide-vue-next';
 import {useI18n} from 'vue-i18n';
 import {useAuthStore} from "@/stores/auth";
 import {getUserLoggedAvatar} from "@/utils/utils";
 import {uniqueId} from "@/utils/uuid";
 import {configDefault} from "@/utils/templates";
+import api from '@/utils/api';
+import {useRoute} from 'vue-router';
 
 const auth = useAuthStore();
 const {t, locale} = useI18n();
+const route = useRoute();
 
 const props = defineProps({
   isEditing: {
@@ -550,10 +693,11 @@ const props = defineProps({
         updatedAt: '',
         comments: [],
         history: [],
-        checklist: []
+        checklist: [],
+        attachments: []
       })
   },
-    boardConfig: {
+  boardConfig: {
     type: Object,
     default: () => (configDefault)
   },
@@ -589,7 +733,8 @@ const handleSave = () => {
         updatedAt: '',
         comments: [],
         history: [],
-        checklist: []
+        checklist: [],
+        attachments: []
       };
 
       Object.keys(defaultCardData).forEach(key => {
@@ -623,6 +768,19 @@ const newLabel = ref('');
 const memberSearch = ref('');
 const newComment = ref('');
 const newChecklistItem = ref('');
+
+// File upload related data
+const fileInput = ref(null);
+const selectedFiles = ref([]);
+const uploadProgress = ref(0);
+const uploadError = ref('');
+const isUploading = ref(false);
+const isDragging = ref(false);
+const totalUploadSize = ref(0);
+const maxFileSize = 2 * 1024 * 1024; // 2MB in bytes
+const maxTotalSize = 10 * 1024 * 1024; // 10MB in bytes
+const allowedImageTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+const allowedDocumentTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'];
 
 // Mock data for team members
 const teamMembers = ref([
@@ -684,6 +842,13 @@ const tabs = computed(() => {
       name: t('boardV2.checklist'),
       icon: CheckSquare,
       count: props.cardData?.checklist ? props.cardData?.checklist.length : 0,
+      visible: props.isEditing
+    },
+    {
+      id: 'attachments',
+      name: t('boardV2.attachments'),
+      icon: Paperclip,
+      count: props.cardData?.attachments ? props.cardData?.attachments.length : 0,
       visible: props.isEditing
     },
     {
@@ -830,7 +995,8 @@ const onModalHide = () => {
       updatedAt: '',
       comments: [],
       history: [],
-      checklist: []
+      checklist: [],
+      attachments: []
     };
 
     // Atualizar os valores do cardData para os valores padrão
@@ -849,14 +1015,211 @@ const onModalHide = () => {
 const onModalShow = () => {
   console.log('Modal show');
   activeTab.value = props.initialTab;
+  setTimeout(fetchAttachments, 1000);
 }
 
+const fetchAttachments = async () => {
+  try {
+    if (!props.isEditing || !props.cardData?.id) return;
+    const {data} = await api.get(`/attachments/item/${props.cardData.id}`);
+    if (data?.success && Array.isArray(data.attachments)) {
+      props.cardData.attachments = data.attachments;
+    }
+  } catch (e) {
+    console.error('Error fetching attachments:', e);
+  }
+};
+
+// File handling methods
+const triggerFileInput = () => {
+  fileInput.value.click();
+};
+
+const onDragOver = () => {
+  isDragging.value = true;
+};
+
+const onDragLeave = () => {
+  isDragging.value = false;
+};
+
+const onFileDrop = (event) => {
+  isDragging.value = false;
+  const files = event.dataTransfer.files;
+  handleFiles(files);
+};
+
+const onFileSelected = (event) => {
+  const files = event.target.files;
+  handleFiles(files);
+  // Reset the input so the same file can be selected again
+  event.target.value = '';
+};
+
+const handleFiles = (files) => {
+  uploadError.value = '';
+
+  // Convert FileList to Array
+  const fileArray = Array.from(files);
+
+  // Validate files
+  const validFiles = [];
+  let totalSize = 0;
+
+  for (const file of fileArray) {
+    const validationResult = validateFile(file);
+    if (validationResult.valid) {
+      validFiles.push(file);
+      totalSize += file.size;
+    } else {
+      uploadError.value = validationResult.error;
+      return;
+    }
+  }
+
+  // Check total size
+  const currentAttachmentsSize = props.cardData?.attachments?.reduce((sum, attachment) => sum + (attachment.size || 0), 0);
+  if (currentAttachmentsSize + totalSize > maxTotalSize) {
+    uploadError.value = `Total upload size exceeds the limit of ${maxTotalSize / (1024 * 1024)}MB`;
+    return;
+  }
+
+  // Add files to selectedFiles
+  selectedFiles.value = [...selectedFiles.value, ...validFiles];
+
+  // Real upload to API
+  uploadFiles(validFiles);
+};
+
+const validateFile = (file) => {
+  // Check file size
+  if (file.size > maxFileSize) {
+    return {
+      valid: false,
+      error: `File ${file.name} exceeds the maximum size of ${maxFileSize / (1024 * 1024)}MB`
+    };
+  }
+
+  // Check file type
+  const isImage = allowedImageTypes.includes(file.type);
+  const isDocument = allowedDocumentTypes.includes(file.type);
+
+  if (!isImage && !isDocument) {
+    return {
+      valid: false,
+      error: `File type not supported. Allowed types: JPEG, JPG, PNG, WEBP, PDF, DOC, DOCX, XLSX`
+    };
+  }
+
+  return {valid: true};
+};
+
+const uploadFiles = async (files) => {
+  try {
+    if (!props.isEditing || !props.cardData?.id) {
+      uploadError.value = t ? t('boardV2.errors.uploadOnlyInEdit') || 'Uploads are only available when editing an existing card' : 'Uploads are only available when editing an existing card';
+      return;
+    }
+
+    isUploading.value = true;
+    uploadProgress.value = 0;
+
+    const totalFiles = files.length;
+
+    for (let i = 0; i < totalFiles; i++) {
+      const file = files[i];
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('boardId', (route.params?.id || '').toString());
+      formData.append('itemId', props.cardData.id);
+
+      const {data} = await api.post('/attachments/upload', formData, {
+        headers: {'Content-Type': 'multipart/form-data'},
+        onUploadProgress: (evt) => {
+          if (evt.total) {
+            const perFile = evt.loaded / evt.total;
+            uploadProgress.value = Math.min(100, Math.round(((i + perFile) / totalFiles) * 100));
+          }
+        }
+      });
+
+      if (data?.success && data?.attachment) {
+        // Push server-provided attachment object
+        props.cardData.attachments.push(data.attachment);
+      } else {
+        throw new Error(data?.message || 'Upload failed');
+      }
+    }
+
+    // Ensure progress ends at 100
+    uploadProgress.value = 100;
+    // Switch to attachments tab
+    if (activeTab.value !== 'attachments') {
+      activeTab.value = 'attachments';
+    }
+  } catch (e) {
+    console.error('Upload error:', e);
+    uploadError.value = e?.response?.data?.message || e?.message || 'Error uploading file';
+  } finally {
+    isUploading.value = false;
+  }
+};
+
+
+const downloadAttachment = async (attachmentId) => {
+  try {
+    const {data} = await api.get(`/attachments/${attachmentId}/download`);
+
+    const filename = data.url.split('/').pop().split('?')[0];
+    const a = document.createElement('a');
+    a.href = data.url;
+    a.download = filename;
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+
+  } catch (e) {
+    console.error('Error download attachment:', e);
+    uploadError.value = e?.response?.data?.message || e?.message || 'Error download attachment';
+  }
+};
+
+const removeAttachment = async (attachmentId) => {
+  try {
+    await api.delete(`/attachments/${attachmentId}`);
+    const index = props.cardData.attachments.findIndex(attachment => attachment.id === attachmentId);
+    if (index !== -1) {
+      // If the attachment has a temporary URL, revoke it to free up memory
+      if (typeof props.cardData.attachments[index].url === 'string' && props.cardData.attachments[index].url.startsWith('blob:')) {
+        URL.revokeObjectURL(props.cardData.attachments[index].url);
+      }
+      props.cardData.attachments.splice(index, 1);
+    }
+  } catch (e) {
+    console.error('Error deleting attachment:', e);
+    uploadError.value = e?.response?.data?.message || e?.message || 'Error deleting attachment';
+  }
+};
+
+
+const formatFileSize = (bytes) => {
+  if (bytes < 1024) return bytes + ' B';
+  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+  return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+};
+
 const resetModalState = () => {
-  // Limpar campos de formulário
   newLabel.value = '';
   memberSearch.value = '';
   newComment.value = '';
   newChecklistItem.value = '';
+  uploadError.value = '';
+  uploadProgress.value = 0;
+  isUploading.value = false;
+  isDragging.value = false;
+  selectedFiles.value = [];
 };
 
 onMounted(() => {
@@ -887,7 +1250,13 @@ onUnmounted(() => {
 <style scoped>
 
 .comments-list, .activity-section, .checklist-items {
-  max-height: 300px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+
+.attachments-list {
+  max-height: 500px;
   overflow-y: auto;
 }
 

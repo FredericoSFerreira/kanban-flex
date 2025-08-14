@@ -454,6 +454,8 @@ export default {
     assignedMembers: 'Membros Atribuídos',
     searchMembers: 'Buscar membros...',
     attachments: 'Anexos',
+    attachment: 'Anexo',
+    noAttachments: 'Nenhum anexo ainda',
     dragFilesHere: 'Arraste arquivos aqui ou clique para selecionar',
     selectFiles: 'Selecionar Arquivos',
     activity: 'Atividade',
@@ -479,6 +481,7 @@ export default {
       titleRequired: 'Você precisa informar o titulo do card!',
       columnNameRequired: 'Você precisa informar o nome da coluna!',
       descriptionRequired: 'Você precisa informar a descrição do card!',
+      uploadOnlyInEdit: 'Uploads disponíveis somente ao editar um card existente',
     },
     confirmations: {
       removeCard: 'Tem certeza que deseja remover este card?',
