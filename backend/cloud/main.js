@@ -1,7 +1,29 @@
 import {UAParser} from 'ua-parser-js';
 import {verifyTokenParseCloudFunction} from "../middleware/auth.js";
 import {escapeRegex, generateTrackingHistory} from "../utils/utils.js";
+import {callFunction} from "../utils/parse-utils.js";
+import {deleteFileFromS3} from "../service/s3-service.js";
 
+
+async function deleteAttachmentHelper(boardId, itemId, request) {
+
+  const query = new Parse.Query("attachments");
+  query.equalTo("boardId", boardId);
+  query.equalTo("itemId", itemId);
+
+  try {
+    const results = await query.find({useMasterKey: true});
+
+    await Promise.all(
+      results.map(async (obj) => {
+        await deleteFileFromS3(obj.get("url"));
+        await callFunction("deleteAttachment", {attachmentId: obj.id}, request);
+      })
+    );
+  } catch (err) {
+    console.log("Erro ao buscar attachments: " + err.message);
+  }
+}
 
 // Apply JWT validation to all cloud functions
 Parse.Cloud.beforeSave('*', async (request) => {
@@ -279,6 +301,9 @@ Parse.Cloud.define("removeCard", async (request) => {
     }
     columns[columnIndex].itens.splice(cardIndex, 1);
     board.set(`columns.${columnIndex}.itens`, columns[columnIndex].itens);
+
+
+    await deleteAttachmentHelper(boardId, cardId, request)
 
     const result = await board.save(null, {useMasterKey: true});
     return {success: true, result};
@@ -589,11 +614,11 @@ Parse.Cloud.define("getMyBoards", async (request) => {
     const query = new Parse.Query("boards");
 
     // Build match condition
-    const matchCondition = { owner_email: request.params.email };
+    const matchCondition = {owner_email: request.params.email};
 
     // Add search filter if provided
     if (request.params.search) {
-      matchCondition.name = { $regex: escapeRegex(request.params.search), $options: 'i' };
+      matchCondition.name = {$regex: escapeRegex(request.params.search), $options: 'i'};
     }
 
     const pipeline = [
@@ -828,7 +853,7 @@ Parse.Cloud.define("getParticipatingBoards", async (request) => {
 
     // Add search filter if provided
     if (request.params.search) {
-      matchCondition.name = { $regex: escapeRegex(request.params.search), $options: 'i' };
+      matchCondition.name = {$regex: escapeRegex(request.params.search), $options: 'i'};
     }
 
     const pipeline = [
@@ -955,6 +980,186 @@ Parse.Cloud.define("createBoard", async (request) => {
     };
   } catch (error) {
     console.error("Error in createBoard:", error);
+    throw error;
+  }
+});
+
+
+// Attachments Cloud Functions
+Parse.Cloud.define("createAttachment", async (request) => {
+  try {
+    await verifyTokenParseCloudFunction(request);
+    const {attachment} = request.params;
+    if (!attachment || !attachment.userId || !attachment.itemId || !attachment.boardId) {
+      throw new Error("Missing attachment required fields");
+    }
+    const Attachments = Parse.Object.extend("attachments");
+    const obj = new Attachments();
+    const saved = await obj.save({
+      name: attachment.name,
+      url: attachment.url,
+      size: attachment.size,
+      type: attachment.type,
+      isImage: !!attachment.isImage,
+      userId: attachment.userId,
+      boardId: attachment.boardId,
+      itemId: attachment.itemId,
+      createdAt: attachment.createdAt || new Date().toISOString()
+    }, {useMasterKey: true});
+
+    // Increment user's used storage (bytes) in otp collection (best-effort)
+    try {
+      const otpQuery = new Parse.Query("otp");
+      otpQuery.equalTo("objectId", attachment.userId);
+      const otp = await otpQuery.first({useMasterKey: true});
+      if (otp) {
+        const current = otp.get('usedStorage') || 0;
+        otp.set('usedStorage', current + (attachment.size || 0));
+        await otp.save(null, {useMasterKey: true});
+      }
+    } catch (e) {
+      // log but do not fail the main operation
+      console.warn('Failed to update otp usedStorage on createAttachment:', e?.message || e);
+    }
+
+    return {
+      id: saved.id,
+      name: saved.get('name'),
+      url: saved.get('url'),
+      size: saved.get('size'),
+      type: saved.get('type'),
+      isImage: saved.get('isImage'),
+      userId: saved.get('userId'),
+      boardId: saved.get('boardId'),
+      itemId: saved.get('itemId'),
+      createdAt: saved.get('createdAt')
+    };
+  } catch (error) {
+    console.log('Failed to createAttachment:', error.message);
+    throw error;
+  }
+});
+
+Parse.Cloud.define("getAttachment", async (request) => {
+  try {
+    await verifyTokenParseCloudFunction(request);
+    const {attachmentId} = request.params;
+    const Attachments = Parse.Object.extend("attachments");
+    const q = new Parse.Query(Attachments);
+    q.equalTo("objectId", attachmentId);
+    const found = await q.first({useMasterKey: true});
+    if (!found) return null;
+    return {
+      id: found.id,
+      name: found.get('name'),
+      url: found.get('url'),
+      size: found.get('size'),
+      type: found.get('type'),
+      isImage: found.get('isImage'),
+      userId: found.get('userId'),
+      boardId: found.get('boardId'),
+      itemId: found.get('itemId'),
+      createdAt: found.get('createdAt')
+    };
+  } catch (error) {
+    console.log('Failed to getAttachment:', error.message);
+    throw error;
+  }
+});
+
+Parse.Cloud.define("deleteAttachment", async (request) => {
+  try {
+    await verifyTokenParseCloudFunction(request);
+    const {attachmentId} = request.params;
+    const Attachments = Parse.Object.extend("attachments");
+    const q = new Parse.Query(Attachments);
+    q.equalTo("objectId", attachmentId);
+    const found = await q.first({useMasterKey: true});
+    if (!found) return {success: false, notFound: true};
+
+    const ownerId = found.get('userId');
+    if (ownerId !== request.user.id) {
+      throw new Parse.Error(403, 'Not authorized to delete this attachment');
+    }
+
+    const size = found.get('size') || 0;
+    await found.destroy({useMasterKey: true});
+
+    // Decrement user's used storage in otp (best-effort)
+    try {
+      const otpQuery = new Parse.Query("otp");
+      otpQuery.equalTo("objectId", ownerId);
+      const otp = await otpQuery.first({useMasterKey: true});
+      if (otp) {
+        const current = otp.get('usedStorage') || 0;
+        const newVal = Math.max(0, current - size);
+        otp.set('usedStorage', newVal);
+        await otp.save(null, {useMasterKey: true});
+      }
+    } catch (e) {
+      console.warn('Failed to update otp usedStorage on deleteAttachment:', e?.message || e);
+    }
+
+    return {success: true};
+  } catch (error) {
+    console.log('Failed to deleteAttachment:', error.message);
+    throw error;
+  }
+});
+
+Parse.Cloud.define("getUserAttachments", async (request) => {
+  try {
+    await verifyTokenParseCloudFunction(request);
+    const {userId} = request.params;
+    if (!userId || userId !== request.user.id) {
+      throw new Parse.Error(403, 'Not authorized');
+    }
+    const Attachments = Parse.Object.extend("attachments");
+    const q = new Parse.Query(Attachments);
+    q.equalTo('userId', userId);
+    q.descending('_created_at');
+    const results = await q.find({useMasterKey: true});
+    return results.map(a => ({
+      id: a.id,
+      name: a.get('name'),
+      url: a.get('url'),
+      size: a.get('size'),
+      type: a.get('type'),
+      isImage: a.get('isImage'),
+      userId: a.get('userId'),
+      boardId: a.get('boardId'),
+      itemId: a.get('itemId'),
+      createdAt: a.get('createdAt')
+    }));
+  } catch (error) {
+    console.log('Failed to getUserAttachments:', error.message);
+    throw error;
+  }
+});
+
+Parse.Cloud.define("getItemAttachments", async (request) => {
+  try {
+    await verifyTokenParseCloudFunction(request);
+    const {itemId} = request.params;
+    const Attachments = Parse.Object.extend("attachments");
+    const q = new Parse.Query(Attachments);
+    q.equalTo('itemId', itemId);
+    q.descending('_created_at');
+    const results = await q.find({useMasterKey: true});
+    return results.map(a => ({
+      id: a.id,
+      name: a.get('name'),
+      url: a.get('url'),
+      size: a.get('size'),
+      type: a.get('type'),
+      isImage: a.get('isImage'),
+      userId: a.get('userId'),
+      boardId: a.get('boardId'),
+      itemId: a.get('itemId'),
+      createdAt: a.get('createdAt')
+    }));
+  } catch (error) {
+    console.log('Failed to getItemAttachments:', error.message);
     throw error;
   }
 });
