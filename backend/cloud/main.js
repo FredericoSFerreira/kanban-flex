@@ -1,7 +1,29 @@
 import {UAParser} from 'ua-parser-js';
 import {verifyTokenParseCloudFunction} from "../middleware/auth.js";
 import {escapeRegex, generateTrackingHistory} from "../utils/utils.js";
+import {callFunction} from "../utils/parse-utils.js";
+import {deleteFileFromS3} from "../service/s3-service.js";
 
+
+async function deleteAttachmentHelper(boardId, itemId, request) {
+
+  const query = new Parse.Query("attachments");
+  query.equalTo("boardId", boardId);
+  query.equalTo("itemId", itemId);
+
+  try {
+    const results = await query.find({useMasterKey: true});
+
+    await Promise.all(
+      results.map(async (obj) => {
+        await deleteFileFromS3(obj.get("url"));
+        await callFunction("deleteAttachment", {attachmentId: obj.id}, request);
+      })
+    );
+  } catch (err) {
+    console.log("Erro ao buscar attachments: " + err.message);
+  }
+}
 
 // Apply JWT validation to all cloud functions
 Parse.Cloud.beforeSave('*', async (request) => {
@@ -279,6 +301,9 @@ Parse.Cloud.define("removeCard", async (request) => {
     }
     columns[columnIndex].itens.splice(cardIndex, 1);
     board.set(`columns.${columnIndex}.itens`, columns[columnIndex].itens);
+
+
+    await deleteAttachmentHelper(boardId, cardId, request)
 
     const result = await board.save(null, {useMasterKey: true});
     return {success: true, result};
@@ -589,11 +614,11 @@ Parse.Cloud.define("getMyBoards", async (request) => {
     const query = new Parse.Query("boards");
 
     // Build match condition
-    const matchCondition = { owner_email: request.params.email };
+    const matchCondition = {owner_email: request.params.email};
 
     // Add search filter if provided
     if (request.params.search) {
-      matchCondition.name = { $regex: escapeRegex(request.params.search), $options: 'i' };
+      matchCondition.name = {$regex: escapeRegex(request.params.search), $options: 'i'};
     }
 
     const pipeline = [
@@ -828,7 +853,7 @@ Parse.Cloud.define("getParticipatingBoards", async (request) => {
 
     // Add search filter if provided
     if (request.params.search) {
-      matchCondition.name = { $regex: escapeRegex(request.params.search), $options: 'i' };
+      matchCondition.name = {$regex: escapeRegex(request.params.search), $options: 'i'};
     }
 
     const pipeline = [
@@ -964,7 +989,7 @@ Parse.Cloud.define("createBoard", async (request) => {
 Parse.Cloud.define("createAttachment", async (request) => {
   try {
     await verifyTokenParseCloudFunction(request);
-    const { attachment } = request.params;
+    const {attachment} = request.params;
     if (!attachment || !attachment.userId || !attachment.itemId || !attachment.boardId) {
       throw new Error("Missing attachment required fields");
     }
@@ -980,17 +1005,17 @@ Parse.Cloud.define("createAttachment", async (request) => {
       boardId: attachment.boardId,
       itemId: attachment.itemId,
       createdAt: attachment.createdAt || new Date().toISOString()
-    }, { useMasterKey: true });
+    }, {useMasterKey: true});
 
     // Increment user's used storage (bytes) in otp collection (best-effort)
     try {
       const otpQuery = new Parse.Query("otp");
       otpQuery.equalTo("objectId", attachment.userId);
-      const otp = await otpQuery.first({ useMasterKey: true });
+      const otp = await otpQuery.first({useMasterKey: true});
       if (otp) {
         const current = otp.get('usedStorage') || 0;
         otp.set('usedStorage', current + (attachment.size || 0));
-        await otp.save(null, { useMasterKey: true });
+        await otp.save(null, {useMasterKey: true});
       }
     } catch (e) {
       // log but do not fail the main operation
@@ -1018,11 +1043,11 @@ Parse.Cloud.define("createAttachment", async (request) => {
 Parse.Cloud.define("getAttachment", async (request) => {
   try {
     await verifyTokenParseCloudFunction(request);
-    const { attachmentId } = request.params;
+    const {attachmentId} = request.params;
     const Attachments = Parse.Object.extend("attachments");
     const q = new Parse.Query(Attachments);
     q.equalTo("objectId", attachmentId);
-    const found = await q.first({ useMasterKey: true });
+    const found = await q.first({useMasterKey: true});
     if (!found) return null;
     return {
       id: found.id,
@@ -1045,12 +1070,12 @@ Parse.Cloud.define("getAttachment", async (request) => {
 Parse.Cloud.define("deleteAttachment", async (request) => {
   try {
     await verifyTokenParseCloudFunction(request);
-    const { attachmentId } = request.params;
+    const {attachmentId} = request.params;
     const Attachments = Parse.Object.extend("attachments");
     const q = new Parse.Query(Attachments);
     q.equalTo("objectId", attachmentId);
-    const found = await q.first({ useMasterKey: true });
-    if (!found) return { success: false, notFound: true };
+    const found = await q.first({useMasterKey: true});
+    if (!found) return {success: false, notFound: true};
 
     const ownerId = found.get('userId');
     if (ownerId !== request.user.id) {
@@ -1058,24 +1083,24 @@ Parse.Cloud.define("deleteAttachment", async (request) => {
     }
 
     const size = found.get('size') || 0;
-    await found.destroy({ useMasterKey: true });
+    await found.destroy({useMasterKey: true});
 
     // Decrement user's used storage in otp (best-effort)
     try {
       const otpQuery = new Parse.Query("otp");
       otpQuery.equalTo("objectId", ownerId);
-      const otp = await otpQuery.first({ useMasterKey: true });
+      const otp = await otpQuery.first({useMasterKey: true});
       if (otp) {
         const current = otp.get('usedStorage') || 0;
         const newVal = Math.max(0, current - size);
         otp.set('usedStorage', newVal);
-        await otp.save(null, { useMasterKey: true });
+        await otp.save(null, {useMasterKey: true});
       }
     } catch (e) {
       console.warn('Failed to update otp usedStorage on deleteAttachment:', e?.message || e);
     }
 
-    return { success: true };
+    return {success: true};
   } catch (error) {
     console.log('Failed to deleteAttachment:', error.message);
     throw error;
@@ -1085,7 +1110,7 @@ Parse.Cloud.define("deleteAttachment", async (request) => {
 Parse.Cloud.define("getUserAttachments", async (request) => {
   try {
     await verifyTokenParseCloudFunction(request);
-    const { userId } = request.params;
+    const {userId} = request.params;
     if (!userId || userId !== request.user.id) {
       throw new Parse.Error(403, 'Not authorized');
     }
@@ -1093,7 +1118,7 @@ Parse.Cloud.define("getUserAttachments", async (request) => {
     const q = new Parse.Query(Attachments);
     q.equalTo('userId', userId);
     q.descending('_created_at');
-    const results = await q.find({ useMasterKey: true });
+    const results = await q.find({useMasterKey: true});
     return results.map(a => ({
       id: a.id,
       name: a.get('name'),
@@ -1115,12 +1140,12 @@ Parse.Cloud.define("getUserAttachments", async (request) => {
 Parse.Cloud.define("getItemAttachments", async (request) => {
   try {
     await verifyTokenParseCloudFunction(request);
-    const { itemId } = request.params;
+    const {itemId} = request.params;
     const Attachments = Parse.Object.extend("attachments");
     const q = new Parse.Query(Attachments);
     q.equalTo('itemId', itemId);
     q.descending('_created_at');
-    const results = await q.find({ useMasterKey: true });
+    const results = await q.find({useMasterKey: true});
     return results.map(a => ({
       id: a.id,
       name: a.get('name'),

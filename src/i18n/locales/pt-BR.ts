@@ -486,6 +486,7 @@ export default {
     confirmations: {
       removeCard: 'Tem certeza que deseja remover este card?',
       removeColumn: 'Tem certeza que deseja remover esta coluna?',
+      removeAttachment: 'Tem certeza que deseja remover este anexo?',
       yes: 'Sim',
       no: 'Não'
     },

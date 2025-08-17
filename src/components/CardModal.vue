@@ -552,7 +552,9 @@
                                   </div>
 
                                   <div class="flex-grow-1">
-                                    <h6 class="mb-1">{{ attachment.name }}</h6>
+                                    <h6 class="mb-1 text-ellipsis" :title="attachment.name">
+                                      {{ attachment.name }}
+                                    </h6>
                                     <div class="d-flex align-items-center text-muted small">
                                       <span class="me-2">{{ formatFileSize(attachment.size) }}</span>
                                       <span>{{ formatDate(attachment.createdAt) }}</span>
@@ -671,7 +673,9 @@ import {uniqueId} from "@/utils/uuid";
 import {configDefault} from "@/utils/templates";
 import api from '@/utils/api';
 import {useRoute} from 'vue-router';
+import {useSwal} from "@/utils/swal";
 
+const $swal = useSwal();
 const auth = useAuthStore();
 const {t, locale} = useI18n();
 const route = useRoute();
@@ -1187,20 +1191,31 @@ const downloadAttachment = async (attachmentId) => {
 };
 
 const removeAttachment = async (attachmentId) => {
-  try {
-    await api.delete(`/attachments/${attachmentId}`);
-    const index = props.cardData.attachments.findIndex(attachment => attachment.id === attachmentId);
-    if (index !== -1) {
-      // If the attachment has a temporary URL, revoke it to free up memory
-      if (typeof props.cardData.attachments[index].url === 'string' && props.cardData.attachments[index].url.startsWith('blob:')) {
-        URL.revokeObjectURL(props.cardData.attachments[index].url);
+  $swal.fire({
+    title: t('boardV2.confirmations.removeAttachment'),
+    icon: "question",
+    showDenyButton: true,
+    showCancelButton: false,
+    confirmButtonText: t('boardV2.confirmations.yes'),
+    denyButtonText: t('boardV2.confirmations.no')
+  }).then(async (result) => {
+    if (result.isConfirmed) {
+      try {
+        await api.delete(`/attachments/${attachmentId}`);
+        const index = props.cardData.attachments.findIndex(attachment => attachment.id === attachmentId);
+        if (index !== -1) {
+          // If the attachment has a temporary URL, revoke it to free up memory
+          if (typeof props.cardData.attachments[index].url === 'string' && props.cardData.attachments[index].url.startsWith('blob:')) {
+            URL.revokeObjectURL(props.cardData.attachments[index].url);
+          }
+          props.cardData.attachments.splice(index, 1);
+        }
+      } catch (e) {
+        console.error('Error deleting attachment:', e);
+        uploadError.value = e?.response?.data?.message || e?.message || 'Error deleting attachment';
       }
-      props.cardData.attachments.splice(index, 1);
     }
-  } catch (e) {
-    console.error('Error deleting attachment:', e);
-    uploadError.value = e?.response?.data?.message || e?.message || 'Error deleting attachment';
-  }
+  });
 };
 
 
@@ -1489,5 +1504,14 @@ onUnmounted(() => {
 
 :deep(.dark-mode) .tab-content::-webkit-scrollbar-thumb:hover {
   background: #5a5a5a;
+}
+
+.text-ellipsis {
+  display: inline-block;     /* ou block/flex item */
+  max-width: 200px;          /* defina um limite fixo ou relativo */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: middle;    /* opcional, deixa alinhado */
 }
 </style>

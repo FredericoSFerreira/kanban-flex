@@ -589,18 +589,14 @@ export default {
           'You need to provide the column name!',
         descriptionRequired: 'You need to provide the card description!',
         uploadOnlyInEdit: 'Uploads are only available when editing an existing card',
-      }
-    ,
+      },
     confirmations: {
       removeCard: 'Are you sure you want to remove this card?',
-      removeColumn:
-        'Are you sure you want to remove this column?',
-      yes:
-        'Yes',
-      no:
-        'No'
-    }
-    ,
+      removeColumn: 'Are you sure you want to remove this column?',
+      removeAttachment: 'Are you sure you want to remove this attachment?',
+      yes: 'Yes',
+      no: 'No'
+    },
     notifications: {
       alreadyLiked: 'You already liked this card!',
       alreadyDisliked:
