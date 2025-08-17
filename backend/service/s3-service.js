@@ -39,7 +39,6 @@ export const uploadFileToS3 = async (fileBuffer, fileName, contentType) => {
       ContentType: contentType
     };
 
-    console.log(params, "HERER")
 
     // Upload the file
     const command = new PutObjectCommand(params);

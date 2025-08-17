@@ -7,9 +7,9 @@
           <div class="d-flex align-items-center">
             <div>
               <h4 class="modal-title mb-0">{{ isEditing ? t('boardV2.editCard') : t('boardV2.newCard') }}</h4>
-              <small class="text-muted">{{
-                  isEditing ? t('boardV2.editCardDescription') : t('boardV2.newCardDescription')
-                }}</small>
+<!--              <small class="text-muted">{{-->
+<!--                  isEditing ? t('boardV2.editCardDescription') : t('boardV2.newCardDescription')-->
+<!--                }}</small>-->
 
             </div>
           </div>
@@ -44,7 +44,7 @@
                   </label>
                   <textarea
                     class="form-control"
-                    rows="7"
+                    rows="6"
                     v-model="cardData.description"
                     :placeholder="$t('boardV2.descriptionPlaceholder')"
                   ></textarea>
@@ -206,6 +206,7 @@
                     {{ $t('boardV2.attachments') }}
                   </label>
                   <div
+                    @click="triggerFileInput"
                     class="attachment-area border border-dashed rounded p-3 text-center"
                     @dragover.prevent="onDragOver"
                     @dragleave.prevent="onDragLeave"
@@ -220,11 +221,11 @@
                       class="d-none"
                       accept=".jpg,.jpeg,.png,.webp,.pdf,.doc,.docx,.xlsx"
                     />
-                    <Upload size="32" class="text-muted mb-2"/>
+                    <Upload size="25" class="text-muted mb-2"/>
                     <p class="text-muted mb-2">{{ $t('boardV2.dragFilesHere') }}</p>
-                    <button type="button" class="btn btn-outline-primary btn-sm" @click="triggerFileInput">
-                      {{ $t('boardV2.selectFiles') }}
-                    </button>
+<!--                    <button type="button" class="btn btn-outline-primary btn-sm" @click="triggerFileInput">-->
+<!--                      {{ $t('boardV2.selectFiles') }}-->
+<!--                    </button>-->
                     <div v-if="uploadError" class="alert alert-danger mt-2">
                       {{ uploadError }}
                     </div>
@@ -479,45 +480,44 @@
                   <!-- Attachments Tab -->
                   <div v-if="isEditing && activeTab === 'attachments'" class="tab-pane active">
                     <div class="attachments-section">
-                      <!-- Add Attachment -->
-                      <!--                      <div class="add-attachment mb-4">-->
-                      <!--                        <div class="attachment-area border border-dashed rounded p-3 text-center"-->
-                      <!--                             @dragover.prevent="onDragOver"-->
-                      <!--                             @dragleave.prevent="onDragLeave"-->
-                      <!--                             @drop.prevent="onFileDrop"-->
-                      <!--                             :class="{ 'drag-over': isDragging }">-->
-                      <!--                          <input-->
-                      <!--                            type="file"-->
-                      <!--                            ref="fileInput"-->
-                      <!--                            @change="onFileSelected"-->
-                      <!--                            multiple-->
-                      <!--                            class="d-none"-->
-                      <!--                            accept=".jpg,.jpeg,.png,.webp,.pdf,.doc,.docx,.xlsx"-->
-                      <!--                          />-->
-                      <!--                          <Upload size="32" class="text-muted mb-2"/>-->
-                      <!--                          <p class="text-muted mb-2">{{ $t('boardV2.dragFilesHere') }}</p>-->
-                      <!--                          <button type="button" class="btn btn-outline-primary btn-sm" @click="triggerFileInput">-->
-                      <!--                            {{ $t('boardV2.selectFiles') }}-->
-                      <!--                          </button>-->
-                      <!--                        </div>-->
-                      <!--                        <div v-if="uploadError" class="alert alert-danger mt-2">-->
-                      <!--                          {{ uploadError }}-->
-                      <!--                        </div>-->
-                      <!--                        <div v-if="isUploading" class="mt-3">-->
-                      <!--                          <div class="progress">-->
-                      <!--                            <div-->
-                      <!--                              class="progress-bar"-->
-                      <!--                              role="progressbar"-->
-                      <!--                              :style="{ width: `${uploadProgress}%` }"-->
-                      <!--                              :aria-valuenow="uploadProgress"-->
-                      <!--                              aria-valuemin="0"-->
-                      <!--                              aria-valuemax="100"-->
-                      <!--                            >-->
-                      <!--                              {{ uploadProgress }}%-->
-                      <!--                            </div>-->
-                      <!--                          </div>-->
-                      <!--                        </div>-->
-                      <!--                      </div>-->
+<!--                      <div class="add-attachment mb-4">-->
+<!--                        <div class="attachment-area border border-dashed rounded p-3 text-center"-->
+<!--                             @dragover.prevent="onDragOver"-->
+<!--                             @dragleave.prevent="onDragLeave"-->
+<!--                             @drop.prevent="onFileDrop"-->
+<!--                             :class="{ 'drag-over': isDragging }">-->
+<!--                          <input-->
+<!--                            type="file"-->
+<!--                            ref="fileInput"-->
+<!--                            @change="onFileSelected"-->
+<!--                            multiple-->
+<!--                            class="d-none"-->
+<!--                            accept=".jpg,.jpeg,.png,.webp,.pdf,.doc,.docx,.xlsx"-->
+<!--                          />-->
+<!--                          <Upload size="32" class="text-muted mb-2"/>-->
+<!--                          <p class="text-muted mb-2">{{ $t('boardV2.dragFilesHere') }}</p>-->
+<!--                          <button type="button" class="btn btn-outline-primary btn-sm" @click="triggerFileInput">-->
+<!--                            {{ $t('boardV2.selectFiles') }}-->
+<!--                          </button>-->
+<!--                        </div>-->
+<!--                        <div v-if="uploadError" class="alert alert-danger mt-2">-->
+<!--                          {{ uploadError }}-->
+<!--                        </div>-->
+<!--                        <div v-if="isUploading" class="mt-3">-->
+<!--                          <div class="progress">-->
+<!--                            <div-->
+<!--                              class="progress-bar"-->
+<!--                              role="progressbar"-->
+<!--                              :style="{ width: `${uploadProgress}%` }"-->
+<!--                              :aria-valuenow="uploadProgress"-->
+<!--                              aria-valuemin="0"-->
+<!--                              aria-valuemax="100"-->
+<!--                            >-->
+<!--                              {{ uploadProgress }}%-->
+<!--                            </div>-->
+<!--                          </div>-->
+<!--                        </div>-->
+<!--                      </div>-->
 
                       <!-- Attachments List -->
                       <div class="attachments-list">
@@ -527,13 +527,13 @@
                           <p>{{ $t('boardV2.noAttachments') || 'No attachments yet' }}</p>
                         </div>
                         <div v-else>
-                          <h6 class="mb-3">{{ cardData?.attachments?.length }}
-                            {{
-                              cardData?.attachments?.length === 1 ? $t('boardV2.attachment') : $t('boardV2.attachments')
-                            }}</h6>
+<!--                          <h6 class="mb-3">{{ cardData?.attachments?.length }}-->
+<!--                            {{-->
+<!--                              cardData?.attachments?.length === 1 ? $t('boardV2.attachment') : $t('boardV2.attachments')-->
+<!--                            }}</h6>-->
 
                           <div v-for="attachment in cardData.attachments" :key="attachment.id"
-                               class="attachment-item mb-3">
+                               class="attachment-item mb-2">
                             <div class="card">
                               <div class="card-body p-3">
                                 <div class="d-flex align-items-center">
@@ -1265,13 +1265,13 @@ onUnmounted(() => {
 <style scoped>
 
 .comments-list, .activity-section, .checklist-items {
-  max-height: 400px;
+  max-height: 350px;
   overflow-y: auto;
 }
 
 
 .attachments-list {
-  max-height: 500px;
+  max-height: 460px;
   overflow-y: auto;
 }
 
@@ -1507,11 +1507,11 @@ onUnmounted(() => {
 }
 
 .text-ellipsis {
-  display: inline-block;     /* ou block/flex item */
-  max-width: 200px;          /* defina um limite fixo ou relativo */
+  display: inline-block; /* ou block/flex item */
+  max-width: 200px; /* defina um limite fixo ou relativo */
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  vertical-align: middle;    /* opcional, deixa alinhado */
+  vertical-align: middle; /* opcional, deixa alinhado */
 }
 </style>
