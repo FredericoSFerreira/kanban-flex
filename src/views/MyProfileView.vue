@@ -171,6 +171,59 @@
             </table>
           </div>
         </div>
+        <div v-if="activeTab === 'plan'" class="plan-tab">
+          <div class="row">
+            <div class="col-md-8">
+              <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body p-4">
+                  <div class="d-flex align-items-center mb-4">
+                    <CreditCard :size="24" class="text-primary me-3"/>
+                    <div>
+                      <h5 class="mb-1">{{ $t('myProfile.freePlan') }}</h5>
+                      <p class="text-muted mb-0">{{ $t('myProfile.freePlanDescription') }}</p>
+                    </div>
+                  </div>
+
+                  <div class="mb-4">
+                    <h6 class="mb-3">{{ $t('myProfile.storageUsage') }}</h6>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                      <span class="text-muted">{{ formatBytes(limitUploadUsed) }} / {{ formatBytes(limitMaxUpload) }}</span>
+                      <span class="badge bg-primary">{{ storagePercentage.toFixed(1) }}%</span>
+                    </div>
+                    <div class="progress" style="height: 8px;">
+                      <div
+                        class="progress-bar bg-primary"
+                        role="progressbar"
+                        :style="{ width: `${storagePercentage}%` }"
+                        :aria-valuenow="storagePercentage"
+                        aria-valuemin="0"
+                        aria-valuemax="100"
+                      ></div>
+                    </div>
+                    <small class="text-muted mt-1 d-block">
+                      {{ $t('myProfile.storageRemaining') }} {{ formatBytes(limitMaxUpload - limitUploadUsed) }}
+                    </small>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-4">
+              <div class="card border-0 shadow-sm">
+                <div class="card-body p-4 text-center">
+                  <h6 class="mb-3">{{ $t('myProfile.upgradePlan') }}</h6>
+                  <p class="text-muted small">
+                    {{ $t('myProfile.upgradeDescription') }}
+                  </p>
+                  <button class="btn btn-outline-primary btn-sm" disabled>
+                    {{ $t('myProfile.comingSoon') }}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -183,7 +236,8 @@ import {
   User,
   Globe,
   Monitor,
-  MapPin
+  MapPin,
+  CreditCard
 } from 'lucide-vue-next';
 import {useAuthStore} from '@/stores/auth'
 import api from "@/utils/api";
@@ -218,12 +272,34 @@ const inputPhone = (_: string, phoneObj: PhoneType) => {
   Object.assign(phoneObject, phoneObj);
 };
 
+const fetchUserData = async () => {
+  try {
+    const response = await api.get('/user/me');
+    const userData = response.data;
+
+    // Update storage data with values from backend (in bytes)
+    limitMaxUpload.value = userData.limitStorage || 0;
+    limitUploadUsed.value = userData.usedStorage || 0;
+  } catch (error) {
+    console.error('Error fetching user data:', error);
+    // Keep default values if API fails
+  }
+};
+
 onMounted(() => {
   showSpinner.value = true;
-  api.get('/access-logs').then(res => {
-    accessLogs.value = res.data
+
+  // Fetch both access logs and user data
+  Promise.all([
+    api.get('/access-logs'),
+    fetchUserData()
+  ]).then(([logsResponse]) => {
+    accessLogs.value = logsResponse.data;
     showSpinner.value = false;
-  })
+  }).catch(error => {
+    console.error('Error loading profile data:', error);
+    showSpinner.value = false;
+  });
 })
 
 
@@ -245,6 +321,7 @@ const isValidForm = computed(() => {
 const tabs = [
   {id: 'profile', name: 'myProfile.profile', icon: User},
   {id: 'logs', name: 'myProfile.accessLogs', icon: Layout},
+  {id: 'plan', name: 'myProfile.myPlan', icon: CreditCard},
 ];
 
 const defaultCountry = computed(() => {
@@ -252,6 +329,31 @@ const defaultCountry = computed(() => {
 });
 
 const activeTab = ref('profile');
+
+// Storage data from backend (in bytes)
+const limitMaxUpload = ref(0); // Storage limit in bytes
+const limitUploadUsed = ref(0); // Storage used in bytes
+
+const storagePercentage = computed(() => {
+  if (limitMaxUpload.value === 0) return 0;
+  return (limitUploadUsed.value / limitMaxUpload.value) * 100;
+});
+
+const formatBytes = (bytes: number) => {
+  if (bytes === 0) return '0 B';
+
+  const k = 1024;
+  const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+  if (i >= 3) { // GB or larger
+    return `${(bytes / Math.pow(k, i)).toFixed(1)} ${sizes[i]}`;
+  } else if (i >= 2) { // MB
+    return `${(bytes / Math.pow(k, i)).toFixed(0)} ${sizes[i]}`;
+  } else {
+    return `${(bytes / Math.pow(k, i)).toFixed(0)} ${sizes[i]}`;
+  }
+};
 
 const saveProfile = () => {
   showSpinner.value = true;

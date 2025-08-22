@@ -399,6 +399,7 @@ export default {
   myProfile: {
     accessLogs: 'Logs de Acesso',
     profile: 'Meu Perfil',
+    myPlan: 'Meu Plano',
     register: 'Cadastro',
     login: 'Login',
     accept: 'Concordo com os temos da',
@@ -413,7 +414,18 @@ export default {
     cancel: 'Cancelar',
     confirmDeleteBtn: 'Excluir Conta',
     accountDeactivated: 'Sua conta foi desativada com sucesso.',
-    errorDeactivating: 'Erro ao desativar sua conta. Por favor, tente novamente.'
+    errorDeactivating: 'Erro ao desativar sua conta. Por favor, tente novamente.',
+    freePlan: 'Plano Gratuito',
+    freePlanDescription: 'Plano básico com recursos limitados',
+    storageUsage: 'Uso do Armazenamento',
+    storageRemaining: 'Restante:',
+    planFeatures: 'Recursos do Plano',
+    feature1: '1GB de armazenamento',
+    feature2: 'Acesso básico aos recursos',
+    feature3: 'Suporte por email',
+    upgradePlan: 'Atualizar Plano',
+    upgradeDescription: 'Obtenha mais espaço e recursos com nossos planos premium.',
+    comingSoon: 'Em Breve'
   },
   boardV2: {
     statistics: 'Estatísticas',
