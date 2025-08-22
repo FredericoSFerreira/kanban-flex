@@ -31,4 +31,19 @@ const updateUser = async (req, res) => {
   }
 };
 
-export { updateUser };
+const getUserMe = async (req, res) => {
+  try {
+    const userData = await callFunction("getUserMe", {
+      id: req.user.id,
+    }, req.token);
+
+    res.status(200);
+    res.json(userData);
+  } catch (e) {
+    console.log("Occurred error in get user data", e);
+    res.status(500);
+    res.send("Occurred error in get user data");
+  }
+};
+
+export { updateUser, getUserMe };

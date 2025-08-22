@@ -105,5 +105,67 @@ describe('User Endpoint', () => {
 
   });
 
+  describe('GET /user/me', () => {
+    it('should return 200 with user data when authenticated', async () => {
+      const mockUserData = {
+        id: 'mock-user-id',
+        name: 'Mock User',
+        email: 'mock@example.com',
+        phone: '1234567890',
+        avatar: 'https://example.com/avatar.jpg',
+        active: true
+      };
+
+      mockCallFunction.mockResolvedValue(mockUserData);
+
+      const response = await request(app)
+        .get('/user/me')
+        .set('Authorization', 'Bearer fake-token');
+
+      expect(response.status).toBe(200);
+      expect(response.body).toEqual(mockUserData);
+      expect(mockCallFunction).toHaveBeenCalledWith(
+        'getUserMe',
+        { id: 'mock-user-id' },
+        'fake-token'
+      );
+    });
+
+    it('should return 401 when not authenticated', async () => {
+      const response = await request(app)
+        .get('/user/me');
+
+      expect(response.status).toBe(401);
+      expect(response.body).toHaveProperty('msg', 'Token not pass');
+      expect(mockCallFunction).not.toHaveBeenCalled();
+    });
+
+    it('should return 401 when token is invalid', async () => {
+      const response = await request(app)
+        .get('/user/me')
+        .set('Authorization', 'Invalid token');
+
+      expect(response.status).toBe(401);
+      expect(response.body).toHaveProperty('msg', 'Token not pass');
+      expect(mockCallFunction).not.toHaveBeenCalled();
+    });
+
+    it('should return 500 when an error occurs in cloud function', async () => {
+      mockCallFunction.mockRejectedValue(new Error('User not found'));
+
+      const response = await request(app)
+        .get('/user/me')
+        .set('Authorization', 'Bearer fake-token');
+
+      expect(response.status).toBe(500);
+      expect(response.text).toBe('Occurred error in get user data');
+      expect(mockCallFunction).toHaveBeenCalledWith(
+        'getUserMe',
+        { id: 'mock-user-id' },
+        'fake-token'
+      );
+    });
+  });
+
 
 });

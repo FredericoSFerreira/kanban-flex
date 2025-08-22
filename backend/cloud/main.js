@@ -707,6 +707,40 @@ Parse.Cloud.define("updateUserOtp", async (request) => {
   });
 });
 
+Parse.Cloud.define("getUserMe", async (request) => {
+  try {
+    // Validate JWT token
+    await verifyTokenParseCloudFunction(request);
+
+    const query = new Parse.Query("otp");
+    query.equalTo("objectId", request.params.id);
+    const user = await query.first();
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    if (user.id !== request.params.id) {
+      throw new Error("Invalid access to user data");
+    }
+
+    // Return the required fields: name, email, phone, avatar, and profile data
+    return {
+      id: user.id,
+      name: user.get('name'),
+      email: user.get('email'),
+      phone: user.get('phone'),
+      avatar: user.get('avatar'),
+      active: user.get('active'),
+      usedStorage: user.get('usedStorage'),
+      limitStorage: user.get('limitStorage'),
+    };
+  } catch (error) {
+    console.log('Failed to get user data, with error code: ' + error.message);
+    throw error;
+  }
+});
+
 
 Parse.Cloud.define("getBoardStats", async (request) => {
   // Validate JWT token

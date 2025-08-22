@@ -485,6 +485,7 @@ export default {
     accessLogs: 'Access Logs',
     profile:
       'My Profile',
+    myPlan: 'My Plan',
     register:
       'Register',
     login:
@@ -514,7 +515,18 @@ export default {
     accountDeactivated:
       'Your account has been deactivated successfully.',
     errorDeactivating:
-      'Error deactivating your account. Please try again.'
+      'Error deactivating your account. Please try again.',
+    freePlan: 'Free Plan',
+    freePlanDescription: 'Basic plan with limited features',
+    storageUsage: 'Storage Usage',
+    storageRemaining: 'Remaining:',
+    planFeatures: 'Plan Features',
+    feature1: '1GB storage',
+    feature2: 'Basic access to resources',
+    feature3: 'Email support',
+    upgradePlan: 'Upgrade Plan',
+    upgradeDescription: 'Get more space and features with our premium plans.',
+    comingSoon: 'Coming Soon'
   }
   ,
   boardV2: {
