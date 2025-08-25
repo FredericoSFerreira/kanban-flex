@@ -127,7 +127,7 @@ const deleteAttachment = async (req, res) => {
     }
 
     await deleteFileFromS3(attachment.url);
-    await callFunction('deleteAttachment', {attachmentId}, {...req.token});
+    await callFunction('deleteAttachment', {attachmentId}, req.token);
 
     res.status(200).json({
       success: true,
