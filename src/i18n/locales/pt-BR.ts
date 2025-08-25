@@ -425,7 +425,47 @@ export default {
     feature3: 'Suporte por email',
     upgradePlan: 'Atualizar Plano',
     upgradeDescription: 'Obtenha mais espaço e recursos com nossos planos premium.',
-    comingSoon: 'Em Breve'
+    comingSoon: 'Em Breve',
+    manageFiles: 'Gerenciar Arquivos',
+    viewAllFiles: 'Ver Todos os Arquivos',
+    manageFilesDescription: 'Visualize, baixe ou remova seus arquivos enviados'
+  },
+  myAttachments: {
+    title: 'Meus Arquivos',
+    backToProfile: 'Voltar ao Perfil',
+    fileName: 'Nome do Arquivo',
+    fileType: 'Tipo',
+    fileSize: 'Tamanho',
+    uploadDate: 'Data de Upload',
+    actions: 'Ações',
+    storageUsed: 'Armazenamento Usado',
+    attachedToBoard: 'Anexado ao quadro',
+    downloadStarted: 'Download iniciado',
+    deleteSuccess: 'Arquivo removido com sucesso',
+    search: {
+      placeholder: 'Buscar arquivos...',
+      noResults: 'Nenhum arquivo encontrado',
+      noResultsDesc: 'Nenhum arquivo corresponde à sua busca por "{query}". Tente um termo diferente.',
+      showAll: 'Mostrar Todos os Arquivos',
+      results: 'Mostrando {count} arquivo(s) para "{query}"'
+    },
+    emptyState: {
+      title: 'Nenhum arquivo ainda',
+      description: 'Você ainda não enviou nenhum arquivo. Os arquivos enviados nos quadros aparecerão aqui.'
+    },
+    deleteModal: {
+      title: 'Remover Arquivo',
+      message: 'Tem certeza que deseja remover "{fileName}"?',
+      warning: 'Esta ação não pode ser desfeita!',
+      cancel: 'Cancelar',
+      confirm: 'Remover Arquivo'
+    },
+    errors: {
+      loadFailed: 'Erro ao carregar arquivos',
+      searchFailed: 'Erro ao buscar arquivos',
+      downloadFailed: 'Erro ao baixar arquivo',
+      deleteFailed: 'Erro ao remover arquivo'
+    }
   },
   boardV2: {
     statistics: 'Estatísticas',

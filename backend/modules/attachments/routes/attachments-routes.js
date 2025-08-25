@@ -1,6 +1,6 @@
 import express from 'express';
 import multer from 'multer';
-import { uploadFile, getItemAttachments, deleteAttachment, getUserUploadSize, downloadAttachment } from '../controllers/attachments-controller.js';
+import { uploadFile, getItemAttachments, deleteAttachment, getUserUploadSize, downloadAttachment, getUserAttachments } from '../controllers/attachments-controller.js';
 import { verifyToken } from '../../../middleware/auth.js';
 
 // Configure multer for memory storage
@@ -22,5 +22,8 @@ attachmentsRouter.get('/attachments/:attachmentId/download', verifyToken, downlo
 
 // Get user's total upload size
 attachmentsRouter.get('/attachments/user/size', verifyToken, getUserUploadSize);
+
+// Get user's attachments with optional search
+attachmentsRouter.get('/attachments/user', verifyToken, getUserAttachments);
 
 export default attachmentsRouter;

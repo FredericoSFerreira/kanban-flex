@@ -230,4 +230,33 @@ const downloadAttachment = async (req, res) => {
   }
 }
 
-export {uploadFile, getItemAttachments, deleteAttachment, getUserUploadSize, downloadAttachment};
+/**
+ * Get all user's attachments with optional search
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ */
+const getUserAttachments = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { search } = req.query;
+
+    // Get user's attachments with optional search
+    const attachments = await callFunction('getUserAttachments', {
+      userId,
+      search: search || undefined
+    }, req.token);
+
+    res.status(200).json({
+      success: true,
+      attachments
+    });
+  } catch (error) {
+    console.error('Error getting user attachments:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error getting user attachments'
+    });
+  }
+};
+
+export {uploadFile, getItemAttachments, deleteAttachment, getUserUploadSize, downloadAttachment, getUserAttachments};

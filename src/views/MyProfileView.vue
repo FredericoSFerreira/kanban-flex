@@ -205,6 +205,19 @@
                     </small>
                   </div>
 
+                  <div class="border-top pt-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                      <h6 class="mb-0">{{ $t('myProfile.manageFiles') }}</h6>
+                      <router-link to="/my-attachments" class="btn btn-outline-primary btn-sm">
+                        <FileText :size="16" class="me-1"/>
+                        {{ $t('myProfile.viewAllFiles') }}
+                      </router-link>
+                    </div>
+                    <small class="text-muted">
+                      {{ $t('myProfile.manageFilesDescription') }}
+                    </small>
+                  </div>
+
                 </div>
               </div>
             </div>
@@ -237,7 +250,8 @@ import {
   Globe,
   Monitor,
   MapPin,
-  CreditCard
+  CreditCard,
+  FileText
 } from 'lucide-vue-next';
 import {useAuthStore} from '@/stores/auth'
 import api from "@/utils/api";

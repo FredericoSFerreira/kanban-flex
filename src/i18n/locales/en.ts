@@ -526,7 +526,48 @@ export default {
     feature3: 'Email support',
     upgradePlan: 'Upgrade Plan',
     upgradeDescription: 'Get more space and features with our premium plans.',
-    comingSoon: 'Coming Soon'
+    comingSoon: 'Coming Soon',
+    manageFiles: 'Manage Files',
+    viewAllFiles: 'View All Files',
+    manageFilesDescription: 'View, download or remove your uploaded files'
+  }
+  ,
+  myAttachments: {
+    title: 'My Files',
+    backToProfile: 'Back to Profile',
+    fileName: 'File Name',
+    fileType: 'Type',
+    fileSize: 'Size',
+    uploadDate: 'Upload Date',
+    actions: 'Actions',
+    storageUsed: 'Storage Used',
+    attachedToBoard: 'Attached to board',
+    downloadStarted: 'Download started',
+    deleteSuccess: 'File removed successfully',
+    search: {
+      placeholder: 'Search files...',
+      noResults: 'No files found',
+      noResultsDesc: 'No files match your search for "{query}". Try a different search term.',
+      showAll: 'Show All Files',
+      results: 'Showing {count} file(s) for "{query}"'
+    },
+    emptyState: {
+      title: 'No files yet',
+      description: 'You haven\'t uploaded any files yet. Files uploaded in boards will appear here.'
+    },
+    deleteModal: {
+      title: 'Remove File',
+      message: 'Are you sure you want to remove "{fileName}"?',
+      warning: 'This action cannot be undone!',
+      cancel: 'Cancel',
+      confirm: 'Remove File'
+    },
+    errors: {
+      loadFailed: 'Error loading files',
+      searchFailed: 'Error searching files',
+      downloadFailed: 'Error downloading file',
+      deleteFailed: 'Error removing file'
+    }
   }
   ,
   boardV2: {
