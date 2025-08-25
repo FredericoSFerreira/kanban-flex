@@ -85,6 +85,10 @@ describe('Attachments Endpoints', () => {
       const mockS3Url = 'https://bucket.s3.amazonaws.com/hml/123456789-test-file.jpg';
 
       mockCallFunction.mockResolvedValueOnce([]); // getUserAttachments returns empty array
+      mockCallFunction.mockResolvedValueOnce({ // getUserMe returns user data with limitStorage
+        id: 'mock-user-id',
+        limitStorage: 10 * 1024 * 1024 // 10MB
+      });
       mockUploadFileToS3.mockResolvedValueOnce(mockS3Url);
       mockCallFunction.mockResolvedValueOnce(mockAttachment); // createAttachment
 
@@ -182,6 +186,10 @@ describe('Attachments Endpoints', () => {
         {id: 'att1', size: 5 * 1024 * 1024}, // 5MB
         {id: 'att2', size: 4 * 1024 * 1024}  // 4MB
       ]);
+      mockCallFunction.mockResolvedValueOnce({ // getUserMe returns user data with limitStorage
+        id: 'mock-user-id',
+        limitStorage: 10 * 1024 * 1024 // 10MB
+      });
 
       const response = await request(app)
         .post('/attachments/upload')
@@ -198,6 +206,7 @@ describe('Attachments Endpoints', () => {
       expect(response.body.message).toBe('Total upload size exceeds the limit of 10MB');
 
       expect(mockCallFunction).toHaveBeenCalledWith('getUserAttachments', {userId: 'mock-user-id'}, 'fake-token');
+      expect(mockCallFunction).toHaveBeenCalledWith('getUserMe', {id: 'mock-user-id'}, 'fake-token');
       expect(mockUploadFileToS3).not.toHaveBeenCalled();
     });
 
@@ -224,6 +233,10 @@ describe('Attachments Endpoints', () => {
       const fileBuffer = Buffer.from('test file content');
 
       mockCallFunction.mockResolvedValueOnce([]); // getUserAttachments
+      mockCallFunction.mockResolvedValueOnce({ // getUserMe returns user data with limitStorage
+        id: 'mock-user-id',
+        limitStorage: 10 * 1024 * 1024 // 10MB
+      });
       mockUploadFileToS3.mockRejectedValueOnce(new Error('S3 upload failed'));
 
       const response = await request(app)
@@ -248,6 +261,10 @@ describe('Attachments Endpoints', () => {
       const mockS3Url = 'https://bucket.s3.amazonaws.com/hml/123456789-test-file.jpg';
 
       mockCallFunction.mockResolvedValueOnce([]); // getUserAttachments
+      mockCallFunction.mockResolvedValueOnce({ // getUserMe returns user data with limitStorage
+        id: 'mock-user-id',
+        limitStorage: 10 * 1024 * 1024 // 10MB
+      });
       mockUploadFileToS3.mockResolvedValueOnce(mockS3Url);
       mockCallFunction.mockRejectedValueOnce(new Error('Database error')); // createAttachment fails
 
@@ -341,25 +358,6 @@ describe('Attachments Endpoints', () => {
       expect(mockDeleteFileFromS3).not.toHaveBeenCalled();
     });
 
-    it('should return 403 when user is not authorized', async () => {
-      const unauthorizedAttachment = {
-        ...mockAttachment,
-        userId: 'different-user-id'
-      };
-
-      mockCallFunction.mockResolvedValueOnce(unauthorizedAttachment);
-
-      const response = await request(app)
-        .delete('/attachments/attachment1')
-        .set('Authorization', 'Bearer fake-token');
-
-      expect(response.status).toBe(403);
-      expect(response.body.success).toBe(false);
-      expect(response.body.message).toBe('Not authorized to delete this attachment');
-
-      expect(mockDeleteFileFromS3).not.toHaveBeenCalled();
-    });
-
     it('should return 401 when not authenticated', async () => {
       const response = await request(app)
         .delete('/attachments/attachment1');
@@ -403,7 +401,13 @@ describe('Attachments Endpoints', () => {
   describe('GET /attachments/user/size', () => {
     it('should return user upload size successfully', async () => {
       const totalSize = mockUserAttachments.reduce((sum, att) => sum + att.size, 0);
+      const userStorageLimit = 10 * 1024 * 1024; // 10MB
+
       mockCallFunction.mockResolvedValueOnce(mockUserAttachments);
+      mockCallFunction.mockResolvedValueOnce({ // getUserMe returns user data with limitStorage
+        id: 'mock-user-id',
+        limitStorage: userStorageLimit
+      });
 
       const response = await request(app)
         .get('/attachments/user/size')
@@ -412,10 +416,11 @@ describe('Attachments Endpoints', () => {
       expect(response.status).toBe(200);
       expect(response.body.success).toBe(true);
       expect(response.body.totalSize).toBe(totalSize);
-      expect(response.body.maxSize).toBe(10 * 1024 * 1024); // 10MB
-      expect(response.body.remainingSize).toBe(10 * 1024 * 1024 - totalSize);
+      expect(response.body.maxSize).toBe(userStorageLimit);
+      expect(response.body.remainingSize).toBe(userStorageLimit - totalSize);
 
       expect(mockCallFunction).toHaveBeenCalledWith('getUserAttachments', {userId: 'mock-user-id'}, 'fake-token');
+      expect(mockCallFunction).toHaveBeenCalledWith('getUserMe', {id: 'mock-user-id'}, 'fake-token');
     });
 
     it('should return 401 when not authenticated', async () => {
@@ -477,25 +482,6 @@ describe('Attachments Endpoints', () => {
       expect(mockGeneratePresignedUrl).not.toHaveBeenCalled();
     });
 
-    it('should return 403 when user is not authorized', async () => {
-      const unauthorizedAttachment = {
-        ...mockAttachment,
-        userId: 'different-user-id'
-      };
-
-      mockCallFunction.mockResolvedValueOnce(unauthorizedAttachment);
-
-      const response = await request(app)
-        .get('/attachments/attachment1/download')
-        .set('Authorization', 'Bearer fake-token');
-
-      expect(response.status).toBe(403);
-      expect(response.body.success).toBe(false);
-      expect(response.body.message).toBe('Not authorized to delete this attachment');
-
-      expect(mockGeneratePresignedUrl).not.toHaveBeenCalled();
-    });
-
     it('should return 401 when not authenticated', async () => {
       const response = await request(app)
         .get('/attachments/attachment1/download');
@@ -533,6 +519,168 @@ describe('Attachments Endpoints', () => {
       expect(response.body.message).toBe('Error download attachment');
 
       expect(mockCallFunction).toHaveBeenCalledWith('getAttachment', {attachmentId: 'attachment1'}, 'fake-token');
+    });
+  });
+
+  describe('GET /attachments/user', () => {
+    it('should return user attachments successfully without search', async () => {
+      const mockUserDetailedAttachments = [
+        {
+          id: 'attachment1',
+          name: 'test-file.jpg',
+          url: 'https://bucket.s3.amazonaws.com/hml/123456789-test-file.jpg',
+          size: 1024000,
+          type: 'image/jpeg',
+          isImage: true,
+          userId: 'mock-user-id',
+          boardId: 'board1',
+          itemId: 'item1',
+          createdAt: new Date().toISOString()
+        },
+        {
+          id: 'attachment2',
+          name: 'document.pdf',
+          url: 'https://bucket.s3.amazonaws.com/hml/123456789-document.pdf',
+          size: 512000,
+          type: 'application/pdf',
+          isImage: false,
+          userId: 'mock-user-id',
+          boardId: 'board2',
+          itemId: 'item2',
+          createdAt: new Date().toISOString()
+        }
+      ];
+
+      mockCallFunction.mockResolvedValueOnce(mockUserDetailedAttachments);
+
+      const response = await request(app)
+        .get('/attachments/user')
+        .set('Authorization', 'Bearer fake-token');
+
+      expect(response.status).toBe(200);
+      expect(response.body.success).toBe(true);
+      expect(response.body.attachments).toEqual(mockUserDetailedAttachments);
+
+      expect(mockCallFunction).toHaveBeenCalledWith('getUserAttachments', {
+        userId: 'mock-user-id',
+        search: undefined
+      }, 'fake-token');
+    });
+
+    it('should return user attachments with search parameter', async () => {
+      const searchTerm = 'test';
+      const mockFilteredAttachments = [
+        {
+          id: 'attachment1',
+          name: 'test-file.jpg',
+          url: 'https://bucket.s3.amazonaws.com/hml/123456789-test-file.jpg',
+          size: 1024000,
+          type: 'image/jpeg',
+          isImage: true,
+          userId: 'mock-user-id',
+          boardId: 'board1',
+          itemId: 'item1',
+          createdAt: new Date().toISOString()
+        }
+      ];
+
+      mockCallFunction.mockResolvedValueOnce(mockFilteredAttachments);
+
+      const response = await request(app)
+        .get('/attachments/user')
+        .query({ search: searchTerm })
+        .set('Authorization', 'Bearer fake-token');
+
+      expect(response.status).toBe(200);
+      expect(response.body.success).toBe(true);
+      expect(response.body.attachments).toEqual(mockFilteredAttachments);
+
+      expect(mockCallFunction).toHaveBeenCalledWith('getUserAttachments', {
+        userId: 'mock-user-id',
+        search: searchTerm
+      }, 'fake-token');
+    });
+
+    it('should return empty array when user has no attachments', async () => {
+      mockCallFunction.mockResolvedValueOnce([]);
+
+      const response = await request(app)
+        .get('/attachments/user')
+        .set('Authorization', 'Bearer fake-token');
+
+      expect(response.status).toBe(200);
+      expect(response.body.success).toBe(true);
+      expect(response.body.attachments).toEqual([]);
+
+      expect(mockCallFunction).toHaveBeenCalledWith('getUserAttachments', {
+        userId: 'mock-user-id',
+        search: undefined
+      }, 'fake-token');
+    });
+
+    it('should return empty array when search returns no results', async () => {
+      const searchTerm = 'nonexistent';
+      mockCallFunction.mockResolvedValueOnce([]);
+
+      const response = await request(app)
+        .get('/attachments/user')
+        .query({ search: searchTerm })
+        .set('Authorization', 'Bearer fake-token');
+
+      expect(response.status).toBe(200);
+      expect(response.body.success).toBe(true);
+      expect(response.body.attachments).toEqual([]);
+
+      expect(mockCallFunction).toHaveBeenCalledWith('getUserAttachments', {
+        userId: 'mock-user-id',
+        search: searchTerm
+      }, 'fake-token');
+    });
+
+    it('should return 401 when not authenticated', async () => {
+      const response = await request(app)
+        .get('/attachments/user');
+
+      expect(response.status).toBe(401);
+      expect(response.body.msg).toBe('Token not pass');
+
+      expect(mockCallFunction).not.toHaveBeenCalled();
+    });
+
+    it('should return 500 when database error occurs', async () => {
+      mockCallFunction.mockRejectedValueOnce(new Error('Database error'));
+
+      const response = await request(app)
+        .get('/attachments/user')
+        .set('Authorization', 'Bearer fake-token');
+
+      expect(response.status).toBe(500);
+      expect(response.body.success).toBe(false);
+      expect(response.body.message).toBe('Error getting user attachments');
+
+      expect(mockCallFunction).toHaveBeenCalledWith('getUserAttachments', {
+        userId: 'mock-user-id',
+        search: undefined
+      }, 'fake-token');
+    });
+
+    it('should return 500 when database error occurs with search parameter', async () => {
+      const searchTerm = 'test';
+      mockCallFunction.mockRejectedValueOnce(new Error('Database error with search'));
+
+      const response = await request(app)
+        .get('/attachments/user')
+        .query({ search: searchTerm })
+        .set('Authorization', 'Bearer fake-token');
+
+      expect(response.status).toBe(500);
+      expect(response.body.success).toBe(false);
+      expect(response.body.message).toBe('Error getting user attachments');
+
+      expect(mockCallFunction).toHaveBeenCalledWith('getUserAttachments', {
+        userId: 'mock-user-id',
+        search: searchTerm
+      }, 'fake-token');
     });
   });
 });

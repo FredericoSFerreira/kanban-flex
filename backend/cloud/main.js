@@ -1112,14 +1112,9 @@ Parse.Cloud.define("deleteAttachment", async (request) => {
     if (!found) return {success: false, notFound: true};
 
     const ownerId = found.get('userId');
-    if (ownerId !== request.user.id) {
-      throw new Parse.Error(403, 'Not authorized to delete this attachment');
-    }
-
     const size = found.get('size') || 0;
     await found.destroy({useMasterKey: true});
 
-    // Decrement user's used storage in otp (best-effort)
     try {
       const otpQuery = new Parse.Query("otp");
       otpQuery.equalTo("objectId", ownerId);

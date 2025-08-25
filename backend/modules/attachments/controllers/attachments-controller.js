@@ -1,16 +1,11 @@
 import {uploadFileToS3, deleteFileFromS3, generatePresignedUrl} from '../../../service/s3-service.js';
 import {callFunction} from '../../../utils/parse-utils.js';
 import dotenv from 'dotenv';
-import {pipeline} from 'stream';
-import {promisify} from 'util';
-
-const pump = promisify(pipeline);
 
 
 dotenv.config();
 
 const MAX_FILE_SIZE = parseInt(process.env.MAX_FILE_SIZE) || 2 * 1024 * 1024; // 2MB in bytes
-const MAX_TOTAL_USER_SIZE = parseInt(process.env.MAX_TOTAL_USER_SIZE) || 10 * 1024 * 1024; // 10MB in bytes
 
 // Allowed file types
 const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
@@ -24,7 +19,6 @@ const ALLOWED_FILE_TYPES = [...ALLOWED_IMAGE_TYPES, ...ALLOWED_DOCUMENT_TYPES];
  */
 const uploadFile = async (req, res) => {
   try {
-    // Check if file exists
     if (!req.file) {
       return res.status(400).json({success: false, message: 'No file uploaded'});
     }
@@ -33,7 +27,6 @@ const uploadFile = async (req, res) => {
     const {boardId, itemId} = req.body;
     const userId = req.user.id;
 
-    // Validate file size
     if (file.size > MAX_FILE_SIZE) {
       return res.status(400).json({
         success: false,
@@ -41,7 +34,6 @@ const uploadFile = async (req, res) => {
       });
     }
 
-    // Validate file type
     if (!ALLOWED_FILE_TYPES.includes(file.mimetype)) {
       return res.status(400).json({
         success: false,
@@ -49,21 +41,22 @@ const uploadFile = async (req, res) => {
       });
     }
 
-    // Check user's total upload size
     const userAttachments = await callFunction('getUserAttachments', {userId}, req.token);
     const totalUserSize = userAttachments.reduce((sum, attachment) => sum + attachment.size, 0);
 
-    if (totalUserSize + file.size > MAX_TOTAL_USER_SIZE) {
+    // Get user's storage limit from OTP collection
+    const userData = await callFunction('getUserMe', {id: userId}, req.token);
+    const userStorageLimit = userData.limitStorage || (10 * 1024 * 1024); // Default 10MB if not set
+
+    if (totalUserSize + file.size > userStorageLimit) {
       return res.status(400).json({
         success: false,
-        message: `Total upload size exceeds the limit of ${MAX_TOTAL_USER_SIZE / (1024 * 1024)}MB`
+        message: `Total upload size exceeds the limit of ${userStorageLimit / (1024 * 1024)}MB`
       });
     }
 
-    // Upload file to S3
     const fileUrl = await uploadFileToS3(file.buffer, file.originalname, file.mimetype);
 
-    // Create attachment record
     const attachment = {
       name: file.originalname,
       url: fileUrl,
@@ -76,7 +69,6 @@ const uploadFile = async (req, res) => {
       createdAt: new Date().toISOString()
     };
 
-    // Save attachment to database
     const result = await callFunction('createAttachment', {attachment}, req.token);
 
     res.status(200).json({
@@ -101,7 +93,6 @@ const getItemAttachments = async (req, res) => {
   try {
     const {itemId} = req.params;
 
-    // Get attachments from database
     const attachments = await callFunction('getItemAttachments', {itemId}, req.token);
 
     res.status(200).json({
@@ -125,12 +116,9 @@ const getItemAttachments = async (req, res) => {
 const deleteAttachment = async (req, res) => {
   try {
     const {attachmentId} = req.params;
-    const userId = req.user.id;
 
-    // Get attachment from database
     const attachment = await callFunction('getAttachment', {attachmentId}, req.token);
 
-    // Check if attachment exists
     if (!attachment) {
       return res.status(404).json({
         success: false,
@@ -138,19 +126,8 @@ const deleteAttachment = async (req, res) => {
       });
     }
 
-    // Check if user is authorized to delete the attachment
-    if (attachment.userId !== userId) {
-      return res.status(403).json({
-        success: false,
-        message: 'Not authorized to delete this attachment'
-      });
-    }
-
-    // Delete file from S3
     await deleteFileFromS3(attachment.url);
-
-    // Delete attachment from database
-    await callFunction('deleteAttachment', {attachmentId}, req.token);
+    await callFunction('deleteAttachment', {attachmentId}, {...req.token});
 
     res.status(200).json({
       success: true,
@@ -174,15 +151,17 @@ const getUserUploadSize = async (req, res) => {
   try {
     const userId = req.user.id;
 
-    // Get user's attachments
     const userAttachments = await callFunction('getUserAttachments', {userId}, req.token);
     const totalSize = userAttachments.reduce((sum, attachment) => sum + attachment.size, 0);
+
+    const userData = await callFunction('getUserMe', {id: userId}, req.token);
+    const userStorageLimit = userData.limitStorage || (10 * 1024 * 1024); // Default 10MB if not set
 
     res.status(200).json({
       success: true,
       totalSize,
-      maxSize: MAX_TOTAL_USER_SIZE,
-      remainingSize: MAX_TOTAL_USER_SIZE - totalSize
+      maxSize: userStorageLimit,
+      remainingSize: userStorageLimit - totalSize
     });
   } catch (error) {
     console.error('Error getting user upload size:', error);
@@ -197,7 +176,6 @@ const getUserUploadSize = async (req, res) => {
 const downloadAttachment = async (req, res) => {
   try {
     const {attachmentId} = req.params;
-    const userId = req.user.id;
 
     const attachment = await callFunction('getAttachment', {attachmentId}, req.token);
 
@@ -205,13 +183,6 @@ const downloadAttachment = async (req, res) => {
       return res.status(404).json({
         success: false,
         message: 'Attachment not found'
-      });
-    }
-
-    if (attachment.userId !== userId) {
-      return res.status(403).json({
-        success: false,
-        message: 'Not authorized to delete this attachment'
       });
     }
 

@@ -334,8 +334,8 @@ const isValidForm = computed(() => {
 
 const tabs = [
   {id: 'profile', name: 'myProfile.profile', icon: User},
-  {id: 'logs', name: 'myProfile.accessLogs', icon: Layout},
   {id: 'plan', name: 'myProfile.myPlan', icon: CreditCard},
+  {id: 'logs', name: 'myProfile.accessLogs', icon: Layout},
 ];
 
 const defaultCountry = computed(() => {
