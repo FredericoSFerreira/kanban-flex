@@ -9,6 +9,7 @@ import Register from "@/views/auth/Register.vue"
 import Terms from "@/views/Terms.vue"
 import PrivacyPolicy from "@/views/PrivacyPolicy.vue"
 import MyProfileView from "@/views/MyProfileView.vue";
+import MyAttachmentsView from "@/views/MyAttachmentsView.vue";
 import BoardStatistics from "@/views/BoardStatistics.vue";
 
 const router = createRouter({
@@ -41,6 +42,12 @@ const router = createRouter({
       path: "/my-profile",
       name: 'my-profile',
       component: MyProfileView,
+      meta: {requiresAuth: true}
+    },
+    {
+      path: "/my-attachments",
+      name: 'my-attachments',
+      component: MyAttachmentsView,
       meta: {requiresAuth: true}
     },
     {

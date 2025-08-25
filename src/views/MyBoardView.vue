@@ -245,8 +245,8 @@ const getBoards = async () => {
 
     api.get(url)
       .then((response) => {
-        console.log(response);
-        boards.value = response.data.map((b: any) => ({'id': b.objectId, ...b}));
+        const data = JSON.parse(JSON.stringify(response.data));
+        boards.value = data.map((b: any) => ({'id': b.objectId, ...b}));
         showSpinner.value = false;
       })
       .catch((error) => {

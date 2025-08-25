@@ -955,6 +955,8 @@ const initialTab = ref('details');
 
 const auth = useAuthStore();
 const {callFunction} = useCloudFunctions();
+const isCardModalOpen = ref(false);
+
 
 const boardConfig = reactive(Object.assign({}, configDefault))
 
@@ -1003,8 +1005,10 @@ const completedItems = (card) => {
 
 const openCardModal = (card = null, columnId = null, tab = 'activity') => {
   isEditingCard.value = !!card;
+  isCardModalOpen.value = true;
+
   if (card) {
-    selectedCard.value = {checklist: [], history: [], ...card};
+    selectedCard.value = JSON.parse(JSON.stringify({checklist: [], history: [], ...card}));
     cardSelectedId.value = card.id;
   } else {
     selectedCard.value = { checklist: [], history: [], title: '', description: '', labels: [] };
@@ -1630,16 +1634,17 @@ const setBoard = (boardAttr) => {
   });
 
   console.log("NOVO BOARD", board);
-  try {
-    const [column, columnIndex] = findColumn(board.columns, columnSelectedId.value);
-    if (!column) return;
-    const [card, cardIndex] = findCard(column, cardSelectedId.value);
-    if (!card) return;
-    selectedCard.value = {...card}
-  } catch (e) {
-    console.log(e)
+  if (!isCardModalOpen.value) {
+    try {
+      const [column, columnIndex] = findColumn(board.columns, columnSelectedId.value);
+      if (!column) return;
+      const [card, cardIndex] = findCard(column, cardSelectedId.value);
+      if (!card) return;
+      selectedCard.value = {...card}
+    } catch (e) {
+      console.log(e)
+    }
   }
-
 
   if (orderBy.value !== 'default') {
     sortItemsByLike();

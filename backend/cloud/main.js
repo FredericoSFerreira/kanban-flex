@@ -1112,14 +1112,9 @@ Parse.Cloud.define("deleteAttachment", async (request) => {
     if (!found) return {success: false, notFound: true};
 
     const ownerId = found.get('userId');
-    if (ownerId !== request.user.id) {
-      throw new Parse.Error(403, 'Not authorized to delete this attachment');
-    }
-
     const size = found.get('size') || 0;
     await found.destroy({useMasterKey: true});
 
-    // Decrement user's used storage in otp (best-effort)
     try {
       const otpQuery = new Parse.Query("otp");
       otpQuery.equalTo("objectId", ownerId);
@@ -1144,13 +1139,19 @@ Parse.Cloud.define("deleteAttachment", async (request) => {
 Parse.Cloud.define("getUserAttachments", async (request) => {
   try {
     await verifyTokenParseCloudFunction(request);
-    const {userId} = request.params;
+    const {userId, search} = request.params;
     if (!userId || userId !== request.user.id) {
       throw new Parse.Error(403, 'Not authorized');
     }
     const Attachments = Parse.Object.extend("attachments");
     const q = new Parse.Query(Attachments);
     q.equalTo('userId', userId);
+
+    // Add search functionality if search parameter is provided
+    if (search && search.trim()) {
+      q.matches('name', new RegExp(search.trim(), 'i'));
+    }
+
     q.descending('_created_at');
     const results = await q.find({useMasterKey: true});
     return results.map(a => ({
