@@ -875,7 +875,7 @@
 
 </template>
 <script setup>
-import {ref, reactive, onMounted, nextTick, computed} from 'vue';
+import {ref, reactive, onMounted, onUnmounted, nextTick} from 'vue';
 import {useRoute, useRouter} from 'vue-router';
 import {Modal, Offcanvas} from 'bootstrap';
 import Parse from 'parse/dist/parse.min.js';
@@ -2074,6 +2074,14 @@ onMounted(() => {
   aiHelpModalInstance = new Modal(aiHelpModal.value);
   aiChatOffcanvasInstance = new Offcanvas(aiChatOffcanvas.value);
   modalEditCard = new Modal(document.getElementById('cardModal'));
+});
+
+onUnmounted(() => {
+  if (subscriptionBoard) {
+    subscriptionBoard.unsubscribe();
+    subscriptionBoard = null;
+    console.log('Board subscription cleaned up');
+  }
 });
 </script>
 <style scoped>
