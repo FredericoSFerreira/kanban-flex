@@ -9,7 +9,7 @@ const MAX_FILE_SIZE = parseInt(process.env.MAX_FILE_SIZE) || 2 * 1024 * 1024; //
 
 // Allowed file types
 const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
-const ALLOWED_DOCUMENT_TYPES = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'];
+const ALLOWED_DOCUMENT_TYPES = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'text/csv', 'text/plain'];
 const ALLOWED_FILE_TYPES = [...ALLOWED_IMAGE_TYPES, ...ALLOWED_DOCUMENT_TYPES];
 
 /**
@@ -37,7 +37,7 @@ const uploadFile = async (req, res) => {
     if (!ALLOWED_FILE_TYPES.includes(file.mimetype)) {
       return res.status(400).json({
         success: false,
-        message: 'File type not supported. Allowed types: JPEG, JPG, PNG, WEBP, PDF, DOC, DOCX, XLSX'
+        message: 'File type not supported. Allowed types: JPEG, JPG, PNG, WEBP, PDF, DOC, DOCX, XLSX, CSV, TXT'
       });
     }
 
@@ -159,6 +159,9 @@ const getUserUploadSize = async (req, res) => {
 
     res.status(200).json({
       success: true,
+      maxFileSize: MAX_FILE_SIZE,
+      allowedImageTypes: ALLOWED_IMAGE_TYPES,
+      allowedDocumentTypes: ALLOWED_DOCUMENT_TYPES,
       totalSize,
       maxSize: userStorageLimit,
       remainingSize: userStorageLimit - totalSize

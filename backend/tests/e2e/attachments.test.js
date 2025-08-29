@@ -166,13 +166,13 @@ describe('Attachments Endpoints', () => {
         .field('boardId', 'board1')
         .field('itemId', 'item1')
         .attach('file', fileBuffer, {
-          filename: 'test-file.txt',
-          contentType: 'text/plain'
+          filename: 'test-file.bmp',
+          contentType: 'image/bmp'
         });
 
       expect(response.status).toBe(400);
       expect(response.body.success).toBe(false);
-      expect(response.body.message).toBe('File type not supported. Allowed types: JPEG, JPG, PNG, WEBP, PDF, DOC, DOCX, XLSX');
+      expect(response.body.message).toBe('File type not supported. Allowed types: JPEG, JPG, PNG, WEBP, PDF, DOC, DOCX, XLSX, CSV, TXT');
 
       expect(mockCallFunction).not.toHaveBeenCalled();
       expect(mockUploadFileToS3).not.toHaveBeenCalled();
