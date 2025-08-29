@@ -37,7 +37,7 @@ const uploadFile = async (req, res) => {
     if (!ALLOWED_FILE_TYPES.includes(file.mimetype)) {
       return res.status(400).json({
         success: false,
-        message: 'File type not supported. Allowed types: JPEG, JPG, PNG, WEBP, PDF, DOC, DOCX, XLSX'
+        message: 'File type not supported. Allowed types: JPEG, JPG, PNG, WEBP, PDF, DOC, DOCX, XLSX, CSV, TXT'
       });
     }
 
