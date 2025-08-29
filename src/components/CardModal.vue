@@ -7,10 +7,9 @@
           <div class="d-flex align-items-center">
             <div>
               <h4 class="modal-title mb-0">{{ isEditing ? t('boardV2.editCard') : t('boardV2.newCard') }}</h4>
-<!--              <small class="text-muted">{{-->
-<!--                  isEditing ? t('boardV2.editCardDescription') : t('boardV2.newCardDescription')-->
-<!--                }}</small>-->
-
+              <small class="text-muted">{{
+                  isEditing ? t('boardV2.editCardDescription') : t('boardV2.newCardDescription')
+                }}</small>
             </div>
           </div>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -1042,8 +1041,8 @@ const validateFile = (file) => {
     };
   }
 
-  const isImage = allowedImageTypes.includes(file.type);
-  const isDocument = allowedDocumentTypes.includes(file.type);
+  const isImage = allowedImageTypes.value.includes(file.type);
+  const isDocument = allowedDocumentTypes.value.includes(file.type);
 
   if (!isImage && !isDocument) {
     return {
