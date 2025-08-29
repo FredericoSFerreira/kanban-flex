@@ -49,35 +49,6 @@
                     :placeholder="$t('boardV2.descriptionPlaceholder')"
                   ></textarea>
                 </div>
-
-                <!-- Row with Priority and Due Date -->
-                <!--                <div class="row g-3 mb-4">-->
-                <!--                  <div class="col-md-6">-->
-                <!--                    <label class="form-label fw-semibold">-->
-                <!--                      <AlertCircle size="16" class="me-2"/>-->
-                <!--                      {{ $t('boardV2.priority') }}-->
-                <!--                    </label>-->
-                <!--                    <select class="form-select" v-model="cardData.priority">-->
-                <!--                      <option value="">{{ $t('boardV2.selectPriority') }}</option>-->
-                <!--                      <option value="low">🟢 {{ $t('boardV2.priorityLow') }}</option>-->
-                <!--                      <option value="medium">🟡 {{ $t('boardV2.priorityMedium') }}</option>-->
-                <!--                      <option value="high">🔴 {{ $t('boardV2.priorityHigh') }}</option>-->
-                <!--                      <option value="urgent">🚨 {{ $t('boardV2.priorityUrgent') }}</option>-->
-                <!--                    </select>-->
-                <!--                  </div>-->
-                <!--                  <div class="col-md-6">-->
-                <!--                    <label class="form-label fw-semibold">-->
-                <!--                      <Calendar size="16" class="me-2"/>-->
-                <!--                      {{ $t('boardV2.dueDate') }}-->
-                <!--                    </label>-->
-                <!--                    <input-->
-                <!--                      type="date"-->
-                <!--                      class="form-control"-->
-                <!--                      v-model="cardData.dueDate"-->
-                <!--                    />-->
-                <!--                  </div>-->
-                <!--                </div>-->
-
                 <!-- Labels -->
                 <div class="mb-4" v-if="boardConfig.showTags">
                   <label class="form-label fw-semibold">
@@ -780,13 +751,11 @@ const uploadProgress = ref(0);
 const uploadError = ref('');
 const isUploading = ref(false);
 const isDragging = ref(false);
-const totalUploadSize = ref(0);
-const maxFileSize = 2 * 1024 * 1024; // 2MB in bytes
+const maxFileSize = ref(5 * 1024 * 1024); // Default 5MB, will be updated from backend
 const maxTotalSize = 10 * 1024 * 1024; // 10MB in bytes
-const allowedImageTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
-const allowedDocumentTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'];
+const allowedImageTypes = ref(['image/jpeg', 'image/jpg', 'image/png', 'image/webp']);
+const allowedDocumentTypes = ref(['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet']);
 
-// Mock data for team members
 const teamMembers = ref([
   {
     id: 1,
@@ -814,15 +783,6 @@ const teamMembers = ref([
   }
 ]);
 
-
-// Checklist
-const checklist = ref([
-  {id: 1, text: 'Revisar requisitos', completed: true},
-  {id: 2, text: 'Criar mockups', completed: true},
-  {id: 3, text: 'Implementar funcionalidade', completed: false},
-  {id: 4, text: 'Testes unitários', completed: false},
-  {id: 5, text: 'Documentação', completed: false}
-]);
 
 // Tabs configuration
 const tabs = computed(() => {
@@ -955,16 +915,6 @@ const removeChecklistItem = (index) => {
   props.cardData.checklist.splice(index, 1);
 };
 
-const getActivityIcon = (type) => {
-  switch (type) {
-    case 'create_card':
-      return Plus;
-    case 'move_card':
-      return ArrowRight;
-    default:
-      return Activity;
-  }
-};
 
 const formatDate = computed(() => {
   return (dateString) => {
@@ -984,12 +934,9 @@ const formatDate = computed(() => {
 
 const onModalHide = () => {
   console.log('Modal hidden');
-  // Resetar o estado do modal
   resetModalState();
 
-  // Limpar o cardData se não estiver em modo de edição
   if (!props.isEditing) {
-    // Criar um objeto com valores padrão para o cardData
     const defaultCardData = {
       id: '',
       title: '',
@@ -1003,7 +950,6 @@ const onModalHide = () => {
       attachments: []
     };
 
-    // Atualizar os valores do cardData para os valores padrão
     Object.keys(defaultCardData).forEach(key => {
       if (props.cardData[key] !== undefined) {
         if (Array.isArray(defaultCardData[key])) {
@@ -1034,7 +980,6 @@ const fetchAttachments = async () => {
   }
 };
 
-// File handling methods
 const triggerFileInput = () => {
   fileInput.value.click();
 };
@@ -1056,17 +1001,14 @@ const onFileDrop = (event) => {
 const onFileSelected = (event) => {
   const files = event.target.files;
   handleFiles(files);
-  // Reset the input so the same file can be selected again
   event.target.value = '';
 };
 
 const handleFiles = (files) => {
   uploadError.value = '';
 
-  // Convert FileList to Array
   const fileArray = Array.from(files);
 
-  // Validate files
   const validFiles = [];
   let totalSize = 0;
 
@@ -1081,37 +1023,32 @@ const handleFiles = (files) => {
     }
   }
 
-  // Check total size
   const currentAttachmentsSize = props.cardData?.attachments?.reduce((sum, attachment) => sum + (attachment.size || 0), 0);
   if (currentAttachmentsSize + totalSize > maxTotalSize) {
-    uploadError.value = `Total upload size exceeds the limit of ${maxTotalSize / (1024 * 1024)}MB`;
+    uploadError.value = t('boardV2.errors.totalSizeExceeded', { maxSize: maxTotalSize / (1024 * 1024) });
     return;
   }
 
-  // Add files to selectedFiles
   selectedFiles.value = [...selectedFiles.value, ...validFiles];
 
-  // Real upload to API
   uploadFiles(validFiles);
 };
 
 const validateFile = (file) => {
-  // Check file size
-  if (file.size > maxFileSize) {
+  if (file.size > maxFileSize.value) {
     return {
       valid: false,
-      error: `File ${file.name} exceeds the maximum size of ${maxFileSize / (1024 * 1024)}MB`
+      error: t('boardV2.errors.fileSizeExceeded', { fileName: file.name, maxSize: maxFileSize.value / (1024 * 1024) })
     };
   }
 
-  // Check file type
   const isImage = allowedImageTypes.includes(file.type);
   const isDocument = allowedDocumentTypes.includes(file.type);
 
   if (!isImage && !isDocument) {
     return {
       valid: false,
-      error: `File type not supported. Allowed types: JPEG, JPG, PNG, WEBP, PDF, DOC, DOCX, XLSX`
+      error: t('boardV2.errors.fileTypeNotSupported')
     };
   }
 
@@ -1148,22 +1085,19 @@ const uploadFiles = async (files) => {
       });
 
       if (data?.success && data?.attachment) {
-        // Push server-provided attachment object
         props.cardData.attachments.push(data.attachment);
       } else {
-        throw new Error(data?.message || 'Upload failed');
+        throw new Error(data?.message || t('boardV2.errors.uploadFailed'));
       }
     }
 
-    // Ensure progress ends at 100
     uploadProgress.value = 100;
-    // Switch to attachments tab
     if (activeTab.value !== 'attachments') {
       activeTab.value = 'attachments';
     }
   } catch (e) {
     console.error('Upload error:', e);
-    uploadError.value = e?.response?.data?.message || e?.message || 'Error uploading file';
+    uploadError.value = e?.response?.data?.message || e?.message || t('boardV2.errors.errorUploadingFile');
   } finally {
     isUploading.value = false;
   }
@@ -1186,7 +1120,7 @@ const downloadAttachment = async (attachmentId) => {
 
   } catch (e) {
     console.error('Error download attachment:', e);
-    uploadError.value = e?.response?.data?.message || e?.message || 'Error download attachment';
+    uploadError.value = e?.response?.data?.message || e?.message || t('boardV2.errors.errorDownloadingAttachment');
   }
 };
 
@@ -1237,20 +1171,31 @@ const resetModalState = () => {
   selectedFiles.value = [];
 };
 
+const fetchUploadSizeConfig = async () => {
+  try {
+    const { data } = await api.get('/attachments/user/size');
+    if (data?.success) {
+      maxFileSize.value = data.maxFileSize;
+      allowedImageTypes.value = data.allowedImageTypes;
+      allowedDocumentTypes.value = data.allowedDocumentTypes
+    }
+  } catch (error) {
+    console.error('Error fetching upload size config:', error);
+  }
+};
+
 onMounted(() => {
+  fetchUploadSizeConfig();
 
   if (cardModal.value) {
     cardModal.value.addEventListener('hide.bs.modal', onModalHide);
     cardModal.value.addEventListener('show.bs.modal', onModalShow);
   }
 
-  // Inicializar activeTab com o valor de initialTab
   activeTab.value = props.initialTab;
 });
 
-// Observar mudanças em initialTab para manter activeTab sincronizado
 watch(() => props.initialTab, (newInitialTab) => {
-  // Atualizar activeTab quando initialTab mudar (exceto durante edição pelo usuário)
   activeTab.value = newInitialTab;
 });
 

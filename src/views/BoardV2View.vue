@@ -50,9 +50,9 @@
         <div class="p-1">
 
           <select class="form-select" aria-label="Ordenação" v-model="orderBy" @change="orderByOnChange($event)">
-            <option value="default">Ordenação padrão</option>
-            <option value="up_vote">Ordenação por likes</option>
-            <option value="down_vote">Ordenação por dislikes</option>
+            <option value="default">{{ $t('board.sortDefault') }}</option>
+            <option value="up_vote">{{ $t('board.sortByLikes') }}</option>
+            <option value="down_vote">{{ $t('board.sortByDislikes') }}</option>
           </select>
         </div>
 
