@@ -35,3 +35,4 @@ coverage
 
 /backend/mongo_data
 /backend/redis_data
+/backend/localstack

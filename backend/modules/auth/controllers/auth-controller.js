@@ -27,7 +27,11 @@ const register = async (req, res) => {
     // change for middleware
     const acceptLanguage = req.headers['accept-language'] || '';
     const locale = acceptLanguage.includes('en') ? 'en' : 'pt-BR';
-    await sendEmail(req.body.email, name, code, locale);
+    if (process.env.NODE_ENV !== 'dev') {
+      await sendEmail(req.body.email, name, code, locale);
+    } else {
+      console.log(`[LOCAL DEV] OTP generated for ${email}: ${code}`);
+    }
     res.send("OK");
   } catch (e) {
     console.log("Occurred error in register otp", e);
@@ -59,7 +63,11 @@ const sendOtp = async (req, res) => {
     await updateOtp(email, code);
     const acceptLanguage = req.headers['accept-language'] || '';
     const locale = acceptLanguage.includes('en') ? 'en' : 'pt-BR';
-    await sendEmail(req.body.email, name, code, locale);
+    if (process.env.NODE_ENV !== 'dev') {
+      await sendEmail(req.body.email, name, code, locale);
+    } else {
+      console.log(`[LOCAL DEV] OTP generated for ${email}: ${code}`);
+    }
     res.status(201).send();
   } catch (e) {
     console.log("Occurred error in send otp", e);
@@ -152,14 +160,16 @@ const authGoogle = async (req, res) => {
 }
 
 
-const updateOtp = async (email, code, isValid= false) => {
+const updateOtp = async (email, code, isValid = false) => {
   const query = new Parse.Query("otp");
   query.equalTo("email", email)
-  query.first().then((otp) => {
-    otp.set('code', code)
+  query.first({useMasterKey: true}).then((otp) => {
+    otp.set('code', code,)
     if (isValid) otp.set('isValid', isValid)
-    otp.save();
-  });
+    otp.save({useMasterKey: true});
+  }).catch((error) => {
+    console.log("error")
+  })
 }
 
 export {register, sendOtp, checkOtp, authGoogle};
