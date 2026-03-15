@@ -71,7 +71,7 @@ Parse.Cloud.define("updateCardPosition", async (request) => {
     // Update the items array for this specific column
     board.set(`columns.${columnIndex}.itens`, items);
 
-    const result = await board.save(null);
+    const result = await board.save(null, {useMasterKey: true});
     return {success: true, result};
   } catch (error) {
     console.error("Error in updateCardPosition:", error);
@@ -136,7 +136,7 @@ Parse.Cloud.define("moveCardBetweenColumns", async (request) => {
     board.set(`columns.${sourceColumnIndex}.itens`, sourceColumn.itens);
     board.set(`columns.${targetColumnIndex}.itens`, targetColumn.itens);
 
-    const result = await board.save(null);
+    const result = await board.save(null, {useMasterKey: true});
     return {success: true, result};
   } catch (error) {
     console.error("Error in moveCardBetweenColumns:", error);
@@ -161,7 +161,7 @@ Parse.Cloud.define("updateColumnPosition", async (request) => {
     // Update the columns array
     board.set('columns', columns);
 
-    const result = await board.save(null);
+    const result = await board.save(null, {useMasterKey: true});
     return {success: true, result};
   } catch (error) {
     console.error("Error in updateColumnPosition:", error);
@@ -202,7 +202,7 @@ Parse.Cloud.define("addCard", async (request) => {
     // Add card to column
     board.add(`columns.${columnIndex}.itens`, card);
 
-    const result = await board.save(null);
+    const result = await board.save(null, {useMasterKey: true});
     return {success: true, result};
   } catch (error) {
     console.error("Error in addCard:", error);
@@ -266,7 +266,7 @@ Parse.Cloud.define("updateCard", async (request) => {
       board.set(`columns.${columnIndex}.itens.${cardIndex}.${key}`, updates[key]);
     });
 
-    const result = await board.save(null);
+    const result = await board.save(null, {useMasterKey: true});
     return {success: true, result};
   } catch (error) {
     console.error("Error in updateCard:", error);
@@ -305,7 +305,7 @@ Parse.Cloud.define("removeCard", async (request) => {
 
     await deleteAttachmentHelper(boardId, cardId, request)
 
-    const result = await board.save(null);
+    const result = await board.save(null, {useMasterKey: true});
     return {success: true, result};
   } catch (error) {
     console.error("Error in removeCard:", error);
@@ -330,7 +330,7 @@ Parse.Cloud.define("addColumn", async (request) => {
     // Add column to board
     board.add("columns", column);
 
-    const result = await board.save(null);
+    const result = await board.save(null, {useMasterKey: true});
     return {success: true, result};
   } catch (error) {
     console.error("Error in addColumn:", error);
@@ -364,7 +364,7 @@ Parse.Cloud.define("updateColumn", async (request) => {
       board.set(`columns.${columnIndex}.${key}`, updates[key]);
     });
 
-    const result = await board.save(null);
+    const result = await board.save(null, {useMasterKey: true});
     return {success: true, result};
   } catch (error) {
     console.error("Error in updateColumn:", error);
@@ -398,7 +398,7 @@ Parse.Cloud.define("removeColumn", async (request) => {
     // Atualizar o array de colunas completo
     board.set('columns', columns);
 
-    const result = await board.save(null);
+    const result = await board.save(null, {useMasterKey: true});
     return {success: true, result};
   } catch (error) {
     console.error("Error in removeColumn:", error);
@@ -425,7 +425,7 @@ Parse.Cloud.define("updateBoardProperties", async (request) => {
       board.set(key, updates[key]);
     });
 
-    const result = await board.save(null);
+    const result = await board.save(null, {useMasterKey: true});
     return {success: true, result};
   } catch (error) {
     console.error("Error in updateBoardProperties:", error);
@@ -486,7 +486,7 @@ Parse.Cloud.define("updateCardVotes", async (request) => {
       }
     }
 
-    const result = await board.save(null);
+    const result = await board.save(null, {useMasterKey: true});
     return {success: true, result};
   } catch (error) {
     console.error("Error in updateCardVotes:", error);
@@ -988,7 +988,7 @@ Parse.Cloud.define("removeBoard", async (request) => {
     }
 
     // Delete the board
-    await board.destroy();
+    await board.destroy({useMasterKey: true});
     return {success: true};
   } catch (error) {
     console.error("Error in removeBoard:", error);
@@ -1006,7 +1006,7 @@ Parse.Cloud.define("createBoard", async (request) => {
     const board = new Boards();
 
     // Save the board with the provided template
-    const boardDatabase = await board.save(template);
+    const boardDatabase = await board.save(template, {useMasterKey: true});
 
     return {
       success: true,
