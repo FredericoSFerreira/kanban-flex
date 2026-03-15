@@ -965,7 +965,7 @@ Parse.Cloud.define("updateBoardName", async (request) => {
     // Update board name
     board.set('name', name);
 
-    const result = await board.save(null);
+    const result = await board.save(null, {useMasterKey: true});
     return {success: true, result};
   } catch (error) {
     console.error("Error in updateBoardName:", error);

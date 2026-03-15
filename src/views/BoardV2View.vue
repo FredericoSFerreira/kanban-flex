@@ -948,7 +948,7 @@ const openCardModal = (card = null, columnId = null, tab = 'activity') => {
 // Methods
 const orderByOnChange = (event) => {
   console.log(event.target.value);
-  getBoard();
+  sortItemsByLike();
 };
 
 const onSelectEmoji = (emoji) => {
