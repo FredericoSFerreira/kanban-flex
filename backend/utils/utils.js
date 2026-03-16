@@ -1,6 +1,6 @@
 import {SignJWT} from 'jose'
 
-const SECRET_KEY = new TextEncoder().encode(process.env.JWT_SECRET_KEY);
+const JWT_SECRET_KEY = new TextEncoder().encode(process.env.JWT_SECRET_KEY);
 
 function generateOtp() {
   return Math.floor(100000 + Math.random() * 900000).toString();
@@ -10,7 +10,7 @@ async function generateToken(payload) {
   return await new SignJWT(payload)
     .setProtectedHeader({alg: 'HS256'})
     .setExpirationTime('168h')
-    .sign(SECRET_KEY);
+    .sign(JWT_SECRET_KEY);
 }
 
 

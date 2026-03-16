@@ -529,14 +529,14 @@ async function saveLog(request, user, action = 'login') {
       cpu: cpu.architecture
     },
     action: action,
-  })
+  }, {useMasterKey: true})
 }
 
 Parse.Cloud.define("getOtp", async (request) => {
   try {
     const query = new Parse.Query("otp");
     query.equalTo({'email': request.params.email})
-    const otp = await query.first();
+    const otp = await query.first({useMasterKey: true});
     if (!otp) {
       return {notFound: true}
     }
@@ -561,11 +561,11 @@ Parse.Cloud.define("saveOtp", async (request) => {
     const otp = new OTP();
     const otpQuery = new Parse.Query(OTP);
     otpQuery.equalTo({'email': request.params.email})
-    const otpData = await otpQuery.first();
+    const otpData = await otpQuery.first({useMasterKey: true});
     if (otpData) {
       if (request.params.phone) otpData.set("phone", request.params.phone);
       if (request.params.picture) otpData.set("avatar", request.params.picture);
-      await otpData.save();
+      await otpData.save(null, {useMasterKey: true});
       await saveLog(request, otpData, 'login')
       return {conflict: true, id: otpData.id, ...otpData.attributes}
     }
@@ -577,7 +577,7 @@ Parse.Cloud.define("saveOtp", async (request) => {
       active: true,
       code: request.params.code || null,
       avatar: request.params.picture || null,
-    })
+    }, {useMasterKey: true})
     await saveLog(request, saveResult, 'register')
 
     return {conflict: false, ...saveResult}
@@ -594,7 +594,7 @@ Parse.Cloud.define("checkOtp", async (request) => {
     // Add check for active=true
     query.equalTo('active', true);
 
-    const otp = await query.first();
+    const otp = await query.first({useMasterKey: true});
     if (!otp) {
       return null; // Return null if no matching OTP found or user is inactive
     }
@@ -683,7 +683,7 @@ Parse.Cloud.define("getMyAccessLogs", async (request) => {
     query.equalTo({'id_user': request.params.id})
     query.descending('_created_at')
     // query.limit(10)
-    return await query.find();
+    return await query.find({useMasterKey: true});
   } catch (error) {
     console.log('Failed to getLogs, with error code: ' + error.message);
     throw error
@@ -703,7 +703,7 @@ Parse.Cloud.define("updateUserOtp", async (request) => {
     otp.set('name', request.params.name)
     otp.set('phone', request.params.phone)
     otp.set('active', request.params.active === undefined ? true : request.params.active)
-    return otp.save();
+    return otp.save(null, {useMasterKey: true});
   });
 });
 
@@ -714,7 +714,7 @@ Parse.Cloud.define("getUserMe", async (request) => {
 
     const query = new Parse.Query("otp");
     query.equalTo("objectId", request.params.id);
-    const user = await query.first();
+    const user = await query.first({useMasterKey: true});
 
     if (!user) {
       throw new Error("User not found");
