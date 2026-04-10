@@ -494,6 +494,52 @@ Parse.Cloud.define("updateCardVotes", async (request) => {
   }
 });
 
+Parse.Cloud.define("archiveCard", async (request) => {
+  try {
+    // Validate JWT token
+    await verifyTokenParseCloudFunction(request);
+
+    const {boardId, columnId, cardId, archived} = request.params;
+    const queryBoard = new Parse.Query("boards");
+    queryBoard.equalTo('objectId', boardId);
+
+    const board = await queryBoard.first();
+    if (!board) {
+      throw new Error("Board not found");
+    }
+
+    const columns = board.get('columns');
+    const [column, columnIndex] = findColumn(columns, columnId);
+
+    if (!column) {
+      throw new Error("Column not found");
+    }
+
+    const [card, cardIndex] = findCard(column, cardId);
+    if (!card) {
+      throw new Error("Card not found");
+    }
+
+    // Inicializa o histórico se não existir
+    if (!card.history) {
+      board.set(`columns.${columnIndex}.itens.${cardIndex}.history`, []);
+    }
+
+    // Registra a ação no histórico
+    board.add(`columns.${columnIndex}.itens.${cardIndex}.history`,
+      generateTrackingHistory(request, archived ? 'archive_card' : 'unarchive_card', {}));
+
+    board.set(`columns.${columnIndex}.itens.${cardIndex}.archived`, archived);
+    board.set(`columns.${columnIndex}.itens.${cardIndex}.updatedAt`, new Date());
+
+    const result = await board.save(null, {useMasterKey: true});
+    return {success: true, result};
+  } catch (error) {
+    console.error("Error in archiveCard:", error);
+    throw error;
+  }
+});
+
 // Helper functions for board operations
 function findColumn(columns, columnId) {
   for (const columnIndex in columns) {

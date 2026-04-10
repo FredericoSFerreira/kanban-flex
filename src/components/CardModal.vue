@@ -349,11 +349,17 @@
                               <div v-if="activity.action == 'create_card'">
                                 {{ $t('boardV2.createdCard') }}
                               </div>
+                              <div v-else-if="activity.action == 'archive_card'">
+                                {{ $t('boardV2.activityArchived') }}
+                              </div>
+                              <div v-else-if="activity.action == 'unarchive_card'">
+                                {{ $t('boardV2.activityUnarchived') }}
+                              </div>
                               <div v-else>
                                 {{
                                   $t('boardV2.movedCard', {
-                                    source: activity.data?.source.columnName,
-                                    target: activity.data?.target.columnName
+                                    source: activity.data?.source?.columnName || '...',
+                                    target: activity.data?.target?.columnName || '...'
                                   })
                                 }}
                               </div>

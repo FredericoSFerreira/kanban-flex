@@ -11,51 +11,149 @@
       </div>
 
 
-      <div class="d-flex flex-row-reverse justify-content-end">
+      <div class="d-flex flex-row-reverse justify-content-end align-items-center gap-2">
 
-        <div class="btn-group btn-group-sm" v-if="board.columns.length > 0">
-          <button class="btn btn-primary" @click="newColumn()" data-bs-toggle="modal"
-                  data-bs-target="#newColumn">
-            <Plus size="18" class="me-1"/>
-            {{ t('board.addColumn') }}
+        <div class="btn-group" v-if="board.columns.length > 0">
+          <!-- Adicionar Coluna -->
+          <button
+            class="btn btn-primary"
+            @click="newColumn()"
+            data-bs-toggle="modal"
+            data-bs-target="#newColumn"
+            :title="t('board.addColumn')"
+          >
+            <Plus size="18"/>
           </button>
+
+          <!-- Estatísticas -->
           <button
             v-if="board?.columns.length > 0 && board?.columns.filter(column => column.itens.length > 0).length > 0 && user.id != 'demo'"
             class="btn btn-primary"
-            @click="router.push(`/board/statistics/${route.params.id}`)
-          ">
+            :title="t('boardV2.statistics')"
+            @click="router.push(`/board/statistics/${route.params.id}`)"
+          >
             <BarChart2 size="18"/>
-            {{ t('boardV2.statistics') }}
           </button>
+
+          <!-- Toggle Arquivados -->
+          <button
+            class="btn position-relative"
+            :class="showArchived ? 'btn-warning' : 'btn-outline-secondary'"
+            @click="showArchived = !showArchived"
+            :title="showArchived ? t('board.hideArchived') : t('board.showArchived')"
+          >
+            <ArchiveRestore v-if="showArchived" size="18"/>
+            <Archive v-else size="18"/>
+            <span
+              v-if="totalArchivedCards > 0"
+              class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger shadow-sm"
+              style="font-size: 0.60rem; padding: 0.25em 0.5em; z-index: 1020;"
+            >
+              {{ totalArchivedCards }}
+            </span>
+          </button>
+
+          <!-- AI Chat -->
           <button
             class="btn btn-primary ai-chat-toggle"
             @click="toggleAIChat"
-            title="Chat with AI Assistant"
+            :title="t('board.aiAssist.title')"
           >
-            <MessageCircle size="18" class="me-2"/>
-            {{ t('board.aiAssist.title') }}
+            <MessageCircle size="18"/>
           </button>
-          <button class="btn btn-primary" @click="showBoardSettings">
+
+          <!-- Configurações -->
+          <button class="btn btn-primary" @click="showBoardSettings" :title="t('board.settings')">
             <Settings size="18"/>
           </button>
         </div>
 
-        <div class="p-1" v-if="checkPermission() && boardConfig.showVisibility" @click="setVisibility()">
+        <!-- Visibilidade -->
+        <div v-if="checkPermission() && boardConfig.showVisibility" @click="setVisibility()">
           <button type="button" class="btn btn-light">
-            <i class="bi bi-eye" v-if="board.visibility"></i>
-            <i class="bi bi-eye-slash" v-if="!board.visibility"></i>
+            <Eye size="18" v-if="board.visibility"/>
+            <EyeOff size="18" v-if="!board.visibility"/>
           </button>
         </div>
 
-        <div class="p-1">
-
-          <select class="form-select" aria-label="Ordenação" v-model="orderBy" @change="orderByOnChange($event)">
-            <option value="default">{{ $t('board.sortDefault') }}</option>
-            <option value="up_vote">{{ $t('board.sortByLikes') }}</option>
-            <option value="down_vote">{{ $t('board.sortByDislikes') }}</option>
-          </select>
+        <!-- Busca de Cards -->
+        <div class="d-flex align-items-center position-relative" style="min-width: 250px; max-width: 350px;" v-if="board.columns.length > 0">
+          <div class="input-group">
+            <span class="input-group-text bg-white">
+              <Search size="18" class="text-muted"/>
+            </span>
+            <input
+              id="cardSearchInput"
+              type="text"
+              class="form-control border-start-0"
+              :placeholder="t('boardV2.cardSearch.placeholder')"
+              v-model="cardSearchQuery"
+              autocomplete="off"
+            />
+            <button
+              v-if="cardSearchQuery"
+              class="btn btn-outline-secondary"
+              type="button"
+              @click="cardSearchQuery = ''"
+              :title="t('boardV2.cardSearch.clear')"
+            >
+              <X size="18"/>
+            </button>
+          </div>
+          <!-- Badge flutuante de resultados -->
+          <transition name="fade">
+            <span v-if="cardSearchDebounced" class="badge bg-primary-subtle text-primary px-2 py-1 position-absolute" style="top: 110%; right: 0; z-index: 10;">
+              <Search size="11" class="me-1"/>
+              {{ totalFilteredCards }} {{ t('boardV2.cardSearch.results') }}
+            </span>
+          </transition>
         </div>
 
+        <!-- Dropdown de Ordenação -->
+        <div class="dropdown">
+          <button
+            class="btn btn-outline-secondary dropdown-toggle"
+            type="button"
+            id="sortDropdown"
+            data-bs-toggle="dropdown"
+            aria-expanded="false"
+            :title="t('board.sortDefault')"
+          >
+            <ArrowUpDown size="18"/>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="sortDropdown">
+            <li>
+              <button
+                class="dropdown-item d-flex align-items-center gap-2"
+                :class="{ active: orderBy === 'default' }"
+                @click="orderBy = 'default'; orderByOnChange()"
+              >
+                <ArrowUpDown size="14"/>
+                {{ t('board.sortDefault') }}
+              </button>
+            </li>
+            <li>
+              <button
+                class="dropdown-item d-flex align-items-center gap-2"
+                :class="{ active: orderBy === 'up_vote' }"
+                @click="orderBy = 'up_vote'; orderByOnChange()"
+              >
+                <ThumbsUp size="14"/>
+                {{ t('board.sortByLikes') }}
+              </button>
+            </li>
+            <li>
+              <button
+                class="dropdown-item d-flex align-items-center gap-2"
+                :class="{ active: orderBy === 'down_vote' }"
+                @click="orderBy = 'down_vote'; orderByOnChange()"
+              >
+                <ThumbsDown size="14"/>
+                {{ t('board.sortByDislikes') }}
+              </button>
+            </li>
+          </ul>
+        </div>
 
       </div>
     </div>
@@ -63,6 +161,8 @@
       <AlertTriangle size="25" class=""/>
       {{ $t('board.demo.alert') }}
     </div>
+
+
     <section class="py-5 text-center container" v-if="board.columns.length === 0 && checkPermission()">
       <div class="empty-state text-center py-5">
         <div class="empty-state-content mx-auto">
@@ -133,7 +233,8 @@
 
             <div class="p-2 flex-grow-1 kanban-cards-container">
               <draggable
-                v-model="column.itens"
+                :model-value="getFilteredItems(column)"
+                @update:model-value="val => updateColumnItems(column, val)"
                 group="cards"
                 item-key="id"
                 class="card-list"
@@ -150,34 +251,46 @@
                       <div class="d-flex justify-content-between align-items-center"
                            :class="{ 'blur-kanban-card': !checkPermission(card.user_id) && !board.visibility }">
                         <div>
-                          <h6 class="card-title mb-2" v-if="boardConfig.showTitle">{{
-                              !checkPermission(card.user_id) && !board.visibility ? cardHideText.repeat(1) : card.title
-                            }}</h6>
-                          <div class="card-text small text-muted mb-2 truncate-multi-line-description"
-                               v-if="boardConfig.showDescription">
-                            {{
-                              !checkPermission(card.user_id) && !board.visibility ? cardHideText.repeat(1) : card.description
-                            }}
-                          </div>
+                          <h6
+                            class="card-title mb-2"
+                            v-if="boardConfig.showTitle"
+                            v-html="!checkPermission(card.user_id) && !board.visibility ? cardHideText : highlightCardText(card.title)"
+                          ></h6>
+                          <div
+                            class="card-text small text-muted mb-2 truncate-multi-line-description"
+                            v-if="boardConfig.showDescription"
+                            v-html="!checkPermission(card.user_id) && !board.visibility ? cardHideText : highlightCardText(card.description)"
+                          ></div>
 
                         </div>
                         <div>
-                          <div class="d-flex gap-2 " v-if="checkPermission(card.user_id, true)">
+                          <div class="d-flex gap-1" v-if="checkPermission(card.user_id, true)">
                             <button
+                              v-if="!showArchived"
                               class="btn btn-sm btn-outline-primary p-1"
                               @click="openCardModal(card, column.id)"
                               :title="$t('board.editCard')"
                             >
-                              <Edit2 size="14"/>
+                              <Edit2 size="13"/>
+                            </button>
+                            <!-- Botão Arquivar / Restaurar -->
+                            <button
+                              class="btn btn-sm p-1"
+                              :class="card.archived ? 'btn-warning' : 'btn-outline-secondary'"
+                              @click="archiveCard(column.id, card.id, !card.archived)"
+                              :title="card.archived ? $t('board.unarchiveCard') : $t('board.archiveCard')"
+                            >
+                              <ArchiveRestore v-if="card.archived" size="13"/>
+                              <Archive v-else size="13"/>
                             </button>
                             <button
+                              v-if="!showArchived"
                               class="btn btn-sm btn-outline-danger p-1"
                               @click="removeCard(column.id, card.id)"
                               :title="$t('board.deleteCard')"
                             >
-                              <Trash2 size="14"/>
+                              <Trash2 size="13"/>
                             </button>
-
                           </div>
                         </div>
                       </div>
@@ -793,7 +906,7 @@
 
 </template>
 <script setup>
-import {ref, reactive, onMounted, onUnmounted, nextTick} from 'vue';
+import {ref, reactive, computed, watch, onMounted, onUnmounted, nextTick} from 'vue';
 import {useRoute, useRouter} from 'vue-router';
 import {Modal, Offcanvas} from 'bootstrap';
 import Parse from 'parse/dist/parse.min.js';
@@ -822,7 +935,14 @@ import {
   Send,
   Sparkles,
   SquareCheckBig,
-  Eye
+  Eye,
+  EyeOff,
+  Archive,
+  ArchiveRestore,
+  ArrowUpDown,
+  RefreshCw,
+  Search,
+  X
 } from 'lucide-vue-next';
 import {useSwal} from '@/utils/swal';
 import draggable from 'vuedraggable';
@@ -843,6 +963,10 @@ const {t} = useI18n();
 
 // Reactive state
 const orderBy = ref("default");
+const showArchived = ref(false);
+const cardSearchQuery = ref('');
+const cardSearchDebounced = ref('');
+let cardSearchTimer = null;
 const cardHideText = t('boardV2.cardHideText');
 const isVisible = ref(true);
 const showEmoji = ref(false);
@@ -945,9 +1069,58 @@ const openCardModal = (card = null, columnId = null, tab = 'activity') => {
 };
 
 
+// Debounce da busca de cards (300ms)
+watch(cardSearchQuery, (val) => {
+  clearTimeout(cardSearchTimer);
+  cardSearchTimer = setTimeout(() => {
+    cardSearchDebounced.value = val;
+  }, 300);
+});
+
+// Highlight do texto buscado
+const highlightCardText = (text) => {
+  if (!cardSearchDebounced.value.trim() || !text) return text || '';
+  const escaped = cardSearchDebounced.value.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const regex = new RegExp(`(${escaped})`, 'gi');
+  return String(text).replace(regex, '<mark class="card-search-highlight">$1</mark>');
+};
+
+// Filtra os itens da coluna: estado de arquivamento + busca por texto
+const getFilteredItems = (column) => {
+  return column.itens.filter(item => {
+    if (item === null) return false;
+    if (!!item.archived !== showArchived.value) return false;
+    if (cardSearchDebounced.value.trim()) {
+      const query = cardSearchDebounced.value.toLowerCase();
+      const titleMatch = (item.title || '').toLowerCase().includes(query);
+      const descMatch = (item.description || '').toLowerCase().includes(query);
+      return titleMatch || descMatch;
+    }
+    return true;
+  });
+};
+
+// Total de cards encontrados na busca (para o badge)
+const totalFilteredCards = computed(() => {
+  if (!cardSearchDebounced.value.trim()) return 0;
+  return board.columns.reduce((acc, col) => acc + getFilteredItems(col).length, 0);
+});
+
+// Total de cards arquivados no board
+const totalArchivedCards = computed(() => {
+  return board.columns.reduce((count, col) => {
+    return count + col.itens.filter(item => item !== null && item.archived === true).length;
+  }, 0);
+});
+
+// Atualiza os itens da coluna preservando os do outro estado (arquivados/ativos)
+const updateColumnItems = (column, newItems) => {
+  const otherItems = column.itens.filter(item => item !== null && !!item.archived !== showArchived.value);
+  column.itens = [...newItems, ...otherItems];
+};
+
 // Methods
-const orderByOnChange = (event) => {
-  console.log(event.target.value);
+const orderByOnChange = () => {
   sortItemsByLike();
 };
 
@@ -1249,6 +1422,42 @@ const checkPermission = (idUser = null, byPass = false) => {
     return true;
   }
   return false;
+};
+
+const archiveCard = (columnId, cardId, archive) => {
+  const columns = board.columns;
+  const [column, columnIndex] = findColumn(columns, columnId);
+  if (!column) return;
+
+  const [card, cardIndex] = findCard(column, cardId);
+  if (!card) return;
+
+  const originalArchived = card.archived;
+  card.archived = archive;
+
+  callFunction('archiveCard', {
+    boardId: route.params.id,
+    columnId,
+    cardId,
+    archived: archive
+  }).then(result => {
+    if (result.success) {
+      toast.success(archive ? t('boardV2.notifications.cardArchived') : t('boardV2.notifications.cardUnarchived'), {
+        position: toast.POSITION.TOP_CENTER,
+      });
+    } else {
+      card.archived = originalArchived;
+      toast.error(t('boardV2.notifications.failedToArchiveCard'), {
+        position: toast.POSITION.TOP_CENTER,
+      });
+    }
+  }).catch(error => {
+    console.error('Error archiving card:', error);
+    card.archived = originalArchived;
+    toast.error(t('boardV2.notifications.errorArchivingCard'), {
+      position: toast.POSITION.TOP_CENTER,
+    });
+  });
 };
 
 const removeCard = (columnId, cardId) => {

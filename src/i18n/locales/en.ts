@@ -200,6 +200,10 @@ export default {
     sortDefault: 'Default sorting',
     sortByLikes: 'Sort by likes',
     sortByDislikes: 'Sort by dislikes',
+    archiveCard: 'Archive Card',
+    unarchiveCard: 'Restore Card',
+    showArchived: 'Archived',
+    hideArchived: 'Hide Archived',
     settings: 'Board Settings',
     settingsTheme: 'Theme',
     themeLight: 'Light',
@@ -610,6 +614,13 @@ export default {
     labelsPlaceholder: 'Type a tag and press Enter...',
     close: 'Close',
     save: 'Save',
+    search: 'Search board...',
+    cardSearch: {
+      placeholder: 'Search cards by title or description...',
+      results: 'found',
+      clear: 'Clear search',
+      noResults: 'No cards found'
+    },
     identify: 'Identify Yourself',
     name: 'Name',
     email: 'Email',
@@ -643,6 +654,8 @@ export default {
     activity: 'Activity',
     noActivity: 'No activity recorded',
     createdCard: 'Created the card.',
+    activityArchived: 'Archived the card.',
+    activityUnarchived: 'Unarchived the card.',
     movedCard: 'Moved the card from "{source}" to "{target}"',
     addItemPlaceholder: 'Add item...',
     progress: 'Progress',
@@ -680,6 +693,7 @@ export default {
       removeCard: 'Are you sure you want to remove this card?',
       removeColumn: 'Are you sure you want to remove this column?',
       removeAttachment: 'Are you sure you want to remove this attachment?',
+      archiveCard: 'Are you sure you want to archive this card?',
       yes: 'Yes',
       no: 'No'
     },
@@ -764,7 +778,11 @@ export default {
       commentRemovedSuccess:
         'Comment removed successfully!',
       errorRemovingComment:
-        'Error removing comment'
+        'Error removing comment',
+      cardArchived: 'Card archived successfully!',
+      cardUnarchived: 'Card restored successfully!',
+      failedToArchiveCard: 'Failed to archive card',
+      errorArchivingCard: 'Error archiving card'
     }
   }
   ,
