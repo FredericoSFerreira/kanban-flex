@@ -11,51 +11,149 @@
       </div>
 
 
-      <div class="d-flex flex-row-reverse justify-content-end">
+      <div class="d-flex flex-row-reverse justify-content-end align-items-center gap-2">
 
-        <div class="btn-group btn-group-sm" v-if="board.columns.length > 0">
-          <button class="btn btn-primary" @click="newColumn()" data-bs-toggle="modal"
-                  data-bs-target="#newColumn">
-            <Plus size="18" class="me-1"/>
-            {{ t('board.addColumn') }}
+        <div class="btn-group" v-if="board.columns.length > 0">
+          <!-- Adicionar Coluna -->
+          <button
+            class="btn btn-primary"
+            @click="newColumn()"
+            data-bs-toggle="modal"
+            data-bs-target="#newColumn"
+            :title="t('board.addColumn')"
+          >
+            <Plus size="18"/>
           </button>
+
+          <!-- Estatísticas -->
           <button
             v-if="board?.columns.length > 0 && board?.columns.filter(column => column.itens.length > 0).length > 0 && user.id != 'demo'"
             class="btn btn-primary"
-            @click="router.push(`/board/statistics/${route.params.id}`)
-          ">
+            :title="t('boardV2.statistics')"
+            @click="router.push(`/board/statistics/${route.params.id}`)"
+          >
             <BarChart2 size="18"/>
-            {{ t('boardV2.statistics') }}
           </button>
+
+          <!-- Toggle Arquivados -->
+          <button
+            class="btn position-relative"
+            :class="showArchived ? 'btn-warning' : 'btn-outline-secondary'"
+            @click="showArchived = !showArchived"
+            :title="showArchived ? t('board.hideArchived') : t('board.showArchived')"
+          >
+            <ArchiveRestore v-if="showArchived" size="18"/>
+            <Archive v-else size="18"/>
+            <span
+              v-if="totalArchivedCards > 0"
+              class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger shadow-sm"
+              style="font-size: 0.60rem; padding: 0.25em 0.5em; z-index: 1020;"
+            >
+              {{ totalArchivedCards }}
+            </span>
+          </button>
+
+          <!-- AI Chat -->
           <button
             class="btn btn-primary ai-chat-toggle"
             @click="toggleAIChat"
-            title="Chat with AI Assistant"
+            :title="t('board.aiAssist.title')"
           >
-            <MessageCircle size="18" class="me-2"/>
-            {{ t('board.aiAssist.title') }}
+            <MessageCircle size="18"/>
           </button>
-          <button class="btn btn-primary" @click="showBoardSettings">
+
+          <!-- Configurações -->
+          <button class="btn btn-primary" @click="showBoardSettings" :title="t('board.settings')">
             <Settings size="18"/>
           </button>
         </div>
 
-        <div class="p-1" v-if="checkPermission() && boardConfig.showVisibility" @click="setVisibility()">
+        <!-- Visibilidade -->
+        <div v-if="checkPermission() && boardConfig.showVisibility" @click="setVisibility()">
           <button type="button" class="btn btn-light">
-            <i class="bi bi-eye" v-if="board.visibility"></i>
-            <i class="bi bi-eye-slash" v-if="!board.visibility"></i>
+            <Eye size="18" v-if="board.visibility === true || board.visibility === undefined"/>
+            <EyeOff size="18" v-if="board.visibility === false"/>
           </button>
         </div>
 
-        <div class="p-1">
-
-          <select class="form-select" aria-label="Ordenação" v-model="orderBy" @change="orderByOnChange($event)">
-            <option value="default">{{ $t('board.sortDefault') }}</option>
-            <option value="up_vote">{{ $t('board.sortByLikes') }}</option>
-            <option value="down_vote">{{ $t('board.sortByDislikes') }}</option>
-          </select>
+        <!-- Busca de Cards -->
+        <div class="d-flex align-items-center position-relative" style="min-width: 250px; max-width: 350px;" v-if="board.columns.length > 0">
+          <div class="input-group">
+            <span class="input-group-text bg-white">
+              <Search size="18" class="text-muted"/>
+            </span>
+            <input
+              id="cardSearchInput"
+              type="text"
+              class="form-control border-start-0"
+              :placeholder="t('boardV2.cardSearch.placeholder')"
+              v-model="cardSearchQuery"
+              autocomplete="off"
+            />
+            <button
+              v-if="cardSearchQuery"
+              class="btn btn-outline-secondary"
+              type="button"
+              @click="cardSearchQuery = ''"
+              :title="t('boardV2.cardSearch.clear')"
+            >
+              <X size="18"/>
+            </button>
+          </div>
+          <!-- Badge flutuante de resultados -->
+          <transition name="fade">
+            <span v-if="cardSearchDebounced" class="badge bg-primary-subtle text-primary px-2 py-1 position-absolute" style="top: 110%; right: 0; z-index: 10;">
+              <Search size="11" class="me-1"/>
+              {{ totalFilteredCards }} {{ t('boardV2.cardSearch.results') }}
+            </span>
+          </transition>
         </div>
 
+        <!-- Dropdown de Ordenação -->
+        <div class="dropdown">
+          <button
+            class="btn btn-outline-secondary dropdown-toggle"
+            type="button"
+            id="sortDropdown"
+            data-bs-toggle="dropdown"
+            aria-expanded="false"
+            :title="t('board.sortDefault')"
+          >
+            <ArrowUpDown size="18"/>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="sortDropdown">
+            <li>
+              <button
+                class="dropdown-item d-flex align-items-center gap-2"
+                :class="{ active: orderBy === 'default' }"
+                @click="orderBy = 'default'; orderByOnChange()"
+              >
+                <ArrowUpDown size="14"/>
+                {{ t('board.sortDefault') }}
+              </button>
+            </li>
+            <li>
+              <button
+                class="dropdown-item d-flex align-items-center gap-2"
+                :class="{ active: orderBy === 'up_vote' }"
+                @click="orderBy = 'up_vote'; orderByOnChange()"
+              >
+                <ThumbsUp size="14"/>
+                {{ t('board.sortByLikes') }}
+              </button>
+            </li>
+            <li>
+              <button
+                class="dropdown-item d-flex align-items-center gap-2"
+                :class="{ active: orderBy === 'down_vote' }"
+                @click="orderBy = 'down_vote'; orderByOnChange()"
+              >
+                <ThumbsDown size="14"/>
+                {{ t('board.sortByDislikes') }}
+              </button>
+            </li>
+          </ul>
+        </div>
 
       </div>
     </div>
@@ -63,6 +161,8 @@
       <AlertTriangle size="25" class=""/>
       {{ $t('board.demo.alert') }}
     </div>
+
+
     <section class="py-5 text-center container" v-if="board.columns.length === 0 && checkPermission()">
       <div class="empty-state text-center py-5">
         <div class="empty-state-content mx-auto">
@@ -133,7 +233,8 @@
 
             <div class="p-2 flex-grow-1 kanban-cards-container">
               <draggable
-                v-model="column.itens"
+                :model-value="getFilteredItems(column)"
+                @update:model-value="val => updateColumnItems(column, val)"
                 group="cards"
                 item-key="id"
                 class="card-list"
@@ -148,52 +249,64 @@
                       @dragstart="startDrag($event, card.id, column.id)"
                     >
                       <div class="d-flex justify-content-between align-items-center"
-                           :class="{ 'blur-kanban-card': !checkPermission(card.user_id) && !board.visibility }">
+                           :class="{ 'blur-kanban-card': !checkPermission(card.user_id) && board.visibility === false }">
                         <div>
-                          <h6 class="card-title mb-2" v-if="boardConfig.showTitle">{{
-                              !checkPermission(card.user_id) && !board.visibility ? cardHideText.repeat(1) : card.title
-                            }}</h6>
-                          <div class="card-text small text-muted mb-2 truncate-multi-line-description"
-                               v-if="boardConfig.showDescription">
-                            {{
-                              !checkPermission(card.user_id) && !board.visibility ? cardHideText.repeat(1) : card.description
-                            }}
-                          </div>
+                          <h6
+                            class="card-title mb-2"
+                            v-if="boardConfig.showTitle"
+                            v-html="!checkPermission(card.user_id) && board.visibility === false ? cardHideText : highlightCardText(card.title)"
+                          ></h6>
+                          <div
+                            class="card-text small text-muted mb-2 truncate-multi-line-description"
+                            v-if="boardConfig.showDescription"
+                            v-html="!checkPermission(card.user_id) && board.visibility === false ? cardHideText : highlightCardText(card.description)"
+                          ></div>
 
                         </div>
                         <div>
-                          <div class="d-flex gap-2 " v-if="checkPermission(card.user_id, true)">
+                          <div class="d-flex gap-1" v-if="checkPermission(card.user_id, true)">
                             <button
+                              v-if="!showArchived"
                               class="btn btn-sm btn-outline-primary p-1"
                               @click="openCardModal(card, column.id)"
                               :title="$t('board.editCard')"
                             >
-                              <Edit2 size="14"/>
+                              <Edit2 size="13"/>
+                            </button>
+                            <!-- Botão Arquivar / Restaurar -->
+                            <button
+                              class="btn btn-sm p-1"
+                              :class="card.archived ? 'btn-warning' : 'btn-outline-secondary'"
+                              @click="archiveCard(column.id, card.id, !card.archived)"
+                              :title="card.archived ? $t('board.unarchiveCard') : $t('board.archiveCard')"
+                            >
+                              <ArchiveRestore v-if="card.archived" size="13"/>
+                              <Archive v-else size="13"/>
                             </button>
                             <button
+                              v-if="!showArchived"
                               class="btn btn-sm btn-outline-danger p-1"
                               @click="removeCard(column.id, card.id)"
                               :title="$t('board.deleteCard')"
                             >
-                              <Trash2 size="14"/>
+                              <Trash2 size="13"/>
                             </button>
-
                           </div>
                         </div>
                       </div>
 
-                      <small :class="{ 'blur-kanban-card': !checkPermission(card.user_id) && !board.visibility}"
+                      <small :class="{ 'blur-kanban-card': !checkPermission(card.user_id) && board.visibility === false}"
                              v-if="boardConfig.showAuthorCard">
-                        <img :src="card.avatar || userDefault" :alt="card.name" class="rounded-circle" width="25"
+                        <img :src="card.assigned_user?.avatar || card.avatar || userDefault" :alt="card.name" class="rounded-circle" width="25"
                              height="25">
                         {{
-                          card.name
+                          card.assigned_user?.name || card.name
                         }}
                       </small>
 
                       <div v-if="card.labels && card.labels.length && boardConfig.showTags"
                            class="d-flex flex-wrap gap-1 mt-2"
-                           :class="{ 'blur-kanban-card': !checkPermission(card.user_id) && !board.visibility }">
+                           :class="{ 'blur-kanban-card': !checkPermission(card.user_id) && board.visibility === false }">
                       <span
                         v-for="label in card.labels"
                         :key="label"
@@ -205,7 +318,7 @@
                       </div>
 
                       <div class="text-end"
-                           :class="{ 'blur-kanban-card': !checkPermission(card.user_id) && !board.visibility }">
+                           :class="{ 'blur-kanban-card': !checkPermission(card.user_id) && board.visibility === false }">
                         <div class="d-flex align-items-center mt-3 pt-2 border-top">
 
                           <button
@@ -397,17 +510,17 @@
                 {{ t('board.settingsVisibility') }}
               </button>
             </li>
-<!--            <li class="nav-item" role="presentation">-->
-<!--              <button-->
-<!--                class="nav-link"-->
-<!--                :class="{ active: activeSettingsTab === 'permissions' }"-->
-<!--                @click="activeSettingsTab = 'permissions'"-->
-<!--                type="button"-->
-<!--              >-->
-<!--                <Shield size="16" class="me-2"/>-->
-<!--                {{ t('board.settingsPermissions') }}-->
-<!--              </button>-->
-<!--            </li>-->
+            <li class="nav-item" role="presentation">
+              <button
+                class="nav-link"
+                :class="{ active: activeSettingsTab === 'permissions' }"
+                @click="activeSettingsTab = 'permissions'"
+                type="button"
+              >
+                <Shield size="16" class="me-2"/>
+                {{ t('board.settingsPermissions') || 'Permissões e Membros' }}
+              </button>
+            </li>
           </ul>
 
           <!-- Tab Content -->
@@ -451,13 +564,12 @@
               <div class="mb-4">
                 <div class="form-check mb-3">
                   <input
-                    disabled
                     class="form-check-input"
                     type="radio"
                     name="visibility"
                     id="visibilityPublic"
-                    value="public"
-                    checked
+                    :value="true"
+                    v-model="board.visibility"
                   >
                   <label class="form-check-label" for="visibilityPublic">
                     <div class="d-flex align-items-center">
@@ -465,6 +577,26 @@
                       <div>
                         <strong>{{ t('board.settingsPublic') }}</strong>
                         <div class="text-muted small">{{ t('board.settingsPublicDescription') }}</div>
+                      </div>
+                    </div>
+                  </label>
+                </div>
+                
+                <div class="form-check mb-3">
+                  <input
+                    class="form-check-input"
+                    type="radio"
+                    name="visibility"
+                    id="visibilityPrivate"
+                    :value="false"
+                    v-model="board.visibility"
+                  >
+                  <label class="form-check-label" for="visibilityPrivate">
+                    <div class="d-flex align-items-center">
+                      <Lock size="18" class="me-2 text-danger"/>
+                      <div>
+                        <strong>{{ t('board.settingsPrivate') || 'Privado' }}</strong>
+                        <div class="text-muted small">{{ t('board.settingsPrivateDescription') || 'Apenas membros vinculados ao board podem visualizar e acessar.' }}</div>
                       </div>
                     </div>
                   </label>
@@ -515,67 +647,34 @@
 
             <!-- Permissions Settings Tab -->
             <div v-if="activeSettingsTab === 'permissions'" class="tab-pane fade show active">
-              <h6 class="mb-3">{{ t('board.settingsMemberPermissions') }}</h6>
-              <div class="mb-4">
-                <div class="form-check mb-3">
-                  <input type="checkbox" class="form-check-input" id="membersCanAddCards">
-                  <label class="form-check-label" for="membersCanAddCards">
-                    {{ t('board.settingsMembersCanAddCards') }}
-                  </label>
-                </div>
-                <div class="form-check mb-3">
-                  <input type="checkbox" class="form-check-input" id="membersCanEditCards">
-                  <label class="form-check-label" for="membersCanEditCards">
-                    {{ t('board.settingsMembersCanEditCards') }}
-                  </label>
-                </div>
-                <div class="form-check mb-3">
-                  <input type="checkbox" class="form-check-input" id="membersCanDeleteCards">
-                  <label class="form-check-label" for="membersCanDeleteCards">
-                    {{ t('board.settingsMembersCanDeleteCards') }}
-                  </label>
-                </div>
-                <div class="form-check mb-3">
-                  <input type="checkbox" class="form-check-input" id="membersCanAddColumns">
-                  <label class="form-check-label" for="membersCanAddColumns">
-                    {{ t('board.settingsMembersCanAddColumns') }}
-                  </label>
-                </div>
-                <div class="form-check mb-3">
-                  <input type="checkbox" class="form-check-input" id="membersCanInvite">
-                  <label class="form-check-label" for="membersCanInvite">
-                    {{ t('board.settingsMembersCanInvite') }}
-                  </label>
-                </div>
-              </div>
-
-              <h6 class="mb-3">{{ t('board.settingsBoardMembers') }}</h6>
+              <h6 class="mb-3">{{ t('board.settingsBoardMembers') || 'Membros do Board' }}</h6>
               <div class="members-list">
-                <div v-for="member in boardMembers" :key="member.id"
+                <div v-for="member in availableMembers" :key="member.userId"
                      class="d-flex align-items-center justify-content-between mb-3 p-3 border rounded">
                   <div class="d-flex align-items-center">
                     <img :src="member.avatar" :alt="member.name" class="rounded-circle me-3" width="40" height="40">
                     <div>
                       <div class="fw-bold">{{ member.name }}</div>
-                      <small class="text-muted">{{ member.email }}</small>
+                      <small class="text-muted">{{ member.email || 'Participant' }}</small>
                     </div>
                   </div>
                   <div class="d-flex align-items-center gap-2">
-                    <select class="form-select form-select-sm" v-model="member.role" style="width: 120px;">
-                      <option value="owner">{{ t('board.settingsOwner') }}</option>
-                      <option value="admin">{{ t('board.settingsAdmin') }}</option>
-                      <option value="member">{{ t('board.settingsMember') }}</option>
-                      <option value="viewer">{{ t('board.settingsViewer') }}</option>
-                    </select>
-                    <button v-if="member.role !== 'owner'" class="btn btn-sm btn-outline-danger">
-                      <Trash2 size="14"/>
+                    <span v-if="member.userId === board.owner_id" class="badge bg-primary">Owner</span>
+                    <span v-else class="badge bg-secondary">Membro</span>
+                  </div>
+                </div>
+
+                <div class="mt-4 border-top pt-3">
+                  <h6>Convidar Novo Membro</h6>
+                  <div class="input-group mb-3">
+                    <input type="email" class="form-control" placeholder="E-mail do usuário" v-model="inviteEmail" @keyup.enter="inviteMember" :disabled="isInviting">
+                    <button class="btn btn-outline-primary" type="button" @click="inviteMember" :disabled="isInviting || !inviteEmail">
+                      <UserPlus size="16" class="me-2" v-if="!isInviting"/>
+                      <span v-if="isInviting" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                      {{ t('board.settingsInviteMember') || 'Convidar' }}
                     </button>
                   </div>
                 </div>
-                <button class="btn btn-outline-primary w-100">
-                  <UserPlus size="16" class="me-2"/>
-                  {{ t('board.settingsInviteMember') }}
-                </button>
               </div>
             </div>
           </div>
@@ -777,13 +876,13 @@
 
 
   <!-- Card Modal -->
-  <!--    :cardData="selectedCard"-->
   <CardModal
     :is-editing="isEditingCard"
     :card-data="selectedCard"
     :column-id="selectedColumnId"
     :initial-tab="initialTab"
     :board-config="boardConfig"
+    :available-members="availableMembers"
     @edit="newSaveEditCard"
     @save="saveCard"
     @delete="removeCard"
@@ -793,7 +892,7 @@
 
 </template>
 <script setup>
-import {ref, reactive, onMounted, onUnmounted, nextTick} from 'vue';
+import {ref, reactive, computed, watch, onMounted, onUnmounted, nextTick} from 'vue';
 import {useRoute, useRouter} from 'vue-router';
 import {Modal, Offcanvas} from 'bootstrap';
 import Parse from 'parse/dist/parse.min.js';
@@ -822,7 +921,18 @@ import {
   Send,
   Sparkles,
   SquareCheckBig,
-  Eye
+  Eye,
+  EyeOff,
+  Archive,
+  ArchiveRestore,
+  ArrowUpDown,
+  RefreshCw,
+  Search,
+  X,
+  Globe,
+  Lock,
+  UserPlus,
+  Shield
 } from 'lucide-vue-next';
 import {useSwal} from '@/utils/swal';
 import draggable from 'vuedraggable';
@@ -843,6 +953,10 @@ const {t} = useI18n();
 
 // Reactive state
 const orderBy = ref("default");
+const showArchived = ref(false);
+const cardSearchQuery = ref('');
+const cardSearchDebounced = ref('');
+let cardSearchTimer = null;
 const cardHideText = t('boardV2.cardHideText');
 const isVisible = ref(true);
 const showEmoji = ref(false);
@@ -918,7 +1032,46 @@ let subscriptionBoard = null;
 let settingsModalInstance = null;
 let modalEditCard = null
 
+const availableMembers = computed(() => {
+  if (!board.columns) return [];
+  const membersMap = new Map();
+  // Add implicitly owner
+  if (board.owner_id) {
+    membersMap.set(board.owner_id, {
+      userId: board.owner_id,
+      name: board.owner_email.split('@')[0], // we might not have owner name easily unless we load it, but we can fallback
+      avatar: userDefault,
+      email: board.owner_email
+    });
+  }
+
+  // Add user themselves if they created a card
+  // Add explicitly invited members
+  const invitedMembers = board.members || [];
+  invitedMembers.forEach(m => membersMap.set(m.userId, m));
+
+  // Add card creators
+  board.columns.forEach(col => {
+    col.itens?.forEach(card => {
+      if (card.user_id && !membersMap.has(card.user_id)) {
+        membersMap.set(card.user_id, {
+          userId: card.user_id,
+          name: card.name || 'User',
+          avatar: card.avatar || userDefault,
+          email: ''
+        });
+      }
+    });
+  });
+
+  return Array.from(membersMap.values());
+});
+
 const completedItems = (card) => {
+  return card.checklist ? card.checklist.filter(item => item.completed).length : 0;
+};
+
+const progressPercentage = (card) => {
   return card.checklist ? card.checklist.filter(item => item.completed).length : 0;
 };
 
@@ -945,9 +1098,58 @@ const openCardModal = (card = null, columnId = null, tab = 'activity') => {
 };
 
 
+// Debounce da busca de cards (300ms)
+watch(cardSearchQuery, (val) => {
+  clearTimeout(cardSearchTimer);
+  cardSearchTimer = setTimeout(() => {
+    cardSearchDebounced.value = val;
+  }, 300);
+});
+
+// Highlight do texto buscado
+const highlightCardText = (text) => {
+  if (!cardSearchDebounced.value.trim() || !text) return text || '';
+  const escaped = cardSearchDebounced.value.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const regex = new RegExp(`(${escaped})`, 'gi');
+  return String(text).replace(regex, '<mark class="card-search-highlight">$1</mark>');
+};
+
+// Filtra os itens da coluna: estado de arquivamento + busca por texto
+const getFilteredItems = (column) => {
+  return column.itens.filter(item => {
+    if (item === null) return false;
+    if (!!item.archived !== showArchived.value) return false;
+    if (cardSearchDebounced.value.trim()) {
+      const query = cardSearchDebounced.value.toLowerCase();
+      const titleMatch = (item.title || '').toLowerCase().includes(query);
+      const descMatch = (item.description || '').toLowerCase().includes(query);
+      return titleMatch || descMatch;
+    }
+    return true;
+  });
+};
+
+// Total de cards encontrados na busca (para o badge)
+const totalFilteredCards = computed(() => {
+  if (!cardSearchDebounced.value.trim()) return 0;
+  return board.columns.reduce((acc, col) => acc + getFilteredItems(col).length, 0);
+});
+
+// Total de cards arquivados no board
+const totalArchivedCards = computed(() => {
+  return board.columns.reduce((count, col) => {
+    return count + col.itens.filter(item => item !== null && item.archived === true).length;
+  }, 0);
+});
+
+// Atualiza os itens da coluna preservando os do outro estado (arquivados/ativos)
+const updateColumnItems = (column, newItems) => {
+  const otherItems = column.itens.filter(item => item !== null && !!item.archived !== showArchived.value);
+  column.itens = [...newItems, ...otherItems];
+};
+
 // Methods
-const orderByOnChange = (event) => {
-  console.log(event.target.value);
+const orderByOnChange = () => {
   sortItemsByLike();
 };
 
@@ -1013,6 +1215,7 @@ const showBoardSettings = () => {
 
 const saveSettings = () => {
   updateBoardProperties({
+    visibility: board.visibility,
     config: {
       showLike: boardConfig.showLike,
       showVisibility: boardConfig.showVisibility,
@@ -1124,6 +1327,10 @@ const newSaveEditCard = (data) => {
   card.description = data.description;
   card.title = data.title;
   card.labels = labels;
+  
+  // Assign members and history tracker locally
+  if (data.assigned_user !== undefined) card.assigned_user = data.assigned_user;
+  if (data.history) card.history = data.history;
 
   callFunction('updateCard', {
     boardId: route.params.id,
@@ -1133,7 +1340,9 @@ const newSaveEditCard = (data) => {
       description: data.description,
       title: data.title,
       labels: labels,
-      checklist: checklist
+      checklist: checklist,
+      assigned_user: data.assigned_user,
+      history: data.history
     }
   }).then(result => {
     console.log("Card update result:", result);
@@ -1226,11 +1435,46 @@ const saveEditCard = () => {
 };
 
 const setVisibility = () => {
-  const newVisibility = !board.visibility;
+  const newVisibility = board.visibility === false ? true : false;
   board.visibility = newVisibility;
   isVisible.value = newVisibility;
   updateBoardProperties({visibility: newVisibility})
 };
+
+const inviteEmail = ref('');
+const isInviting = ref(false);
+
+const inviteMember = async () => {
+  if (!inviteEmail.value) return;
+  isInviting.value = true;
+  try {
+    const res = await callFunction('inviteMemberToBoard', {
+      boardId: route.params.id,
+      email: inviteEmail.value
+    });
+    if (res && res.success) {
+      if (!board.members) board.members = [];
+      board.members.push(res.member);
+      $swal.fire({ title: 'Sucesso', text: 'Membro convidado com sucesso', icon: 'success' });
+      inviteEmail.value = '';
+    }
+  } catch(e) {
+     let title = 'Atenção';
+     let message = e.message || 'Erro ao convidar membro';
+     
+     if (e.message?.includes('user_not_found')) {
+       message = t('board.settingsUserNotFound') || 'Usuário não encontrado na base de dados.';
+     } else if (e.message?.includes('user_already_member')) {
+       message = t('board.settingsUserAlreadyMember') || 'Este usuário já é membro do board.';
+     } else {
+       message = t('board.settingsErrorInvite') || message;
+     }
+
+     $swal.fire({ title, text: message, icon: 'error' });
+  } finally {
+    isInviting.value = false;
+  }
+}
 
 const updateBoardProperties = (updateData) => {
   callFunction('updateBoardProperties', {
@@ -1249,6 +1493,42 @@ const checkPermission = (idUser = null, byPass = false) => {
     return true;
   }
   return false;
+};
+
+const archiveCard = (columnId, cardId, archive) => {
+  const columns = board.columns;
+  const [column, columnIndex] = findColumn(columns, columnId);
+  if (!column) return;
+
+  const [card, cardIndex] = findCard(column, cardId);
+  if (!card) return;
+
+  const originalArchived = card.archived;
+  card.archived = archive;
+
+  callFunction('archiveCard', {
+    boardId: route.params.id,
+    columnId,
+    cardId,
+    archived: archive
+  }).then(result => {
+    if (result.success) {
+      toast.success(archive ? t('boardV2.notifications.cardArchived') : t('boardV2.notifications.cardUnarchived'), {
+        position: toast.POSITION.TOP_CENTER,
+      });
+    } else {
+      card.archived = originalArchived;
+      toast.error(t('boardV2.notifications.failedToArchiveCard'), {
+        position: toast.POSITION.TOP_CENTER,
+      });
+    }
+  }).catch(error => {
+    console.error('Error archiving card:', error);
+    card.archived = originalArchived;
+    toast.error(t('boardV2.notifications.errorArchivingCard'), {
+      position: toast.POSITION.TOP_CENTER,
+    });
+  });
 };
 
 const removeCard = (columnId, cardId) => {
@@ -1441,6 +1721,7 @@ const saveCard = (data) => {
     name: user.name,
     user_id: user.id,
     avatar: avatar.value,
+    assigned_user: { id: user.id, name: user.name, avatar: avatar.value },
     title: data.title,
     description: data.description,
     labels: data.labels ? data.labels.map(label => label.trim()).filter(Boolean) : [],
@@ -1511,7 +1792,14 @@ const getBoard = () => {
     })
     .catch((error) => {
       console.log('Failed to get board, with error code: ' + error.message);
-      router.push(`/404`);
+      if (error.message && error.message.includes("Access denied")) {
+        toast.error(t('board.accessDenied') || 'Acesso negado: Este board é privado e você não é membro.', {
+          position: toast.POSITION.TOP_CENTER,
+        });
+        router.push(`/my-boards`);
+      } else {
+        router.push(`/404`);
+      }
     });
 };
 
@@ -1520,7 +1808,9 @@ const setBoard = (boardAttr) => {
   const attributes = boardAttr.attributes || boardAttr;
   console.log("SET BOARD", attributes);
 
-  const visibility = attributes.visibility ?? true;
+  let visibility = attributes.visibility;
+  if (visibility === undefined) visibility = true;
+
   const columns = attributes.columns.map((column) => {
     return {
       ...column,

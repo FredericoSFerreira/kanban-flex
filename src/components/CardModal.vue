@@ -90,84 +90,78 @@
                   </div>
                 </div>
 
-                <!--                &lt;!&ndash; Assign Members &ndash;&gt;-->
-                <!--                <div class="mb-4">-->
-                <!--                  <label class="form-label fw-semibold">-->
-                <!--                    <Users size="16" class="me-2"/>-->
-                <!--                    {{ $t('boardV2.assignedMembers') }}-->
-                <!--                  </label>-->
+                <!-- Assign Members -->
+                <div class="mb-4">
+                  <label class="form-label fw-semibold">
+                    <Users size="16" class="me-2"/>
+                    {{ t('boardV2.assignedMembers') || 'Membro Atribuído' }}
+                  </label>
 
-                <!--                  &lt;!&ndash; Selected Members &ndash;&gt;-->
-                <!--                  <div class="selected-members mb-3" v-if="cardData.assignedMembers.length > 0">-->
-                <!--                    <div class="d-flex flex-wrap gap-2">-->
-                <!--                      <div-->
-                <!--                        v-for="member in cardData.assignedMembers"-->
-                <!--                        :key="member.id"-->
-                <!--                        class="member-chip d-flex align-items-center"-->
-                <!--                      >-->
-                <!--                        <img-->
-                <!--                          :src="member.avatar"-->
-                <!--                          :alt="member.name"-->
-                <!--                          class="rounded-circle me-2"-->
-                <!--                          width="24"-->
-                <!--                          height="24"-->
-                <!--                        />-->
-                <!--                        <span class="me-2">{{ member.name }}</span>-->
-                <!--                        <button-->
-                <!--                          type="button"-->
-                <!--                          class="btn-close"-->
-                <!--                          style="font-size: 0.6rem;"-->
-                <!--                          @click="removeMember(member.id)"-->
-                <!--                        ></button>-->
-                <!--                      </div>-->
-                <!--                    </div>-->
-                <!--                  </div>-->
+                  <!-- Selected Member -->
+                  <div class="selected-members mb-3" v-if="cardData.assigned_user">
+                    <div class="d-flex flex-wrap gap-2">
+                      <div class="member-chip d-flex align-items-center border p-1 rounded-pill pe-2 bg-light">
+                        <img
+                          :src="cardData.assigned_user.avatar"
+                          :alt="cardData.assigned_user.name"
+                          class="rounded-circle me-2"
+                          width="24"
+                          height="24"
+                        />
+                        <span class="me-2 small fw-medium">{{ cardData.assigned_user.name }}</span>
+                        <button
+                          type="button"
+                          class="btn-close"
+                          style="font-size: 0.6rem;"
+                          @click="unassignMember()"
+                        ></button>
+                      </div>
+                    </div>
+                  </div>
 
-                <!--                  &lt;!&ndash; Member Search &ndash;&gt;-->
-                <!--                  <div class="member-search">-->
-                <!--                    <div class="input-group">-->
-                <!--                      <span class="input-group-text">-->
-                <!--                        <Search size="16"/>-->
-                <!--                      </span>-->
-                <!--                      <input-->
-                <!--                        type="text"-->
-                <!--                        class="form-control"-->
-                <!--                        v-model="memberSearch"-->
-                <!--                        @input="searchMembers"-->
-                <!--                        :placeholder="$t('boardV2.searchMembers')"-->
-                <!--                      />-->
-                <!--                    </div>-->
-
-                <!--                    &lt;!&ndash; Search Results &ndash;&gt;-->
-                <!--                    <div v-if="filteredMembers.length > 0 && memberSearch" class="member-results mt-2">-->
-                <!--                      <div class="list-group">-->
-                <!--                        <button-->
-                <!--                          v-for="member in filteredMembers"-->
-                <!--                          :key="member.id"-->
-                <!--                          type="button"-->
-                <!--                          class="list-group-item list-group-item-action d-flex align-items-center"-->
-                <!--                          @click="assignMember(member)"-->
-                <!--                          :disabled="isAlreadyAssigned(member.id)"-->
-                <!--                        >-->
-                <!--                          <img-->
-                <!--                            :src="member.avatar"-->
-                <!--                            :alt="member.name"-->
-                <!--                            class="rounded-circle me-3"-->
-                <!--                            width="32"-->
-                <!--                            height="32"-->
-                <!--                          />-->
-                <!--                          <div class="flex-grow-1">-->
-                <!--                            <div class="fw-semibold">{{ member.name }}</div>-->
-                <!--                            <small class="text-muted">{{ member.email }}</small>-->
-                <!--                          </div>-->
-                <!--                          <div v-if="isAlreadyAssigned(member.id)" class="text-success">-->
-                <!--                            <Check size="16"/>-->
-                <!--                          </div>-->
-                <!--                        </button>-->
-                <!--                      </div>-->
-                <!--                    </div>-->
-                <!--                  </div>-->
-                <!--                </div>-->
+                  <!-- Member Search Dropdown -->
+                  <div class="member-search dropdown" v-if="!cardData.assigned_user">
+                    <button class="btn btn-outline-secondary w-100 text-start d-flex justify-content-between align-items-center" type="button" data-bs-toggle="dropdown" aria-expanded="false" @click.prevent>
+                      <span class="text-muted"><Search size="16" class="me-2"/> Buscar membro</span>
+                    </button>
+                    <div class="dropdown-menu w-100 p-2 shadow" style="max-height: 250px; overflow-y: auto;">
+                      <div class="input-group mb-2">
+                        <input
+                          type="text"
+                          class="form-control form-control-sm"
+                          v-model="memberSearch"
+                          :placeholder="'Buscar...'"
+                          @click.stop
+                        />
+                      </div>
+                      
+                      <div v-if="filteredMembers.length > 0">
+                        <button
+                          v-for="member in filteredMembers"
+                          :key="member.userId"
+                          type="button"
+                          class="dropdown-item d-flex align-items-center rounded mb-1"
+                          @click="assignMember(member)"
+                        >
+                          <img
+                            :src="member.avatar"
+                            :alt="member.name"
+                            class="rounded-circle me-3"
+                            width="28"
+                            height="28"
+                          />
+                          <div class="flex-grow-1">
+                            <div class="fw-semibold small">{{ member.name }}</div>
+                            <small class="text-muted" style="font-size: 0.70rem;">{{ member.email || 'Membro do Board' }}</small>
+                          </div>
+                        </button>
+                      </div>
+                      <div v-else class="text-muted small text-center p-2">
+                        Membro não encontrado... Vá nas configurações para convidar.
+                      </div>
+                    </div>
+                  </div>
+                </div>
 
                 <!--                 Attachments -->
                 <div class="mb-4">
@@ -349,11 +343,23 @@
                               <div v-if="activity.action == 'create_card'">
                                 {{ $t('boardV2.createdCard') }}
                               </div>
+                              <div v-else-if="activity.action == 'archive_card'">
+                                {{ $t('boardV2.activityArchived') }}
+                              </div>
+                              <div v-else-if="activity.action == 'unarchive_card'">
+                                {{ $t('boardV2.activityUnarchived') }}
+                              </div>
+                              <div v-else-if="activity.action == 'assign_member'">
+                                Atribuiu para <span class="fw-semibold">{{ activity.data?.assigneeName }}</span>
+                              </div>
+                              <div v-else-if="activity.action == 'unassign_member'">
+                                Removeu a atribuição do card
+                              </div>
                               <div v-else>
                                 {{
                                   $t('boardV2.movedCard', {
-                                    source: activity.data?.source.columnName,
-                                    target: activity.data?.target.columnName
+                                    source: activity.data?.source?.columnName || '...',
+                                    target: activity.data?.target?.columnName || '...'
                                   })
                                 }}
                               </div>
@@ -684,6 +690,10 @@ const props = defineProps({
     type: String,
     default:
       'details' // Ou qualquer valor padrão que faça sentido
+  },
+  availableMembers: {
+    type: Array,
+    default: () => []
   }
 });
 
@@ -753,34 +763,41 @@ const isDragging = ref(false);
 const maxFileSize = ref(5 * 1024 * 1024); // Default 5MB, will be updated from backend
 const maxTotalSize = 10 * 1024 * 1024; // 10MB in bytes
 const allowedImageTypes = ref(['image/jpeg', 'image/jpg', 'image/png', 'image/webp']);
-const allowedDocumentTypes = ref(['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet']);
+const filteredMembers = computed(() => {
+  if (!memberSearch.value) return props.availableMembers;
+  const search = memberSearch.value.toLowerCase();
+  return props.availableMembers.filter(m => 
+    m.name?.toLowerCase().includes(search) || 
+    m.email?.toLowerCase().includes(search)
+  );
+});
 
-const teamMembers = ref([
-  {
-    id: 1,
-    name: 'Sarah Johnson',
-    email: 'sarah@example.com',
-    avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=32&h=32&q=80'
-  },
-  {
-    id: 2,
-    name: 'Michael Chen',
-    email: 'michael@example.com',
-    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=32&h=32&q=80'
-  },
-  {
-    id: 3,
-    name: 'Emily Rodriguez',
-    email: 'emily@example.com',
-    avatar: 'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=32&h=32&q=80'
-  },
-  {
-    id: 4,
-    name: 'David Kim',
-    email: 'david@example.com',
-    avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=32&h=32&q=80'
-  }
-]);
+const assignMember = (member) => {
+  props.cardData.assigned_user = { id: member.userId, name: member.name, avatar: member.avatar };
+  memberSearch.value = '';
+  // Add history event
+  if (!props.cardData.history) props.cardData.history = [];
+  props.cardData.history.push({
+    id: uniqueId(),
+    user: { name: auth.user.name, avatar: avatar.value },
+    action: 'assign_member',
+    timestamp: new Date().toISOString(),
+    data: { assigneeName: member.name }
+  });
+};
+
+const unassignMember = () => {
+  props.cardData.assigned_user = null;
+  // Add history event
+  if (!props.cardData.history) props.cardData.history = [];
+  props.cardData.history.push({
+    id: uniqueId(),
+    user: { name: auth.user.name, avatar: avatar.value },
+    action: 'unassign_member',
+    timestamp: new Date().toISOString(),
+    data: {}
+  });
+};
 
 
 // Tabs configuration
@@ -825,13 +842,6 @@ const tabs = computed(() => {
 });
 
 // Computed properties
-const filteredMembers = computed(() => {
-  if (!memberSearch.value) return [];
-  return teamMembers.value.filter(member =>
-    member.name.toLowerCase().includes(memberSearch.value.toLowerCase()) ||
-    member.email.toLowerCase().includes(memberSearch.value.toLowerCase())
-  );
-});
 
 const completedItems = computed(() =>
   props.cardData.checklist.filter(item => item.completed).length
@@ -861,26 +871,7 @@ const getLabelClass = (label) => {
   return `bg-${['primary', 'success', 'info', 'warning', 'danger', 'secondary'][index]}`;
 };
 
-const searchMembers = () => {
-  // Search is handled by computed property
-};
-
-const assignMember = (member) => {
-  if (!isAlreadyAssigned(member.id)) {
-    props.cardData.assignedMembers.push(member);
-    memberSearch.value = '';
-  }
-};
-
-const removeMember = (memberId) => {
-  props.cardData.assignedMembers = props.cardData.assignedMembers.filter(
-    member => member.id !== memberId
-  );
-};
-
-const isAlreadyAssigned = (memberId) => {
-  return props.cardData.assignedMembers.some(member => member.id === memberId);
-};
+//
 
 const addComment = () => {
   if (newComment.value.trim()) {

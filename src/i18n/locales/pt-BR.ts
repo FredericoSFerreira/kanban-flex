@@ -100,12 +100,12 @@ export default {
     watchDemo: 'Ver Demonstração',
     subtitle_footer: 'É um quadro web moderno, aplicativo de código aberto baseado em colunas e cartões.',
     textVariations: [
-    "Visualize seu Fluxo de Trabalho com",
-    "Organize suas Tarefas com",
-    "Gerencie seus Projetos com",
-    "Colabore com sua Equipe usando",
-    "Aumente sua Produtividade com"
-  ]
+      "Visualize seu Fluxo de Trabalho com",
+      "Organize suas Tarefas com",
+      "Gerencie seus Projetos com",
+      "Colabore com sua Equipe usando",
+      "Aumente sua Produtividade com"
+    ]
   },
   features: {
     title: 'Recursos que tornam seu fluxo de trabalho mais suave',
@@ -201,6 +201,10 @@ export default {
     sortDefault: 'Ordenação padrão',
     sortByLikes: 'Ordenação por likes',
     sortByDislikes: 'Ordenação por dislikes',
+    archiveCard: 'Arquivar Card',
+    unarchiveCard: 'Restaurar Card',
+    showArchived: 'Arquivados',
+    hideArchived: 'Ocultar Arquivados',
     settings: 'Configurações do Quadro',
     settingsTheme: 'Tema',
     themeLight: 'Claro',
@@ -220,6 +224,9 @@ export default {
     settingsBoardVisibility: 'Visibilidade do Quadro',
     settingsPublic: 'Público',
     settingsPublicDescription: 'Qualquer pessoa com o link pode visualizar este quadro',
+    settingsPrivate: 'Privado',
+    settingsPrivateDescription: 'Apenas membros vinculados ao board podem visualizar e acessar',
+    accessDenied: 'Acesso negado: Este board é privado e você não é membro.',
     settingsAdditionalOptions: 'Opções Adicionais',
     settingsMemberPermissions: 'Permissões de Membros',
     settingsMembersCanAddCards: 'Membros podem adicionar cartões',
@@ -233,6 +240,9 @@ export default {
     settingsMember: 'Membro',
     settingsViewer: 'Visualizador',
     settingsInviteMember: 'Convidar Membro',
+    settingsUserNotFound: 'Usuário não encontrado na base de dados.',
+    settingsUserAlreadyMember: 'Este usuário já é membro do board.',
+    settingsErrorInvite: 'Erro ao convidar membro. Tente novamente mais tarde.',
     settingsAIHelpBoardTitle: 'Ajuda de IA para Título do Quadro',
     settingsAIHelpBoardDescription: 'Ajuda de IA para Descrição do Quadro',
     emptyState: {
@@ -507,6 +517,13 @@ export default {
     labelsPlaceholder: 'Digite uma etiqueta é pressione Enter...',
     close: 'Fechar',
     save: 'Salvar',
+    search: 'Buscar board...',
+    cardSearch: {
+      placeholder: 'Buscar cards...',
+      results: 'encontrado(s)',
+      clear: 'Limpar busca',
+      noResults: 'Nenhum card encontrado'
+    },
     identify: 'Identifique-se',
     name: 'Nome',
     email: 'Email',
@@ -540,6 +557,8 @@ export default {
     activity: 'Atividade',
     noActivity: 'Nenhuma atividade registrada',
     createdCard: 'Criou o card.',
+    activityArchived: 'Arquivou o card.',
+    activityUnarchived: 'Removeu o arquivamento do card.',
     movedCard: 'Movel o card de "{source}" para "{target}"',
     addItemPlaceholder: 'Adicionar item...',
     progress: 'Progresso',
@@ -572,6 +591,7 @@ export default {
       removeCard: 'Tem certeza que deseja remover este card?',
       removeColumn: 'Tem certeza que deseja remover esta coluna?',
       removeAttachment: 'Tem certeza que deseja remover este anexo?',
+      archiveCard: 'Tem certeza que deseja arquivar este card?',
       yes: 'Sim',
       no: 'Não'
     },
@@ -616,7 +636,11 @@ export default {
       errorAddingComment: 'Erro ao adicionar comentário',
       failedToRemoveComment: 'Falha ao remover comentário',
       commentRemovedSuccess: 'Comentário removido com sucesso!',
-      errorRemovingComment: 'Erro ao remover comentário'
+      errorRemovingComment: 'Erro ao remover comentário',
+      cardArchived: 'Card arquivado com sucesso!',
+      cardUnarchived: 'Card restaurado com sucesso!',
+      failedToArchiveCard: 'Falha ao arquivar o card',
+      errorArchivingCard: 'Erro ao arquivar o card'
     }
   },
   createBoard: {
