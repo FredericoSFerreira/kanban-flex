@@ -71,8 +71,8 @@
         <!-- Visibilidade -->
         <div v-if="checkPermission() && boardConfig.showVisibility" @click="setVisibility()">
           <button type="button" class="btn btn-light">
-            <Eye size="18" v-if="board.visibility"/>
-            <EyeOff size="18" v-if="!board.visibility"/>
+            <Eye size="18" v-if="board.visibility === true || board.visibility === undefined"/>
+            <EyeOff size="18" v-if="board.visibility === false"/>
           </button>
         </div>
 
@@ -249,17 +249,17 @@
                       @dragstart="startDrag($event, card.id, column.id)"
                     >
                       <div class="d-flex justify-content-between align-items-center"
-                           :class="{ 'blur-kanban-card': !checkPermission(card.user_id) && !board.visibility }">
+                           :class="{ 'blur-kanban-card': !checkPermission(card.user_id) && board.visibility === false }">
                         <div>
                           <h6
                             class="card-title mb-2"
                             v-if="boardConfig.showTitle"
-                            v-html="!checkPermission(card.user_id) && !board.visibility ? cardHideText : highlightCardText(card.title)"
+                            v-html="!checkPermission(card.user_id) && board.visibility === false ? cardHideText : highlightCardText(card.title)"
                           ></h6>
                           <div
                             class="card-text small text-muted mb-2 truncate-multi-line-description"
                             v-if="boardConfig.showDescription"
-                            v-html="!checkPermission(card.user_id) && !board.visibility ? cardHideText : highlightCardText(card.description)"
+                            v-html="!checkPermission(card.user_id) && board.visibility === false ? cardHideText : highlightCardText(card.description)"
                           ></div>
 
                         </div>
@@ -295,18 +295,18 @@
                         </div>
                       </div>
 
-                      <small :class="{ 'blur-kanban-card': !checkPermission(card.user_id) && !board.visibility}"
+                      <small :class="{ 'blur-kanban-card': !checkPermission(card.user_id) && board.visibility === false}"
                              v-if="boardConfig.showAuthorCard">
-                        <img :src="card.avatar || userDefault" :alt="card.name" class="rounded-circle" width="25"
+                        <img :src="card.assigned_user?.avatar || card.avatar || userDefault" :alt="card.name" class="rounded-circle" width="25"
                              height="25">
                         {{
-                          card.name
+                          card.assigned_user?.name || card.name
                         }}
                       </small>
 
                       <div v-if="card.labels && card.labels.length && boardConfig.showTags"
                            class="d-flex flex-wrap gap-1 mt-2"
-                           :class="{ 'blur-kanban-card': !checkPermission(card.user_id) && !board.visibility }">
+                           :class="{ 'blur-kanban-card': !checkPermission(card.user_id) && board.visibility === false }">
                       <span
                         v-for="label in card.labels"
                         :key="label"
@@ -318,7 +318,7 @@
                       </div>
 
                       <div class="text-end"
-                           :class="{ 'blur-kanban-card': !checkPermission(card.user_id) && !board.visibility }">
+                           :class="{ 'blur-kanban-card': !checkPermission(card.user_id) && board.visibility === false }">
                         <div class="d-flex align-items-center mt-3 pt-2 border-top">
 
                           <button
@@ -510,17 +510,17 @@
                 {{ t('board.settingsVisibility') }}
               </button>
             </li>
-<!--            <li class="nav-item" role="presentation">-->
-<!--              <button-->
-<!--                class="nav-link"-->
-<!--                :class="{ active: activeSettingsTab === 'permissions' }"-->
-<!--                @click="activeSettingsTab = 'permissions'"-->
-<!--                type="button"-->
-<!--              >-->
-<!--                <Shield size="16" class="me-2"/>-->
-<!--                {{ t('board.settingsPermissions') }}-->
-<!--              </button>-->
-<!--            </li>-->
+            <li class="nav-item" role="presentation">
+              <button
+                class="nav-link"
+                :class="{ active: activeSettingsTab === 'permissions' }"
+                @click="activeSettingsTab = 'permissions'"
+                type="button"
+              >
+                <Shield size="16" class="me-2"/>
+                {{ t('board.settingsPermissions') || 'Permissões e Membros' }}
+              </button>
+            </li>
           </ul>
 
           <!-- Tab Content -->
@@ -564,13 +564,12 @@
               <div class="mb-4">
                 <div class="form-check mb-3">
                   <input
-                    disabled
                     class="form-check-input"
                     type="radio"
                     name="visibility"
                     id="visibilityPublic"
-                    value="public"
-                    checked
+                    :value="true"
+                    v-model="board.visibility"
                   >
                   <label class="form-check-label" for="visibilityPublic">
                     <div class="d-flex align-items-center">
@@ -578,6 +577,26 @@
                       <div>
                         <strong>{{ t('board.settingsPublic') }}</strong>
                         <div class="text-muted small">{{ t('board.settingsPublicDescription') }}</div>
+                      </div>
+                    </div>
+                  </label>
+                </div>
+                
+                <div class="form-check mb-3">
+                  <input
+                    class="form-check-input"
+                    type="radio"
+                    name="visibility"
+                    id="visibilityPrivate"
+                    :value="false"
+                    v-model="board.visibility"
+                  >
+                  <label class="form-check-label" for="visibilityPrivate">
+                    <div class="d-flex align-items-center">
+                      <Lock size="18" class="me-2 text-danger"/>
+                      <div>
+                        <strong>{{ t('board.settingsPrivate') || 'Privado' }}</strong>
+                        <div class="text-muted small">{{ t('board.settingsPrivateDescription') || 'Apenas membros vinculados ao board podem visualizar e acessar.' }}</div>
                       </div>
                     </div>
                   </label>
@@ -628,67 +647,34 @@
 
             <!-- Permissions Settings Tab -->
             <div v-if="activeSettingsTab === 'permissions'" class="tab-pane fade show active">
-              <h6 class="mb-3">{{ t('board.settingsMemberPermissions') }}</h6>
-              <div class="mb-4">
-                <div class="form-check mb-3">
-                  <input type="checkbox" class="form-check-input" id="membersCanAddCards">
-                  <label class="form-check-label" for="membersCanAddCards">
-                    {{ t('board.settingsMembersCanAddCards') }}
-                  </label>
-                </div>
-                <div class="form-check mb-3">
-                  <input type="checkbox" class="form-check-input" id="membersCanEditCards">
-                  <label class="form-check-label" for="membersCanEditCards">
-                    {{ t('board.settingsMembersCanEditCards') }}
-                  </label>
-                </div>
-                <div class="form-check mb-3">
-                  <input type="checkbox" class="form-check-input" id="membersCanDeleteCards">
-                  <label class="form-check-label" for="membersCanDeleteCards">
-                    {{ t('board.settingsMembersCanDeleteCards') }}
-                  </label>
-                </div>
-                <div class="form-check mb-3">
-                  <input type="checkbox" class="form-check-input" id="membersCanAddColumns">
-                  <label class="form-check-label" for="membersCanAddColumns">
-                    {{ t('board.settingsMembersCanAddColumns') }}
-                  </label>
-                </div>
-                <div class="form-check mb-3">
-                  <input type="checkbox" class="form-check-input" id="membersCanInvite">
-                  <label class="form-check-label" for="membersCanInvite">
-                    {{ t('board.settingsMembersCanInvite') }}
-                  </label>
-                </div>
-              </div>
-
-              <h6 class="mb-3">{{ t('board.settingsBoardMembers') }}</h6>
+              <h6 class="mb-3">{{ t('board.settingsBoardMembers') || 'Membros do Board' }}</h6>
               <div class="members-list">
-                <div v-for="member in boardMembers" :key="member.id"
+                <div v-for="member in availableMembers" :key="member.userId"
                      class="d-flex align-items-center justify-content-between mb-3 p-3 border rounded">
                   <div class="d-flex align-items-center">
                     <img :src="member.avatar" :alt="member.name" class="rounded-circle me-3" width="40" height="40">
                     <div>
                       <div class="fw-bold">{{ member.name }}</div>
-                      <small class="text-muted">{{ member.email }}</small>
+                      <small class="text-muted">{{ member.email || 'Participant' }}</small>
                     </div>
                   </div>
                   <div class="d-flex align-items-center gap-2">
-                    <select class="form-select form-select-sm" v-model="member.role" style="width: 120px;">
-                      <option value="owner">{{ t('board.settingsOwner') }}</option>
-                      <option value="admin">{{ t('board.settingsAdmin') }}</option>
-                      <option value="member">{{ t('board.settingsMember') }}</option>
-                      <option value="viewer">{{ t('board.settingsViewer') }}</option>
-                    </select>
-                    <button v-if="member.role !== 'owner'" class="btn btn-sm btn-outline-danger">
-                      <Trash2 size="14"/>
+                    <span v-if="member.userId === board.owner_id" class="badge bg-primary">Owner</span>
+                    <span v-else class="badge bg-secondary">Membro</span>
+                  </div>
+                </div>
+
+                <div class="mt-4 border-top pt-3">
+                  <h6>Convidar Novo Membro</h6>
+                  <div class="input-group mb-3">
+                    <input type="email" class="form-control" placeholder="E-mail do usuário" v-model="inviteEmail" @keyup.enter="inviteMember" :disabled="isInviting">
+                    <button class="btn btn-outline-primary" type="button" @click="inviteMember" :disabled="isInviting || !inviteEmail">
+                      <UserPlus size="16" class="me-2" v-if="!isInviting"/>
+                      <span v-if="isInviting" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                      {{ t('board.settingsInviteMember') || 'Convidar' }}
                     </button>
                   </div>
                 </div>
-                <button class="btn btn-outline-primary w-100">
-                  <UserPlus size="16" class="me-2"/>
-                  {{ t('board.settingsInviteMember') }}
-                </button>
               </div>
             </div>
           </div>
@@ -890,13 +876,13 @@
 
 
   <!-- Card Modal -->
-  <!--    :cardData="selectedCard"-->
   <CardModal
     :is-editing="isEditingCard"
     :card-data="selectedCard"
     :column-id="selectedColumnId"
     :initial-tab="initialTab"
     :board-config="boardConfig"
+    :available-members="availableMembers"
     @edit="newSaveEditCard"
     @save="saveCard"
     @delete="removeCard"
@@ -942,7 +928,11 @@ import {
   ArrowUpDown,
   RefreshCw,
   Search,
-  X
+  X,
+  Globe,
+  Lock,
+  UserPlus,
+  Shield
 } from 'lucide-vue-next';
 import {useSwal} from '@/utils/swal';
 import draggable from 'vuedraggable';
@@ -1042,7 +1032,46 @@ let subscriptionBoard = null;
 let settingsModalInstance = null;
 let modalEditCard = null
 
+const availableMembers = computed(() => {
+  if (!board.columns) return [];
+  const membersMap = new Map();
+  // Add implicitly owner
+  if (board.owner_id) {
+    membersMap.set(board.owner_id, {
+      userId: board.owner_id,
+      name: board.owner_email.split('@')[0], // we might not have owner name easily unless we load it, but we can fallback
+      avatar: userDefault,
+      email: board.owner_email
+    });
+  }
+
+  // Add user themselves if they created a card
+  // Add explicitly invited members
+  const invitedMembers = board.members || [];
+  invitedMembers.forEach(m => membersMap.set(m.userId, m));
+
+  // Add card creators
+  board.columns.forEach(col => {
+    col.itens?.forEach(card => {
+      if (card.user_id && !membersMap.has(card.user_id)) {
+        membersMap.set(card.user_id, {
+          userId: card.user_id,
+          name: card.name || 'User',
+          avatar: card.avatar || userDefault,
+          email: ''
+        });
+      }
+    });
+  });
+
+  return Array.from(membersMap.values());
+});
+
 const completedItems = (card) => {
+  return card.checklist ? card.checklist.filter(item => item.completed).length : 0;
+};
+
+const progressPercentage = (card) => {
   return card.checklist ? card.checklist.filter(item => item.completed).length : 0;
 };
 
@@ -1186,6 +1215,7 @@ const showBoardSettings = () => {
 
 const saveSettings = () => {
   updateBoardProperties({
+    visibility: board.visibility,
     config: {
       showLike: boardConfig.showLike,
       showVisibility: boardConfig.showVisibility,
@@ -1297,6 +1327,10 @@ const newSaveEditCard = (data) => {
   card.description = data.description;
   card.title = data.title;
   card.labels = labels;
+  
+  // Assign members and history tracker locally
+  if (data.assigned_user !== undefined) card.assigned_user = data.assigned_user;
+  if (data.history) card.history = data.history;
 
   callFunction('updateCard', {
     boardId: route.params.id,
@@ -1306,7 +1340,9 @@ const newSaveEditCard = (data) => {
       description: data.description,
       title: data.title,
       labels: labels,
-      checklist: checklist
+      checklist: checklist,
+      assigned_user: data.assigned_user,
+      history: data.history
     }
   }).then(result => {
     console.log("Card update result:", result);
@@ -1399,11 +1435,46 @@ const saveEditCard = () => {
 };
 
 const setVisibility = () => {
-  const newVisibility = !board.visibility;
+  const newVisibility = board.visibility === false ? true : false;
   board.visibility = newVisibility;
   isVisible.value = newVisibility;
   updateBoardProperties({visibility: newVisibility})
 };
+
+const inviteEmail = ref('');
+const isInviting = ref(false);
+
+const inviteMember = async () => {
+  if (!inviteEmail.value) return;
+  isInviting.value = true;
+  try {
+    const res = await callFunction('inviteMemberToBoard', {
+      boardId: route.params.id,
+      email: inviteEmail.value
+    });
+    if (res && res.success) {
+      if (!board.members) board.members = [];
+      board.members.push(res.member);
+      $swal.fire({ title: 'Sucesso', text: 'Membro convidado com sucesso', icon: 'success' });
+      inviteEmail.value = '';
+    }
+  } catch(e) {
+     let title = 'Atenção';
+     let message = e.message || 'Erro ao convidar membro';
+     
+     if (e.message?.includes('user_not_found')) {
+       message = t('board.settingsUserNotFound') || 'Usuário não encontrado na base de dados.';
+     } else if (e.message?.includes('user_already_member')) {
+       message = t('board.settingsUserAlreadyMember') || 'Este usuário já é membro do board.';
+     } else {
+       message = t('board.settingsErrorInvite') || message;
+     }
+
+     $swal.fire({ title, text: message, icon: 'error' });
+  } finally {
+    isInviting.value = false;
+  }
+}
 
 const updateBoardProperties = (updateData) => {
   callFunction('updateBoardProperties', {
@@ -1650,6 +1721,7 @@ const saveCard = (data) => {
     name: user.name,
     user_id: user.id,
     avatar: avatar.value,
+    assigned_user: { id: user.id, name: user.name, avatar: avatar.value },
     title: data.title,
     description: data.description,
     labels: data.labels ? data.labels.map(label => label.trim()).filter(Boolean) : [],
@@ -1720,7 +1792,14 @@ const getBoard = () => {
     })
     .catch((error) => {
       console.log('Failed to get board, with error code: ' + error.message);
-      router.push(`/404`);
+      if (error.message && error.message.includes("Access denied")) {
+        toast.error(t('board.accessDenied') || 'Acesso negado: Este board é privado e você não é membro.', {
+          position: toast.POSITION.TOP_CENTER,
+        });
+        router.push(`/my-boards`);
+      } else {
+        router.push(`/404`);
+      }
     });
 };
 
@@ -1729,7 +1808,9 @@ const setBoard = (boardAttr) => {
   const attributes = boardAttr.attributes || boardAttr;
   console.log("SET BOARD", attributes);
 
-  const visibility = attributes.visibility ?? true;
+  let visibility = attributes.visibility;
+  if (visibility === undefined) visibility = true;
+
   const columns = attributes.columns.map((column) => {
     return {
       ...column,

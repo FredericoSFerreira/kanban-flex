@@ -788,6 +788,58 @@ Parse.Cloud.define("getUserMe", async (request) => {
 });
 
 
+Parse.Cloud.define("inviteMemberToBoard", async (request) => {
+  try {
+    // Validate JWT token
+    await verifyTokenParseCloudFunction(request);
+
+    const { boardId, email } = request.params;
+    if (!boardId || !email) throw new Error("Missing parameters");
+
+    // Check if board exists and user is owner
+    const boardQuery = new Parse.Query("boards");
+    boardQuery.equalTo('objectId', boardId);
+    const board = await boardQuery.first({useMasterKey: true});
+    
+    if (!board) throw new Error("Board not found");
+    if (board.get('owner_id') !== request.user.id) {
+      throw new Error("Only the owner can invite members");
+    }
+
+    // Find user by email
+    const otpQuery = new Parse.Query("otp");
+    otpQuery.equalTo('email', email);
+    const user = await otpQuery.first({useMasterKey: true});
+
+    if (!user) {
+      throw new Error("user_not_found");
+    }
+
+    // Check if user is already a member
+    let members = board.get('members') || [];
+    if (members.some(m => m.userId === user.id)) {
+      throw new Error("user_already_member");
+    }
+
+    // Add to members
+    members.push({
+      userId: user.id,
+      email: user.get('email'),
+      name: user.get('name'),
+      avatar: user.get('avatar'),
+      role: 'member'
+    });
+
+    board.set('members', members);
+    await board.save(null, {useMasterKey: true});
+
+    return { success: true, member: members[members.length - 1] };
+  } catch (error) {
+    console.log('Failed to inviteMemberToBoard: ' + error.message);
+    throw error;
+  }
+});
+
 Parse.Cloud.define("getBoardStats", async (request) => {
   // Validate JWT token
   await verifyTokenParseCloudFunction(request);
@@ -910,7 +962,30 @@ Parse.Cloud.define("getBoardById", async (request) => {
     const {id} = request.params;
     const query = new Parse.Query("boards");
     query.equalTo('objectId', id)
-    return await query.first();
+    const board = await query.first({useMasterKey: true});
+    if (!board) {
+      throw new Error("Board not found");
+    }
+
+    const userId = request.user?.id;
+    if (userId) {
+      const visibility = board.get('visibility');
+      const isPublic = visibility !== false;
+      
+      if (!isPublic) {
+        const isOwner = board.get('owner_id') === userId;
+        const members = board.get('members') || [];
+        const isMember = members.some(m => m.userId === userId);
+        const columns = board.get('columns') || [];
+        const hasCards = columns.some(c => (c.itens || []).some(card => card.user_id === userId));
+
+        if (!isOwner && !isMember && !hasCards) {
+          throw new Parse.Error(Parse.Error.OPERATION_FORBIDDEN, "Access denied: Board is private");
+        }
+      }
+    }
+
+    return board;
   } catch (error) {
     console.log('Failed to getBoardById, with error code: ' + error.message);
     throw error
@@ -925,10 +1000,12 @@ Parse.Cloud.define("getParticipatingBoards", async (request) => {
     const query = new Parse.Query("boards");
     const userId = request.params.userId;
 
-    // Build match condition
     const matchCondition = {
-      "owner_id": {$not: {$eq: userId}},
-      "columns.itens.user_id": userId
+      "owner_id": {$ne: userId},
+      $or: [
+        {"columns.itens.user_id": userId},
+        {"members.userId": userId}
+      ]
     };
 
     // Add search filter if provided
