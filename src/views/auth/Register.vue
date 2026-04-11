@@ -160,6 +160,9 @@ import {jwtDecode} from "jwt-decode";
 import {useAuthStore} from "@/stores/auth";
 import {sleep} from "@/utils/utils";
 import type { JwtPayload, PhoneType} from '@/utils/types';
+import { useCloudFunctions } from '@/composables/useCloudFunctions';
+
+const { callFunction } = useCloudFunctions();
 
 const router = useRouter()
 const route = useRoute()
@@ -241,10 +244,23 @@ const verifyOTP = async () => {
         console.log(decoded, "HERER")
         auth.login(decoded, token)
         await sleep()
+        
+        // Check for invite token
+        const inviteToken = route.query.invite;
+        if (inviteToken) {
+          try {
+            await callFunction('acceptBoardInvite', { token: inviteToken, userId: decoded.id });
+          } catch (e) {
+            console.error('Failed to accept board invite:', e);
+          }
+        }
+
         showSpinner.value = false;
         const redirectPath = route.query.redirect
         if (typeof redirectPath === 'string' && redirectPath !== '/login') {
           router.push(redirectPath)
+        } else if (route.query.board) {
+          router.push(`/board/${route.query.board}`)
         } else {
           router.push('/my-boards')
         }

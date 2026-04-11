@@ -146,6 +146,9 @@ import {jwtDecode} from 'jwt-decode';
 import {useRoute, useRouter} from "vue-router";
 import {sleep} from "@/utils/utils"
 import {googleTokenLogin} from "vue3-google-login"
+import { useCloudFunctions } from '@/composables/useCloudFunctions';
+
+const { callFunction } = useCloudFunctions();
 
 
 type JwtPayload = {
@@ -226,10 +229,23 @@ const verifyOTP = async () => {
         const decoded = jwtDecode<JwtPayload>(token)
         auth.login(decoded, token)
         await sleep()
+
+        // Check for invite token
+        const inviteToken = route.query.invite;
+        if (inviteToken) {
+          try {
+            await callFunction('acceptBoardInvite', { token: inviteToken, userId: decoded.id });
+          } catch (e) {
+            console.error('Failed to accept board invite:', e);
+          }
+        }
+
         showSpinner.value = false;
         const redirectPath = route.query.redirect
         if (typeof redirectPath === 'string' && redirectPath !== '/login') {
           router.push(redirectPath)
+        } else if (route.query.board) {
+          router.push(`/board/${route.query.board}`)
         } else {
           router.push('/my-boards')
         }
@@ -308,10 +324,20 @@ function handleGoogleLogin() {
         localStorage.setItem('token', token);
         const decoded = jwtDecode<JwtPayload>(token)
         auth.login(decoded, token)
+
+        // Check for invite token
+        const inviteToken = route.query.invite;
+        if (inviteToken) {
+          callFunction('acceptBoardInvite', { token: inviteToken, userId: decoded.id })
+            .catch(e => console.error('Failed to accept board invite:', e));
+        }
+
         showSpinner.value = false;
         const redirectPath = route.query.redirect
         if (typeof redirectPath === 'string' && redirectPath !== '/login') {
           router.push(redirectPath)
+        } else if (route.query.board) {
+          router.push(`/board/${route.query.board}`)
         } else {
           router.push('/my-boards')
         }

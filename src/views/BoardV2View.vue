@@ -5,6 +5,14 @@
     <div class="kanban-header d-flex justify-content-between align-items-center">
       <div class="d-flex flex-row">
         <h2 class="mb-0">{{ board.name }}
+          <span
+            v-if="showArchived"
+            class="badge bg-warning text-dark ms-2"
+            style="font-size: 0.6rem; vertical-align: middle; font-weight: 600;"
+          >
+            <Archive :size="10" class="me-1"/>
+            {{ t('board.archivedMode') }}
+          </span>
           <button v-if="checkPermission()" class="btn btn-sm btn btn-light edit-column"
                   @click="editBoardName(board.name)"><i class="bi bi-pencil-square"></i></button>
         </h2>
@@ -59,7 +67,7 @@
             @click="toggleAIChat"
             :title="t('board.aiAssist.title')"
           >
-            <MessageCircle size="18"/>
+            <Sparkles size="18"/>
           </button>
 
           <!-- Configurações -->
@@ -71,15 +79,15 @@
         <!-- Visibilidade -->
         <div v-if="checkPermission() && boardConfig.showVisibility" @click="setVisibility()">
           <button type="button" class="btn btn-light">
-            <Eye size="18" v-if="board.visibility === true || board.visibility === undefined"/>
-            <EyeOff size="18" v-if="board.visibility === false"/>
+            <Eye size="18" v-if="board.visibility"/>
+            <EyeOff size="18" v-if="!board.visibility"/>
           </button>
         </div>
 
         <!-- Busca de Cards -->
         <div class="d-flex align-items-center position-relative" style="min-width: 250px; max-width: 350px;" v-if="board.columns.length > 0">
           <div class="input-group">
-            <span class="input-group-text bg-white">
+            <span class="input-group-text bg-transparent border-end-0">
               <Search size="18" class="text-muted"/>
             </span>
             <input
@@ -181,7 +189,6 @@
     </section>
 
     <div class="kanban-board" id="kanban-board">
-      <!-- Colunas com vuedraggable -->
       <draggable
         v-model="board.columns"
         group="columns"
@@ -232,23 +239,16 @@
             </div>
 
             <div class="p-2 flex-grow-1 kanban-cards-container">
-              <draggable
-                :model-value="getFilteredItems(column)"
-                @update:model-value="val => updateColumnItems(column, val)"
-                group="cards"
-                item-key="id"
-                class="card-list"
-                handle=".card-drag-handle"
-                @end="onCardMoved($event, column.id)"
-              >
-                <template #item="{element: card}">
-                  <div v-if="card !== null" class="card-drag-handle">
-                    <div
-                      class="kanban-card card p-2 mx-2"
-                      draggable="true"
-                      @dragstart="startDrag($event, card.id, column.id)"
-                    >
-                      <div class="d-flex justify-content-between align-items-center"
+              <div v-for="card in getFilteredItems(column)" :key="card.id">
+                <div v-if="card !== null">
+                  <div
+                    class="kanban-card card p-2 mx-2 position-relative"
+                    draggable="true"
+                    @dragstart="startDrag($event, card.id, column.id)"
+                    @click="openCardModal(card, column.id)"
+                    style="cursor: pointer;"
+                  >
+                      <div class="d-flex justify-content-between align-items-center me-3"
                            :class="{ 'blur-kanban-card': !checkPermission(card.user_id) && board.visibility === false }">
                         <div>
                           <h6
@@ -265,19 +265,11 @@
                         </div>
                         <div>
                           <div class="d-flex gap-1" v-if="checkPermission(card.user_id, true)">
-                            <button
-                              v-if="!showArchived"
-                              class="btn btn-sm btn-outline-primary p-1"
-                              @click="openCardModal(card, column.id)"
-                              :title="$t('board.editCard')"
-                            >
-                              <Edit2 size="13"/>
-                            </button>
                             <!-- Botão Arquivar / Restaurar -->
                             <button
                               class="btn btn-sm p-1"
                               :class="card.archived ? 'btn-warning' : 'btn-outline-secondary'"
-                              @click="archiveCard(column.id, card.id, !card.archived)"
+                              @click.stop="archiveCard(column.id, card.id, !card.archived)"
                               :title="card.archived ? $t('board.unarchiveCard') : $t('board.archiveCard')"
                             >
                               <ArchiveRestore v-if="card.archived" size="13"/>
@@ -286,7 +278,7 @@
                             <button
                               v-if="!showArchived"
                               class="btn btn-sm btn-outline-danger p-1"
-                              @click="removeCard(column.id, card.id)"
+                              @click.stop="removeCard(column.id, card.id)"
                               :title="$t('board.deleteCard')"
                             >
                               <Trash2 size="13"/>
@@ -295,14 +287,46 @@
                         </div>
                       </div>
 
-                      <small :class="{ 'blur-kanban-card': !checkPermission(card.user_id) && board.visibility === false}"
-                             v-if="boardConfig.showAuthorCard">
-                        <img :src="card.assigned_user?.avatar || card.avatar || userDefault" :alt="card.name" class="rounded-circle" width="25"
-                             height="25">
-                        {{
-                          card.assigned_user?.name || card.name
-                        }}
-                      </small>
+                      <div :class="{ 'blur-kanban-card': !checkPermission(card.user_id) && board.visibility === false }"
+                           v-if="boardConfig.showAuthorCard" class="d-flex align-items-center justify-content-between mt-2">
+
+                        <div class="card-members d-flex align-items-center" v-if="card.assigned_users && card.assigned_users.length > 0">
+                          <!-- Membro único: exibe foto + nome -->
+                          <template v-if="card.assigned_users.length === 1">
+                            <img
+                              :src="card.assigned_users[0].avatar || userDefault"
+                              :alt="card.assigned_users[0].name"
+                              :title="card.assigned_users[0].name"
+                              class="rounded-circle"
+                              width="24" height="24"
+                              style="position: relative; z-index: 10; box-shadow: 0 0 0 2px #fff; flex-shrink: 0;"
+                            />
+                            <small class="ms-1 text-muted text-truncate" style="max-width: 80px;">{{ card.assigned_users[0].name }}</small>
+                          </template>
+                          <!-- Múltiplos membros: avatares empilhados -->
+                          <template v-else>
+                            <template v-for="(member, idx) in card.assigned_users" :key="member.id">
+                              <img v-if="idx < 3"
+                                   :src="member.avatar || userDefault"
+                                   :alt="member.name"
+                                   :title="member.name"
+                                   class="rounded-circle"
+                                   width="28" height="28"
+                                   :style="idx > 0 ? 'margin-left: -6px; position: relative; z-index: ' + (10 - idx) + '; box-shadow: 0 0 0 2px #fff;' : 'position: relative; z-index: 10; box-shadow: 0 0 0 2px #fff;'"/>
+                            </template>
+                            <div v-if="card.assigned_users.length > 3"
+                                 class="d-flex justify-content-center align-items-center rounded-circle bg-secondary text-white"
+                                 style="width: 28px; height: 28px; font-size: 0.70rem; margin-left: -6px; position: relative; z-index: 1; box-shadow: 0 0 0 2px #fff;">
+                              +{{ card.assigned_users.length - 3 }}
+                            </div>
+                          </template>
+                        </div>
+
+                        <div v-else-if="!card.assigned_users || card.assigned_users.length === 0" class="d-flex align-items-center">
+                          <img :src="card.avatar || userDefault" :alt="card.name" :title="card.name" class="rounded-circle" width="28" height="28">
+                          <small class="ms-1 text-muted">{{ card.name }}</small>
+                        </div>
+                      </div>
 
                       <div v-if="card.labels && card.labels.length && boardConfig.showTags"
                            class="d-flex flex-wrap gap-1 mt-2"
@@ -319,12 +343,12 @@
 
                       <div class="text-end"
                            :class="{ 'blur-kanban-card': !checkPermission(card.user_id) && board.visibility === false }">
-                        <div class="d-flex align-items-center mt-3 pt-2 border-top">
+                        <div class="d-flex align-items-center mt-3 pt-2 border-top" @click.stop>
 
                           <button
                             v-if="boardConfig.showLike"
                             class="btn btn-sm btn-outline-success me-2 d-flex align-items-center gap-1"
-                            @click="saveCardVotes(column.id, card.id, true, false)"
+                            @click.stop="saveCardVotes(column.id, card.id, true, false)"
                             :class="{ 'active': card.up_vote }"
                           >
                             <ThumbsUp size="14"/>
@@ -333,7 +357,7 @@
                           <button
                             v-if="boardConfig.showLike"
                             class="btn btn-sm btn-outline-danger me-2 d-flex align-items-center gap-1"
-                            @click="saveCardVotes(column.id, card.id, false, true)"
+                            @click.stop="saveCardVotes(column.id, card.id, false, true)"
                             :class="{ 'active': card.down_vote }"
                           >
                             <ThumbsDown size="14"/>
@@ -341,7 +365,7 @@
                           </button>
                           <button
                             class="btn btn-sm btn-outline-secondary me-2  d-flex align-items-center gap-1"
-                            @click="openCardModal(card, column.id, 'comments')"
+                            @click.stop="openCardModal(card, column.id, 'comments')"
                           >
                             <MessageSquare size="14"/>
                             <span>{{ card.comments?.length || 0 }}</span>
@@ -350,7 +374,7 @@
                           <button
                             v-if="card.checklist?.length"
                             :class="`btn btn-sm ${completedItems(card) === card.checklist?.length ? 'btn-primary' : 'btn-outline-primary'} d-flex align-items-center gap-1`"
-                            @click="openCardModal(card, column.id, 'checklist')"
+                            @click.stop="openCardModal(card, column.id, 'checklist')"
                           >
                             <SquareCheckBig size="14"/>
                             <span>{{ completedItems(card) }}/{{ card.checklist?.length || 0 }}</span>
@@ -359,9 +383,8 @@
                         </div>
                       </div>
                     </div>
-                  </div>
-                </template>
-              </draggable>
+                </div>
+              </div>
             </div>
           </div>
         </template>
@@ -566,10 +589,10 @@
                   <input
                     class="form-check-input"
                     type="radio"
-                    name="visibility"
+                    name="is_public"
                     id="visibilityPublic"
                     :value="true"
-                    v-model="board.visibility"
+                    v-model="board.is_public"
                   >
                   <label class="form-check-label" for="visibilityPublic">
                     <div class="d-flex align-items-center">
@@ -581,15 +604,15 @@
                     </div>
                   </label>
                 </div>
-                
+
                 <div class="form-check mb-3">
                   <input
                     class="form-check-input"
                     type="radio"
-                    name="visibility"
+                    name="is_public"
                     id="visibilityPrivate"
                     :value="false"
-                    v-model="board.visibility"
+                    v-model="board.is_public"
                   >
                   <label class="form-check-label" for="visibilityPrivate">
                     <div class="d-flex align-items-center">
@@ -647,33 +670,44 @@
 
             <!-- Permissions Settings Tab -->
             <div v-if="activeSettingsTab === 'permissions'" class="tab-pane fade show active">
-              <h6 class="mb-3">{{ t('board.settingsBoardMembers') || 'Membros do Board' }}</h6>
-              <div class="members-list">
-                <div v-for="member in availableMembers" :key="member.userId"
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <h6 class="mb-0">{{ t('board.settingsBoardMembers') || 'Membros do Board' }}</h6>
+                <div class="input-group input-group-sm w-50">
+                  <span class="input-group-text bg-transparent border-end-0"><Search size="14"/></span>
+                  <input type="text" class="form-control border-start-0" v-model="settingsMemberSearch" :placeholder="t('board.searchMember') || 'Buscar membro...'">
+                </div>
+              </div>
+              <div class="members-list" style="max-height: 300px; overflow-y: auto; overflow-x: hidden; padding-right: 5px;">
+                <div v-for="member in filteredSettingsMembers" :key="member.userId"
                      class="d-flex align-items-center justify-content-between mb-3 p-3 border rounded">
                   <div class="d-flex align-items-center">
-                    <img :src="member.avatar" :alt="member.name" class="rounded-circle me-3" width="40" height="40">
+                    <img :src="member.pending ? userDefault : member.avatar" :alt="member.name" class="rounded-circle me-3" width="40" height="40">
                     <div>
                       <div class="fw-bold">{{ member.name }}</div>
-                      <small class="text-muted">{{ member.email || 'Participant' }}</small>
+                      <small v-if="member.email" class="text-muted">{{ member.email }}</small>
                     </div>
                   </div>
                   <div class="d-flex align-items-center gap-2">
                     <span v-if="member.userId === board.owner_id" class="badge bg-primary">Owner</span>
+                    <span v-else-if="member.pending" class="badge bg-info text-dark">{{ t('board.settingsPendingMember') || 'Convidado' }}</span>
                     <span v-else class="badge bg-secondary">Membro</span>
-                  </div>
-                </div>
-
-                <div class="mt-4 border-top pt-3">
-                  <h6>Convidar Novo Membro</h6>
-                  <div class="input-group mb-3">
-                    <input type="email" class="form-control" placeholder="E-mail do usuário" v-model="inviteEmail" @keyup.enter="inviteMember" :disabled="isInviting">
-                    <button class="btn btn-outline-primary" type="button" @click="inviteMember" :disabled="isInviting || !inviteEmail">
-                      <UserPlus size="16" class="me-2" v-if="!isInviting"/>
-                      <span v-if="isInviting" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                      {{ t('board.settingsInviteMember') || 'Convidar' }}
+                    <button v-if="member.userId !== board.owner_id && user.id === board.owner_id" class="btn btn-sm btn-outline-danger ms-2" @click="removeMember(member.userId)">
+                      <Trash2 size="14"/>
                     </button>
                   </div>
+                </div>
+              </div>
+
+              <!-- Invite Member Fixed Area (Outside Scroll) -->
+              <div class="mt-3 border-top pt-3">
+                <h6>{{ t('board.settingsInviteMemberTitle') || 'Convidar Novo Membro' }}</h6>
+                <div class="input-group mb-3">
+                  <input type="email" class="form-control" :placeholder="t('board.settingsInviteMemberPlaceholder') || 'E-mail do usuário'" v-model="inviteEmail" @keyup.enter="inviteMember" :disabled="isInviting">
+                  <button class="btn btn-outline-primary" type="button" @click="inviteMember" :disabled="isInviting || !inviteEmail">
+                    <UserPlus size="16" class="me-2" v-if="!isInviting"/>
+                    <span v-if="isInviting" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                    {{ t('board.settingsInviteMemberLabel') || 'Convidar' }}
+                  </button>
                 </div>
               </div>
             </div>
@@ -917,7 +951,7 @@ import {
   BarChart2,
   Settings,
   AlertTriangle,
-  MessageCircle,
+
   Send,
   Sparkles,
   SquareCheckBig,
@@ -976,6 +1010,7 @@ const board = reactive({
   name: null,
   owner: null,
   visibility: true,
+  is_public: true,
   slug: "",
   columns: [],
   _created_at: null,
@@ -1083,7 +1118,14 @@ const openCardModal = (card = null, columnId = null, tab = 'activity') => {
     selectedCard.value = JSON.parse(JSON.stringify({checklist: [], history: [], ...card}));
     cardSelectedId.value = card.id;
   } else {
-    selectedCard.value = {checklist: [], history: [], title: '', description: '', labels: []};
+    selectedCard.value = {
+      checklist: [],
+      history: [],
+      title: '',
+      description: '',
+      labels: [],
+      assigned_users: [{ id: user.id, name: user.name, avatar: avatar.value }]
+    };
     cardSelectedId.value = null;
   }
   selectedColumnId.value = columnId;
@@ -1216,6 +1258,7 @@ const showBoardSettings = () => {
 const saveSettings = () => {
   updateBoardProperties({
     visibility: board.visibility,
+    is_public: board.is_public,
     config: {
       showLike: boardConfig.showLike,
       showVisibility: boardConfig.showVisibility,
@@ -1327,9 +1370,9 @@ const newSaveEditCard = (data) => {
   card.description = data.description;
   card.title = data.title;
   card.labels = labels;
-  
+
   // Assign members and history tracker locally
-  if (data.assigned_user !== undefined) card.assigned_user = data.assigned_user;
+  if (data.assigned_users !== undefined) card.assigned_users = data.assigned_users;
   if (data.history) card.history = data.history;
 
   callFunction('updateCard', {
@@ -1341,7 +1384,7 @@ const newSaveEditCard = (data) => {
       title: data.title,
       labels: labels,
       checklist: checklist,
-      assigned_user: data.assigned_user,
+      assigned_users: data.assigned_users,
       history: data.history
     }
   }).then(result => {
@@ -1441,11 +1484,61 @@ const setVisibility = () => {
   updateBoardProperties({visibility: newVisibility})
 };
 
+const settingsMemberSearch = ref('');
+const filteredSettingsMembers = computed(() => {
+  if (!settingsMemberSearch.value) return availableMembers.value;
+  const s = settingsMemberSearch.value.toLowerCase();
+  return availableMembers.value.filter(m =>
+    (m.name && m.name.toLowerCase().includes(s)) ||
+    (m.email && m.email.toLowerCase().includes(s))
+  );
+});
+
+const removeMember = async (userId) => {
+  try {
+    const result = await $swal.fire({
+      title: 'Remover Membro',
+      text: 'Tem certeza que deseja remover este membro do board? Ele perderá acesso se for um board privado.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sim, remover',
+      cancelButtonText: 'Cancelar'
+    });
+
+    if (result.isConfirmed) {
+      await callFunction('removeMemberFromBoard', {
+        boardId: route.params.id,
+        userId: userId
+      });
+      // Refresh local board members array
+      if (board.members) {
+        board.members = board.members.filter(m => m.userId !== userId);
+      }
+      $swal.fire('Removido', 'Membro removido com sucesso!', 'success');
+    }
+  } catch (err) {
+    console.error(err);
+    if (!err.message?.includes('user_not_member')) {
+      $swal.fire('Atenção', 'Erro ao remover membro', 'error');
+    }
+  }
+};
+
 const inviteEmail = ref('');
 const isInviting = ref(false);
 
 const inviteMember = async () => {
   if (!inviteEmail.value) return;
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(inviteEmail.value)) {
+    return $swal.fire({
+      icon: 'error',
+      title: t('board.invalidEmailTitle') || 'E-mail Inválido',
+      text: t('board.invalidEmailText') || 'Por favor, insira um endereço de e-mail válido.'
+    });
+  }
+
   isInviting.value = true;
   try {
     const res = await callFunction('inviteMemberToBoard', {
@@ -1461,9 +1554,27 @@ const inviteMember = async () => {
   } catch(e) {
      let title = 'Atenção';
      let message = e.message || 'Erro ao convidar membro';
-     
+
      if (e.message?.includes('user_not_found')) {
        message = t('board.settingsUserNotFound') || 'Usuário não encontrado na base de dados.';
+
+       const confirm = await $swal.fire({
+         title: t('board.inviteNotRegistered'),
+         text: t('board.sendInviteConfirm'),
+         icon: 'question',
+         showCancelButton: true,
+       });
+
+       if (confirm.isConfirmed) {
+         await callFunction('sendBoardInviteEmail', {
+           boardId: route.params.id,
+           email: inviteEmail.value,
+           locale: t('locale') || 'pt-BR'
+         });
+         $swal.fire({ title: t('board.inviteSent'), icon: 'success' });
+         inviteEmail.value = '';
+         return;
+       }
      } else if (e.message?.includes('user_already_member')) {
        message = t('board.settingsUserAlreadyMember') || 'Este usuário já é membro do board.';
      } else {
@@ -1721,7 +1832,7 @@ const saveCard = (data) => {
     name: user.name,
     user_id: user.id,
     avatar: avatar.value,
-    assigned_user: { id: user.id, name: user.name, avatar: avatar.value },
+    assigned_users: [{ id: user.id, name: user.name, avatar: avatar.value }],
     title: data.title,
     description: data.description,
     labels: data.labels ? data.labels.map(label => label.trim()).filter(Boolean) : [],
@@ -1811,6 +1922,9 @@ const setBoard = (boardAttr) => {
   let visibility = attributes.visibility;
   if (visibility === undefined) visibility = true;
 
+  let is_public = attributes.is_public;
+  if (is_public === undefined) is_public = true;
+
   const columns = attributes.columns.map((column) => {
     return {
       ...column,
@@ -1823,7 +1937,8 @@ const setBoard = (boardAttr) => {
   Object.assign(board, {
     ...attributes,
     columns,
-    visibility: visibility
+    visibility: visibility,
+    is_public: is_public
   });
 
   console.log("NOVO BOARD", board);
@@ -1892,11 +2007,10 @@ const startDrag = (evt, cardId, columnId) => {
   evt.dataTransfer.effectAllowed = 'move';
   evt.dataTransfer.setData('cardDragId', cardId);
   evt.dataTransfer.setData('collumnDragId', columnId);
+  evt.dataTransfer.setData('dragType', 'card');
 };
 
-const onColumnMoved = (evt) => {
-  console.log("Column moved", evt);
-
+const onColumnMoved = () => {
   const originalColumns = JSON.parse(JSON.stringify(board.columns));
 
   callFunction('updateColumnPosition', {
@@ -1951,6 +2065,9 @@ const onCardMoved = (evt, columnId) => {
 };
 
 const onDrop = (evt, columnDropId) => {
+  const dragType = evt.dataTransfer.getData('dragType');
+  if (dragType !== 'card' && dragType !== '') return; // support empty for legacy if any
+
   const cardDragId = evt.dataTransfer.getData('cardDragId');
   const columnToRemoveId = evt.dataTransfer.getData('collumnDragId');
   evt.preventDefault();

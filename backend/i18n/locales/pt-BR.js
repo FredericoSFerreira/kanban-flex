@@ -17,7 +17,11 @@ export default {
     accountDeletionMessage: "Lamentamos vê-lo partir. Sua conta foi desativada conforme solicitado.",
     accountDeactivated: "Sua conta foi desativada",
     accountDeletionInfo: "Se desejar reativar sua conta no futuro, entre em contato com nossa equipe de suporte.",
-    accountDeletionContact: "Se tiver alguma dúvida ou preocupação, não hesite em entrar em contato conosco."
+    accountDeletionContact: "Se tiver alguma dúvida ou preocupação, não hesite em entrar em contato conosco.",
+    boardInviteSubject: "Convite para Quadro - {boardName}",
+    boardInviteTitle: "Convite para o Quadro",
+    boardInviteMessage: "Olá! Você foi convidado por {inviterName} para participar do quadro '{boardName}'. Clique no botão abaixo para criar sua conta.",
+    boardInviteButton: "Criar minha conta"
   },
   auth: {
     inactiveAccount: "Sua conta foi desativada. Por favor, entre em contato com o suporte para obter assistência."

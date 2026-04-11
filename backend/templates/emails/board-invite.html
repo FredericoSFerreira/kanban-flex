@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="{{ locale }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ t 'email.boardInviteTitle' }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        .email-container {
+            max-width: 600px;
+            margin: 20px auto;
+            background: #f6f6f6;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            padding: 24px;
+            text-align: center;
+        }
+
+        .header img {
+            width: 60px;
+            margin-bottom: 12px;
+        }
+
+        .header h1 {
+            font-weight: bold;
+            color: white;
+            margin: 0;
+            padding-top: 5px;
+            font-size: 24px;
+        }
+
+        .header h2 {
+            font-weight: bold;
+            color: black;
+            font-size: 20px;
+            margin: 0;
+        }
+
+        .email-body {
+            padding: 30px;
+            text-align: center;
+        }
+
+        .btn-container {
+            margin: 30px 0;
+        }
+
+        .btn-invite {
+            display: inline-block;
+            padding: 12px 30px;
+            background-color: #0070f3;
+            color: white !important;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .email-footer {
+            text-align: center;
+            padding: 15px;
+            background: #e4e4e4;
+            font-size: 14px;
+            color:  #6c757d;
+        }
+
+        .email-footer a {
+            color:  #6c757d;
+        }
+    </style>
+</head>
+<body>
+<div class="email-container">
+
+    <div class="header" style="background-color: #0070f3;">
+        <h1>{{ t 'email.boardInviteTitle' }}</h1>
+    </div>
+    <div class="header">
+          <img src="{{host}}/logo-kanbanflex.png"
+             alt="{{ t 'email.appName' }} Logo">
+        <h2>{{ t 'email.appName' }}</h2>
+    </div>
+
+    <!-- Body -->
+    <div class="email-body">
+        <p style="font-size: 18px; color: #333;">{{ t 'email.greeting' }},</p>
+        <p style="color: #666; line-height: 1.5;">
+            {{ t 'email.boardInviteMessage' boardName=boardName inviterName=inviterName }}
+        </p>
+
+        <div class="btn-container">
+            <a href="{{ inviteUrl }}" class="btn-invite">
+                {{ t 'email.boardInviteButton' }}
+            </a>
+        </div>
+
+        <p style="font-size: 14px; color: #999;">{{ t 'email.disclaimer' }}</p>
+        <p style="color: #666;">{{ t 'email.regards' }}<br>{{ t 'email.team' }}</p>
+    </div>
+
+    <!-- Footer -->
+    <div class="email-footer">
+        <p>{{ t 'email.copyright' }} {{ host }} {{ t 'email.contribute' }} <a target="_blank"
+                                                               href="https://github.com/FredericoSFerreira/kanban-flex">
+            {{ t 'email.openSource' }} </a></p>
+    </div>
+</div>
+</body>
+</html>

@@ -204,6 +204,7 @@ export default {
     unarchiveCard: 'Restore Card',
     showArchived: 'Archived',
     hideArchived: 'Hide Archived',
+    archivedMode: 'Archived',
     settings: 'Board Settings',
     settingsTheme: 'Theme',
     themeLight: 'Light',
@@ -238,12 +239,22 @@ export default {
     settingsAdmin: 'Admin',
     settingsMember: 'Member',
     settingsViewer: 'Viewer',
+    searchMember: 'Search member...',
+    settingsInviteMemberTitle: 'Invite New Member',
+    settingsInviteMemberPlaceholder: 'User e-mail address',
+    settingsInviteMemberLabel: 'Invite',
+    settingsPendingMember: 'Invited',
     settingsInviteMember: 'Invite Member',
     settingsUserNotFound: 'User not found in the database.',
     settingsUserAlreadyMember: 'This user is already a member of the board.',
-    settingsErrorInvite: 'Error inviting member. Try again later.',
+    settingsErrorInvite: 'Error inviting member. Please try again later.',
+    invalidEmailTitle: 'Invalid Email',
+    invalidEmailText: 'Please enter a valid email address.',
     settingsAIHelpBoardTitle: 'AI Help for Board Title',
     settingsAIHelpBoardDescription: 'AI Help for Board Description',
+    inviteNotRegistered: 'User not registered',
+    sendInviteConfirm: 'This e-mail was not found in our database. Do you want to send an invitation to join this board?',
+    inviteSent: 'Invitation sent successfully!',
     emptyState: {
       title: "Time to get started",
       description: "Start by creating the columns for your board",
@@ -794,12 +805,17 @@ export default {
   ,
   createBoard: {
     success: 'Board created successfully!',
-    error:
-      {
-        title: 'Oops...',
-        message:
-          'An error occurred while creating the board!'
-      }
+    error: {
+      title: 'Oops...',
+      message: 'An error occurred while creating the board!'
+    },
+    stepPermissions: 'Access Settings',
+    visibilityLabel: 'Who can access this board?',
+    visibilityWarning: 'This option can be changed anytime in the board settings.',
+    inviteLabel: 'Invite Members (Optional)',
+    addEmail: 'Add Email',
+    back: 'Back',
+    create: 'Create Board'
   }
   ,
   error: {

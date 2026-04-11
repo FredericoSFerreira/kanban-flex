@@ -38,6 +38,9 @@ async function sendEmail(emailTo, name, code, locale = 'pt-BR', options = {}) {
   if (isAccountDeletion) {
     filePath = path.join(__dirname, '../templates/emails/account-deletion.html');
     subject = t('email.accountDeletionSubject', locale) || 'Your account has been deactivated';
+  } else if (code === 'BOARD_INVITE') {
+    filePath = path.join(__dirname, '../templates/emails/board-invite.html');
+    subject = t('email.boardInviteSubject', locale, { boardName: options.boardName }) || 'Board Invitation';
   } else {
     filePath = path.join(__dirname, '../templates/emails/index.html');
     subject = t('email.subject', locale);
@@ -58,8 +61,8 @@ async function sendEmail(emailTo, name, code, locale = 'pt-BR', options = {}) {
     locale: locale,
     isAccountDeletion: isAccountDeletion,
     ...options,
-    t: function(key) {
-      return t(key, locale);
+    t: function(key, options) {
+      return t(key, locale, options.hash);
     }
   };
 

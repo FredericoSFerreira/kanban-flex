@@ -6,7 +6,12 @@
         <div class="modal-header border-0 pb-0">
           <div class="d-flex align-items-center">
             <div>
-              <h4 class="modal-title mb-0">{{ isEditing ? t('boardV2.editCard') : t('boardV2.newCard') }}</h4>
+              <h4 class="modal-title mb-0">
+                {{ isEditing ? t('boardV2.editCard') : t('boardV2.newCard') }}
+                <span v-if="cardData.archived" class="badge bg-warning text-dark ms-2" style="font-size: 0.8rem;">
+                  {{ t('board.archivedMode') }}
+                </span>
+              </h4>
               <small class="text-muted">{{
                   isEditing ? t('boardV2.editCardDescription') : t('boardV2.newCardDescription')
                 }}</small>
@@ -98,29 +103,29 @@
                   </label>
 
                   <!-- Selected Member -->
-                  <div class="selected-members mb-3" v-if="cardData.assigned_user">
+                  <div class="selected-members mb-3" v-if="cardData.assigned_users && cardData.assigned_users.length > 0">
                     <div class="d-flex flex-wrap gap-2">
-                      <div class="member-chip d-flex align-items-center border p-1 rounded-pill pe-2 bg-light">
+                      <div class="member-chip d-flex align-items-center border p-1 rounded-pill pe-2 bg-light" v-for="member in cardData.assigned_users" :key="member.id">
                         <img
-                          :src="cardData.assigned_user.avatar"
-                          :alt="cardData.assigned_user.name"
+                          :src="member.avatar"
+                          :alt="member.name"
                           class="rounded-circle me-2"
                           width="24"
                           height="24"
                         />
-                        <span class="me-2 small fw-medium">{{ cardData.assigned_user.name }}</span>
+                        <span class="me-2 small fw-medium">{{ member.name }}</span>
                         <button
                           type="button"
                           class="btn-close"
                           style="font-size: 0.6rem;"
-                          @click="unassignMember()"
+                          @click="unassignMember(member.id, member.name)"
                         ></button>
                       </div>
                     </div>
                   </div>
 
                   <!-- Member Search Dropdown -->
-                  <div class="member-search dropdown" v-if="!cardData.assigned_user">
+                  <div class="member-search dropdown">
                     <button class="btn btn-outline-secondary w-100 text-start d-flex justify-content-between align-items-center" type="button" data-bs-toggle="dropdown" aria-expanded="false" @click.prevent>
                       <span class="text-muted"><Search size="16" class="me-2"/> Buscar membro</span>
                     </button>
@@ -134,7 +139,7 @@
                           @click.stop
                         />
                       </div>
-                      
+
                       <div v-if="filteredMembers.length > 0">
                         <button
                           v-for="member in filteredMembers"
@@ -353,7 +358,7 @@
                                 Atribuiu para <span class="fw-semibold">{{ activity.data?.assigneeName }}</span>
                               </div>
                               <div v-else-if="activity.action == 'unassign_member'">
-                                Removeu a atribuição do card
+                                Removeu a atribuição de <span class="fw-semibold">{{ activity.data?.unassigneeName || 'um Membro' }}</span>
                               </div>
                               <div v-else>
                                 {{
@@ -764,16 +769,23 @@ const maxFileSize = ref(5 * 1024 * 1024); // Default 5MB, will be updated from b
 const maxTotalSize = 10 * 1024 * 1024; // 10MB in bytes
 const allowedImageTypes = ref(['image/jpeg', 'image/jpg', 'image/png', 'image/webp']);
 const filteredMembers = computed(() => {
-  if (!memberSearch.value) return props.availableMembers;
+  let members = props.availableMembers;
+  if (props.cardData.assigned_users && props.cardData.assigned_users.length > 0) {
+    const assignedIds = props.cardData.assigned_users.map(u => u.id);
+    members = members.filter(m => !assignedIds.includes(m.userId));
+  }
+
+  if (!memberSearch.value) return members;
   const search = memberSearch.value.toLowerCase();
-  return props.availableMembers.filter(m => 
-    m.name?.toLowerCase().includes(search) || 
+  return members.filter(m =>
+    m.name?.toLowerCase().includes(search) ||
     m.email?.toLowerCase().includes(search)
   );
 });
 
 const assignMember = (member) => {
-  props.cardData.assigned_user = { id: member.userId, name: member.name, avatar: member.avatar };
+  if (!props.cardData.assigned_users) props.cardData.assigned_users = [];
+  props.cardData.assigned_users.push({ id: member.userId, name: member.name, avatar: member.avatar });
   memberSearch.value = '';
   // Add history event
   if (!props.cardData.history) props.cardData.history = [];
@@ -786,8 +798,9 @@ const assignMember = (member) => {
   });
 };
 
-const unassignMember = () => {
-  props.cardData.assigned_user = null;
+const unassignMember = (memberId, memberName) => {
+  if (!props.cardData.assigned_users) return;
+  props.cardData.assigned_users = props.cardData.assigned_users.filter(m => m.id !== memberId);
   // Add history event
   if (!props.cardData.history) props.cardData.history = [];
   props.cardData.history.push({
@@ -795,9 +808,10 @@ const unassignMember = () => {
     user: { name: auth.user.name, avatar: avatar.value },
     action: 'unassign_member',
     timestamp: new Date().toISOString(),
-    data: {}
+    data: { unassigneeName: memberName || 'Membro' }
   });
 };
+
 
 
 // Tabs configuration
