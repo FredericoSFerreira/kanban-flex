@@ -43,7 +43,9 @@ export function t(key, locale = defaultLocale, params = {}) {
   // Replace parameters in the translation
   let translatedText = result;
   Object.entries(params).forEach(([paramKey, paramValue]) => {
-    translatedText = translatedText.replace(new RegExp(`{{\\s*${paramKey}\\s*}}`, 'g'), paramValue);
+    // Matches {paramKey} or {{paramKey}}
+    const regex = new RegExp(`[{]{1,2}\\s*${paramKey}\\s*[}]{1,2}`, 'g');
+    translatedText = translatedText.replace(regex, paramValue);
   });
 
   return translatedText;

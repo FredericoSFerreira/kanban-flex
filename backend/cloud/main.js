@@ -3,6 +3,7 @@ import {verifyTokenParseCloudFunction} from "../middleware/auth.js";
 import {escapeRegex, generateTrackingHistory} from "../utils/utils.js";
 import {callFunction} from "../utils/parse-utils.js";
 import {deleteFileFromS3} from "../service/s3-service.js";
+import sendEmail from "../service/email-service.js";
 
 
 async function deleteAttachmentHelper(boardId, itemId, request) {
@@ -796,6 +797,9 @@ Parse.Cloud.define("inviteMemberToBoard", async (request) => {
     const { boardId, email } = request.params;
     if (!boardId || !email) throw new Error("Missing parameters");
 
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) throw new Error("invalid_email_format");
+
     // Check if board exists and user is owner
     const boardQuery = new Parse.Query("boards");
     boardQuery.equalTo('objectId', boardId);
@@ -839,6 +843,70 @@ Parse.Cloud.define("inviteMemberToBoard", async (request) => {
     throw error;
   }
 });
+
+Parse.Cloud.define("removeMemberFromBoard", async (request) => {
+  try {
+    // Validate JWT token
+    await verifyTokenParseCloudFunction(request);
+
+    const { boardId, userId } = request.params;
+    if (!boardId || !userId) throw new Error("Missing parameters");
+
+    // Check if board exists and user is owner
+    const boardQuery = new Parse.Query("boards");
+    boardQuery.equalTo('objectId', boardId);
+    const board = await boardQuery.first({useMasterKey: true});
+    
+    if (!board) throw new Error("Board not found");
+    if (board.get('owner_id') !== request.user.id) {
+      throw new Error("Only the owner can remove members");
+    }
+
+    let members = board.get('members') || [];
+    const index = members.findIndex(m => m.userId === userId);
+    if (index === -1) {
+      throw new Error("user_not_member");
+    }
+
+    members.splice(index, 1);
+    board.set('members', members);
+
+    // If removing a pending member, also invalidate the invite token
+    if (userId.startsWith('pending:')) {
+      const email = userId.split(':')[1];
+      const inviteQuery = new Parse.Query("boardInvites");
+      inviteQuery.equalTo("boardId", boardId);
+      inviteQuery.equalTo("email", email);
+      inviteQuery.equalTo("used", false);
+      const invite = await inviteQuery.first({ useMasterKey: true });
+      if (invite) {
+        invite.set("used", true); // or delete it, but used=true is safer for history
+        await invite.save(null, { useMasterKey: true });
+      }
+    }
+
+    // Optional: Also remove the user from all assigned_users in cards
+    const columns = board.get('columns') || [];
+    columns.forEach(col => {
+      if (col.itens) {
+        col.itens.forEach(card => {
+          if (card && card.assigned_users) {
+            card.assigned_users = card.assigned_users.filter(u => u.id !== userId);
+          }
+        });
+      }
+    });
+    board.set('columns', columns);
+
+    await board.save(null, {useMasterKey: true});
+
+    return { success: true };
+  } catch (error) {
+    console.log('Failed to removeMemberFromBoard: ' + error.message);
+    throw error;
+  }
+});
+
 
 Parse.Cloud.define("getBoardStats", async (request) => {
   // Validate JWT token
@@ -969,8 +1037,7 @@ Parse.Cloud.define("getBoardById", async (request) => {
 
     const userId = request.user?.id;
     if (userId) {
-      const visibility = board.get('visibility');
-      const isPublic = visibility !== false;
+      const isPublic = board.get('is_public') !== false;
       
       if (!isPublic) {
         const isOwner = board.get('owner_id') === userId;
@@ -1124,12 +1191,47 @@ Parse.Cloud.define("createBoard", async (request) => {
     // Validate JWT token
     await verifyTokenParseCloudFunction(request);
 
-    const {template} = request.params;
+    const { template, is_public, members, pendingInviteEmails } = request.params;
     const Boards = Parse.Object.extend("boards");
     const board = new Boards();
 
+    // Set visibility if provided
+    if (typeof is_public !== 'undefined') {
+      template.is_public = is_public;
+    }
+
     // Save the board with the provided template
-    const boardDatabase = await board.save(template, {useMasterKey: true});
+    const boardDatabase = await board.save(template, { useMasterKey: true });
+
+    // Add initial members if provided
+    if (members && members.length > 0) {
+      const Members = Parse.Object.extend("members");
+      for (const m of members) {
+        const mem = new Members();
+        await mem.save({
+          boardId: boardDatabase.id,
+          userId: m.id,
+          email: m.email,
+          name: m.name,
+          role: 'Member'
+        }, { useMasterKey: true });
+      }
+    }
+
+    // Send invitations if provided
+    if (pendingInviteEmails && pendingInviteEmails.length > 0) {
+      for (const email of pendingInviteEmails) {
+        try {
+          await Parse.Cloud.run("sendBoardInviteEmail", { 
+            boardId: boardDatabase.id, 
+            email,
+            locale: request.params.locale || 'pt-BR'
+          }, { sessionToken: request.sessionToken });
+        } catch (inviteError) {
+          console.error(`Failed to send invite to ${email} during board creation:`, inviteError);
+        }
+      }
+    }
 
     return {
       success: true,
@@ -1137,6 +1239,167 @@ Parse.Cloud.define("createBoard", async (request) => {
     };
   } catch (error) {
     console.error("Error in createBoard:", error);
+    throw error;
+  }
+});
+
+Parse.Cloud.define("checkMemberEmail", async (request) => {
+  try {
+    await verifyTokenParseCloudFunction(request);
+    const { email } = request.params;
+
+    const query = new Parse.Query("otp");
+    query.equalTo("email", email);
+    const user = await query.first({ useMasterKey: true });
+
+    if (user) {
+      return {
+        exists: true,
+        id: user.id,
+        name: user.get("name"),
+        avatar: user.get("avatar")
+      };
+    }
+
+    return { exists: false };
+  } catch (error) {
+    console.error("Error in checkMemberEmail:", error);
+    throw error;
+  }
+});
+
+Parse.Cloud.define("sendBoardInviteEmail", async (request) => {
+  try {
+    await verifyTokenParseCloudFunction(request);
+    const { boardId, email, locale } = request.params;
+    if (!boardId || !email) throw new Error("Missing parameters");
+    
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) throw new Error("invalid_email_format");
+    const inviter = request.user; // request.user might be null if manually calling verifyToken
+    
+    // Get inviter info from otp if request.user is just a mock (verifyTokenParseCloudFunction populates request.user)
+    const inviterName = request.user?.name || "User";
+
+    // Verify board exists and requester is owner
+    const boardQuery = new Parse.Query("boards");
+    const board = await boardQuery.get(boardId, { useMasterKey: true });
+    if (!board) throw new Parse.Error(404, "Board not found");
+    
+    // Find inviter in otp to get name
+    const inviterQuery = new Parse.Query("otp");
+    const inviterOtp = await inviterQuery.get(request.user.id, { useMasterKey: true });
+    const fullInviterName = inviterOtp?.get("name") || inviterName;
+
+    const boardName = board.get("name");
+
+    // Check if user already registered
+    const userQuery = new Parse.Query("otp");
+    userQuery.equalTo("email", email);
+    const existingUser = await userQuery.first({ useMasterKey: true });
+    if (existingUser) return { success: false, error: "user_already_registered" };
+
+    // Create invite token
+    const token = crypto.randomUUID();
+    const BoardInvites = Parse.Object.extend("boardInvites");
+    const invite = new BoardInvites();
+    
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + 7); // 7 days
+
+    await invite.save({
+      token,
+      email,
+      boardId,
+      invitedBy: request.user.id,
+      expiresAt,
+      used: false
+    }, { useMasterKey: true });
+
+    const frontHost = process.env.FRONT_HOST.endsWith('/') ? process.env.FRONT_HOST.slice(0, -1) : process.env.FRONT_HOST;
+    const inviteUrl = `${frontHost}/register?invite=${token}&board=${boardId}`;
+
+    // Add pending member to board members list
+    let members = board.get('members') || [];
+    if (!members.some(m => m.email === email)) {
+      members.push({
+        userId: 'pending:' + email,
+        email: email,
+        name: email,
+        pending: true,
+        role: 'member'
+      });
+      board.set('members', members);
+      await board.save(null, { useMasterKey: true });
+    }
+
+    await sendEmail(email, email, 'BOARD_INVITE', locale || 'pt-BR', {
+      boardName,
+      inviterName: fullInviterName,
+      inviteUrl
+    });
+
+    return { success: true };
+  } catch (error) {
+    console.error("Error in sendBoardInviteEmail:", error);
+    throw error;
+  }
+});
+
+Parse.Cloud.define("acceptBoardInvite", async (request) => {
+  try {
+    const { token, userId } = request.params;
+    
+    const query = new Parse.Query("boardInvites");
+    query.equalTo("token", token);
+    query.equalTo("used", false);
+    query.greaterThan("expiresAt", new Date());
+    const invite = await query.first({ useMasterKey: true });
+
+    if (!invite) {
+      return { success: false, error: "invalid_or_expired_token" };
+    }
+
+    const { boardId, email } = invite.attributes;
+
+    // Get user info
+    const userQuery = new Parse.Query("otp");
+    const user = await userQuery.get(userId, { useMasterKey: true });
+    if (!user) throw new Parse.Error(404, "User not found");
+
+    // Check if already a member in board object
+    const boardQuery = new Parse.Query("boards");
+    const board = await boardQuery.get(boardId, { useMasterKey: true });
+    if (!board) throw new Parse.Error(404, "Board not found");
+
+    let members = board.get('members') || [];
+    
+    // Remove any pending placeholders for this email
+    members = members.filter(m => !(m.email === email && m.pending === true));
+
+    if (!members.some(m => m.userId === userId)) {
+      // Build member object for the board array
+      const memberObj = {
+        userId,
+        email: user.get("email"),
+        name: user.get("name"),
+        avatar: user.get("avatar"),
+        role: 'member'
+      };
+
+      members.push(memberObj);
+      board.set('members', members);
+      await board.save(null, { useMasterKey: true });
+    }
+
+
+    // Mark token as used
+    invite.set("used", true);
+    await invite.save(null, { useMasterKey: true });
+
+    return { success: true };
+  } catch (error) {
+    console.error("Error in acceptBoardInvite:", error);
     throw error;
   }
 });

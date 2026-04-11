@@ -17,7 +17,11 @@ export default {
     accountDeletionMessage: "We're sorry to see you go. Your account has been deactivated as requested.",
     accountDeactivated: "Your account has been deactivated",
     accountDeletionInfo: "If you wish to reactivate your account in the future, please contact our support team.",
-    accountDeletionContact: "If you have any questions or concerns, please don't hesitate to reach out to us."
+    accountDeletionContact: "If you have any questions or concerns, please don't hesitate to reach out to us.",
+    boardInviteSubject: "Board Invitation - {boardName}",
+    boardInviteTitle: "Board Invitation",
+    boardInviteMessage: "Hello! You have been invited by {inviterName} to join the board '{boardName}'. Click the button below to create your account.",
+    boardInviteButton: "Create my account"
   },
   auth: {
     inactiveAccount: "Your account has been deactivated. Please contact support for assistance."

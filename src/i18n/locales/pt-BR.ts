@@ -205,6 +205,7 @@ export default {
     unarchiveCard: 'Restaurar Card',
     showArchived: 'Arquivados',
     hideArchived: 'Ocultar Arquivados',
+    archivedMode: 'Arquivados',
     settings: 'Configurações do Quadro',
     settingsTheme: 'Tema',
     themeLight: 'Claro',
@@ -239,12 +240,22 @@ export default {
     settingsAdmin: 'Administrador',
     settingsMember: 'Membro',
     settingsViewer: 'Visualizador',
+    searchMember: 'Buscar membro...',
+    settingsInviteMemberTitle: 'Convidar Novo Membro',
+    settingsInviteMemberPlaceholder: 'E-mail do usuário',
+    settingsInviteMemberLabel: 'Convidar',
+    settingsPendingMember: 'Convidado',
     settingsInviteMember: 'Convidar Membro',
     settingsUserNotFound: 'Usuário não encontrado na base de dados.',
     settingsUserAlreadyMember: 'Este usuário já é membro do board.',
     settingsErrorInvite: 'Erro ao convidar membro. Tente novamente mais tarde.',
+    invalidEmailTitle: 'E-mail Inválido',
+    invalidEmailText: 'Por favor, insira um endereço de e-mail válido.',
     settingsAIHelpBoardTitle: 'Ajuda de IA para Título do Quadro',
     settingsAIHelpBoardDescription: 'Ajuda de IA para Descrição do Quadro',
+    inviteNotRegistered: 'Usuário não cadastrado',
+    sendInviteConfirm: 'Este e-mail não foi encontrado em nossa base. Deseja enviar um convite para este quadro?',
+    inviteSent: 'Convite enviado com sucesso!',
     emptyState: {
       title: 'Hora de começar',
       description: 'Começe criando as colunas do seu board',
@@ -648,7 +659,14 @@ export default {
     error: {
       title: 'Oops...',
       message: 'Ocorreu um erro ao criar o board!'
-    }
+    },
+    stepPermissions: 'Configurações de Acesso',
+    visibilityLabel: 'Quem pode acessar este quadro?',
+    visibilityWarning: 'Esta opção pode ser alterada a qualquer momento nas configurações do quadro.',
+    inviteLabel: 'Convidar Membros (Opcional)',
+    addEmail: 'Adicionar E-mail',
+    back: 'Voltar',
+    create: 'Criar Quadro'
   },
   error: {
     notFound: 'Board ou página não encontrada.',
