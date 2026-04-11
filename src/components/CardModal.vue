@@ -139,7 +139,7 @@
                           @click.stop
                         />
                       </div>
-                      
+
                       <div v-if="filteredMembers.length > 0">
                         <button
                           v-for="member in filteredMembers"
@@ -774,11 +774,11 @@ const filteredMembers = computed(() => {
     const assignedIds = props.cardData.assigned_users.map(u => u.id);
     members = members.filter(m => !assignedIds.includes(m.userId));
   }
-  
+
   if (!memberSearch.value) return members;
   const search = memberSearch.value.toLowerCase();
-  return members.filter(m => 
-    m.name?.toLowerCase().includes(search) || 
+  return members.filter(m =>
+    m.name?.toLowerCase().includes(search) ||
     m.email?.toLowerCase().includes(search)
   );
 });

@@ -804,7 +804,7 @@ Parse.Cloud.define("inviteMemberToBoard", async (request) => {
     const boardQuery = new Parse.Query("boards");
     boardQuery.equalTo('objectId', boardId);
     const board = await boardQuery.first({useMasterKey: true});
-    
+
     if (!board) throw new Error("Board not found");
     if (board.get('owner_id') !== request.user.id) {
       throw new Error("Only the owner can invite members");
@@ -856,7 +856,7 @@ Parse.Cloud.define("removeMemberFromBoard", async (request) => {
     const boardQuery = new Parse.Query("boards");
     boardQuery.equalTo('objectId', boardId);
     const board = await boardQuery.first({useMasterKey: true});
-    
+
     if (!board) throw new Error("Board not found");
     if (board.get('owner_id') !== request.user.id) {
       throw new Error("Only the owner can remove members");
@@ -1038,7 +1038,7 @@ Parse.Cloud.define("getBoardById", async (request) => {
     const userId = request.user?.id;
     if (userId) {
       const isPublic = board.get('is_public') !== false;
-      
+
       if (!isPublic) {
         const isOwner = board.get('owner_id') === userId;
         const members = board.get('members') || [];
@@ -1222,8 +1222,8 @@ Parse.Cloud.define("createBoard", async (request) => {
     if (pendingInviteEmails && pendingInviteEmails.length > 0) {
       for (const email of pendingInviteEmails) {
         try {
-          await Parse.Cloud.run("sendBoardInviteEmail", { 
-            boardId: boardDatabase.id, 
+          await Parse.Cloud.run("sendBoardInviteEmail", {
+            boardId: boardDatabase.id,
             email,
             locale: request.params.locale || 'pt-BR'
           }, { sessionToken: request.sessionToken });
@@ -1273,11 +1273,11 @@ Parse.Cloud.define("sendBoardInviteEmail", async (request) => {
     await verifyTokenParseCloudFunction(request);
     const { boardId, email, locale } = request.params;
     if (!boardId || !email) throw new Error("Missing parameters");
-    
+
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) throw new Error("invalid_email_format");
     const inviter = request.user; // request.user might be null if manually calling verifyToken
-    
+
     // Get inviter info from otp if request.user is just a mock (verifyTokenParseCloudFunction populates request.user)
     const inviterName = request.user?.name || "User";
 
@@ -1285,7 +1285,7 @@ Parse.Cloud.define("sendBoardInviteEmail", async (request) => {
     const boardQuery = new Parse.Query("boards");
     const board = await boardQuery.get(boardId, { useMasterKey: true });
     if (!board) throw new Parse.Error(404, "Board not found");
-    
+
     // Find inviter in otp to get name
     const inviterQuery = new Parse.Query("otp");
     const inviterOtp = await inviterQuery.get(request.user.id, { useMasterKey: true });
@@ -1303,7 +1303,7 @@ Parse.Cloud.define("sendBoardInviteEmail", async (request) => {
     const token = crypto.randomUUID();
     const BoardInvites = Parse.Object.extend("boardInvites");
     const invite = new BoardInvites();
-    
+
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + 7); // 7 days
 
@@ -1349,7 +1349,7 @@ Parse.Cloud.define("sendBoardInviteEmail", async (request) => {
 Parse.Cloud.define("acceptBoardInvite", async (request) => {
   try {
     const { token, userId } = request.params;
-    
+
     const query = new Parse.Query("boardInvites");
     query.equalTo("token", token);
     query.equalTo("used", false);
@@ -1373,7 +1373,7 @@ Parse.Cloud.define("acceptBoardInvite", async (request) => {
     if (!board) throw new Parse.Error(404, "Board not found");
 
     let members = board.get('members') || [];
-    
+
     // Remove any pending placeholders for this email
     members = members.filter(m => !(m.email === email && m.pending === true));
 

@@ -289,7 +289,7 @@
 
                       <div :class="{ 'blur-kanban-card': !checkPermission(card.user_id) && board.visibility === false }"
                            v-if="boardConfig.showAuthorCard" class="d-flex align-items-center justify-content-between mt-2">
-                        
+
                         <div class="card-members d-flex align-items-center" v-if="card.assigned_users && card.assigned_users.length > 0">
                           <!-- Membro único: exibe foto + nome -->
                           <template v-if="card.assigned_users.length === 1">
@@ -321,7 +321,7 @@
                             </div>
                           </template>
                         </div>
-                        
+
                         <div v-else-if="!card.assigned_users || card.assigned_users.length === 0" class="d-flex align-items-center">
                           <img :src="card.avatar || userDefault" :alt="card.name" :title="card.name" class="rounded-circle" width="28" height="28">
                           <small class="ms-1 text-muted">{{ card.name }}</small>
@@ -604,7 +604,7 @@
                     </div>
                   </label>
                 </div>
-                
+
                 <div class="form-check mb-3">
                   <input
                     class="form-check-input"
@@ -1119,10 +1119,10 @@ const openCardModal = (card = null, columnId = null, tab = 'activity') => {
     cardSelectedId.value = card.id;
   } else {
     selectedCard.value = {
-      checklist: [], 
-      history: [], 
-      title: '', 
-      description: '', 
+      checklist: [],
+      history: [],
+      title: '',
+      description: '',
       labels: [],
       assigned_users: [{ id: user.id, name: user.name, avatar: avatar.value }]
     };
@@ -1370,7 +1370,7 @@ const newSaveEditCard = (data) => {
   card.description = data.description;
   card.title = data.title;
   card.labels = labels;
-  
+
   // Assign members and history tracker locally
   if (data.assigned_users !== undefined) card.assigned_users = data.assigned_users;
   if (data.history) card.history = data.history;
@@ -1488,8 +1488,8 @@ const settingsMemberSearch = ref('');
 const filteredSettingsMembers = computed(() => {
   if (!settingsMemberSearch.value) return availableMembers.value;
   const s = settingsMemberSearch.value.toLowerCase();
-  return availableMembers.value.filter(m => 
-    (m.name && m.name.toLowerCase().includes(s)) || 
+  return availableMembers.value.filter(m =>
+    (m.name && m.name.toLowerCase().includes(s)) ||
     (m.email && m.email.toLowerCase().includes(s))
   );
 });
@@ -1504,7 +1504,7 @@ const removeMember = async (userId) => {
       confirmButtonText: 'Sim, remover',
       cancelButtonText: 'Cancelar'
     });
-    
+
     if (result.isConfirmed) {
       await callFunction('removeMemberFromBoard', {
         boardId: route.params.id,
@@ -1529,7 +1529,7 @@ const isInviting = ref(false);
 
 const inviteMember = async () => {
   if (!inviteEmail.value) return;
-  
+
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(inviteEmail.value)) {
     return $swal.fire({
@@ -1554,10 +1554,10 @@ const inviteMember = async () => {
   } catch(e) {
      let title = 'Atenção';
      let message = e.message || 'Erro ao convidar membro';
-     
+
      if (e.message?.includes('user_not_found')) {
        message = t('board.settingsUserNotFound') || 'Usuário não encontrado na base de dados.';
-       
+
        const confirm = await $swal.fire({
          title: t('board.inviteNotRegistered'),
          text: t('board.sendInviteConfirm'),
@@ -1566,8 +1566,8 @@ const inviteMember = async () => {
        });
 
        if (confirm.isConfirmed) {
-         await callFunction('sendBoardInviteEmail', { 
-           boardId: route.params.id, 
+         await callFunction('sendBoardInviteEmail', {
+           boardId: route.params.id,
            email: inviteEmail.value,
            locale: t('locale') || 'pt-BR'
          });
@@ -2067,7 +2067,7 @@ const onCardMoved = (evt, columnId) => {
 const onDrop = (evt, columnDropId) => {
   const dragType = evt.dataTransfer.getData('dragType');
   if (dragType !== 'card' && dragType !== '') return; // support empty for legacy if any
-  
+
   const cardDragId = evt.dataTransfer.getData('cardDragId');
   const columnToRemoveId = evt.dataTransfer.getData('collumnDragId');
   evt.preventDefault();
