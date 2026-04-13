@@ -349,7 +349,8 @@
                             v-if="boardConfig.showLike"
                             class="btn btn-sm btn-outline-success me-2 d-flex align-items-center gap-1"
                             @click.stop="saveCardVotes(column.id, card.id, true, false)"
-                            :class="{ 'active': card.up_vote }"
+                            :class="{ 'active': isUserInVoteList(card.up_vote_users, user.id) }"
+                            :title="getVotesTooltip(card.up_vote_users)"
                           >
                             <ThumbsUp size="14"/>
                             <span>{{ card.up_vote || 0 }}</span>
@@ -358,7 +359,8 @@
                             v-if="boardConfig.showLike"
                             class="btn btn-sm btn-outline-danger me-2 d-flex align-items-center gap-1"
                             @click.stop="saveCardVotes(column.id, card.id, false, true)"
-                            :class="{ 'active': card.down_vote }"
+                            :class="{ 'active': isUserInVoteList(card.down_vote_users, user.id) }"
+                            :title="getVotesTooltip(card.down_vote_users)"
                           >
                             <ThumbsDown size="14"/>
                             <span>{{ card.down_vote || 0 }}</span>
@@ -688,10 +690,12 @@
                     </div>
                   </div>
                   <div class="d-flex align-items-center gap-2">
-                    <span v-if="member.userId === board.owner_id" class="badge bg-primary">Owner</span>
+                    <span v-if="member.isOwner" class="badge bg-primary">Owner</span>
                     <span v-else-if="member.pending" class="badge bg-info text-dark">{{ t('board.settingsPendingMember') || 'Convidado' }}</span>
-                    <span v-else class="badge bg-secondary">Membro</span>
-                    <button v-if="member.userId !== board.owner_id && user.id === board.owner_id" class="btn btn-sm btn-outline-danger ms-2" @click="removeMember(member.userId)">
+                    <span v-else-if="member.isMember" class="badge bg-secondary">Membro</span>
+                    <span v-else-if="member.isContributor" class="badge bg-light text-muted border">{{ t('board.settingsContributor') || 'Contributor' }}</span>
+                    
+                    <button v-if="member.isMember && member.userId !== board.owner_id && user.id === board.owner_id" class="btn btn-sm btn-outline-danger ms-2" @click="removeMember(member.userId)">
                       <Trash2 size="14"/>
                     </button>
                   </div>
@@ -699,7 +703,7 @@
               </div>
 
               <!-- Invite Member Fixed Area (Outside Scroll) -->
-              <div class="mt-3 border-top pt-3">
+              <div class="mt-3 border-top pt-3" v-if="checkPermission()">
                 <h6>{{ t('board.settingsInviteMemberTitle') || 'Convidar Novo Membro' }}</h6>
                 <div class="input-group mb-3">
                   <input type="email" class="form-control" :placeholder="t('board.settingsInviteMemberPlaceholder') || 'E-mail do usuário'" v-model="inviteEmail" @keyup.enter="inviteMember" :disabled="isInviting">
@@ -917,6 +921,7 @@
     :initial-tab="initialTab"
     :board-config="boardConfig"
     :available-members="availableMembers"
+    :is-owner="checkPermission()"
     @edit="newSaveEditCard"
     @save="saveCard"
     @delete="removeCard"
@@ -1071,19 +1076,27 @@ const availableMembers = computed(() => {
   if (!board.columns) return [];
   const membersMap = new Map();
   // Add implicitly owner
+  // Add implicitly owner
   if (board.owner_id) {
     membersMap.set(board.owner_id, {
       userId: board.owner_id,
-      name: board.owner_email.split('@')[0], // we might not have owner name easily unless we load it, but we can fallback
-      avatar: userDefault,
-      email: board.owner_email
+      name: board.owner || board.owner_email?.split('@')[0] || 'Owner',
+      avatar: board.owner_avatar || userDefault,
+      email: board.owner_email,
+      isMember: true,
+      isOwner: true
     });
   }
 
-  // Add user themselves if they created a card
   // Add explicitly invited members
   const invitedMembers = board.members || [];
-  invitedMembers.forEach(m => membersMap.set(m.userId, m));
+  invitedMembers.forEach(m => {
+    membersMap.set(m.userId, {
+      ...m,
+      isMember: true,
+      isOwner: m.userId === board.owner_id
+    });
+  });
 
   // Add card creators
   board.columns.forEach(col => {
@@ -1093,7 +1106,9 @@ const availableMembers = computed(() => {
           userId: card.user_id,
           name: card.name || 'User',
           avatar: card.avatar || userDefault,
-          email: ''
+          email: '',
+          isMember: false,
+          isContributor: true
         });
       }
     });
@@ -1291,28 +1306,22 @@ const saveCardVotes = (idColumn, idCard, upVote = false, downVote = false) => {
   if (upVote) {
     if (!card.up_vote_users) card.up_vote_users = [];
 
-    if (card.up_vote_users.includes(user.id)) {
-      const index = card.up_vote_users.indexOf(user.id);
-      if (index > -1) {
-        card.up_vote_users.splice(index, 1);
-      }
+    if (isUserInVoteList(card.up_vote_users, user.id)) {
+      card.up_vote_users = card.up_vote_users.filter(u => (typeof u === 'string' ? u !== user.id : u.userId !== user.id));
       card.up_vote = Math.max(0, (card.up_vote || 0) - 1);
     } else {
-      card.up_vote_users.push(user.id);
+      card.up_vote_users.push({ userId: user.id, name: user.name });
       card.up_vote = (card.up_vote || 0) + 1;
     }
   }
 
   if (downVote) {
     if (!card.down_vote_users) card.down_vote_users = [];
-    if (card.down_vote_users.includes(user.id)) {
-      const index = card.down_vote_users.indexOf(user.id);
-      if (index > -1) {
-        card.down_vote_users.splice(index, 1);
-      }
+    if (isUserInVoteList(card.down_vote_users, user.id)) {
+      card.down_vote_users = card.down_vote_users.filter(u => (typeof u === 'string' ? u !== user.id : u.userId !== user.id));
       card.down_vote = Math.max(0, (card.down_vote || 0) - 1);
     } else {
-      card.down_vote_users.push(user.id);
+      card.down_vote_users.push({ userId: user.id, name: user.name });
       card.down_vote = (card.down_vote || 0) + 1;
     }
   }
@@ -1323,6 +1332,7 @@ const saveCardVotes = (idColumn, idCard, upVote = false, downVote = false) => {
     columnId: idColumn,
     cardId: idCard,
     userId: user.id,
+    userName: user.name,
     voteType: voteType
   }).then(result => {
     console.log("Vote update result:", result);
@@ -1977,6 +1987,20 @@ const findCard = (column, cardId) => {
   }
   return [null, -1];
 };
+
+const isUserInVoteList = (list, id) => {
+  if (!list) return false;
+  return list.some(item => (typeof item === 'string' ? item === id : item.userId === id));
+};
+
+const getVotesTooltip = (users) => {
+  if (!users || users.length === 0) return '';
+  return users
+      .map(u => (typeof u === 'string' ? '' : u.name))
+      .filter(name => name)
+      .join(', ');
+};
+
 
 const realTimeBoard = async () => {
   const queryBoard = new Parse.Query('boards');

@@ -1,6 +1,6 @@
 <template>
   <div class="modal fade" id="cardModal" tabindex="-1" ref="cardModal">
-    <div class="modal-dialog modal-xl modal-dialog-centered">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
       <div class="modal-content border-0 shadow-lg">
         <!-- Modal Header -->
         <div class="modal-header border-0 pb-0">
@@ -25,36 +25,36 @@
           <div class="row g-0">
             <!-- Left Panel - Form -->
             <div class="col-lg-8 border-end">
-              <div class="p-4">
+              <div class="p-3">
                 <!-- Card Title -->
-                <div class="mb-4" v-if="boardConfig.showTitle">
+                <div class="mb-3" v-if="boardConfig.showTitle">
                   <label class="form-label fw-semibold">
                     <FileText size="16" class="me-2"/>
                     {{ $t('boardV2.title') }}
                   </label>
                   <input
                     type="text"
-                    class="form-control form-control-lg"
+                    class="form-control"
                     v-model="cardData.title"
                     :placeholder="$t('boardV2.titlePlaceholder')"
                   />
                 </div>
 
                 <!-- Card Description -->
-                <div class="mb-4" v-if="boardConfig.showDescription">
+                <div class="mb-3" v-if="boardConfig.showDescription">
                   <label class="form-label fw-semibold">
                     <AlignLeft size="16" class="me-2"/>
                     {{ $t('boardV2.description') }}
                   </label>
                   <textarea
                     class="form-control"
-                    rows="6"
+                    rows="3"
                     v-model="cardData.description"
                     :placeholder="$t('boardV2.descriptionPlaceholder')"
                   ></textarea>
                 </div>
                 <!-- Labels -->
-                <div class="mb-4" v-if="boardConfig.showTags">
+                <div class="mb-3" v-if="boardConfig.showTags">
                   <label class="form-label fw-semibold">
                     <Tag size="16" class="me-2"/>
                     {{ $t('boardV2.labels') }}
@@ -96,7 +96,7 @@
                 </div>
 
                 <!-- Assign Members -->
-                <div class="mb-4">
+                <div class="mb-3">
                   <label class="form-label fw-semibold">
                     <Users size="16" class="me-2"/>
                     {{ t('boardV2.assignedMembers') || 'Membro Atribuído' }}
@@ -162,14 +162,15 @@
                         </button>
                       </div>
                       <div v-else class="text-muted small text-center p-2">
-                        Membro não encontrado... Vá nas configurações para convidar.
+                        <span v-if="isOwner">Membro não encontrado... Vá nas configurações para convidar.</span>
+                        <span v-else>Membro não encontrado... Peça ao proprietário para convidar.</span>
                       </div>
                     </div>
                   </div>
                 </div>
 
                 <!--                 Attachments -->
-                <div class="mb-4">
+                <div class="mb-3">
                   <label class="form-label fw-semibold">
                     <Paperclip size="16" class="me-2"/>
                     {{ $t('boardV2.attachments') }}
@@ -243,7 +244,7 @@
                   <div v-if="activeTab === 'comments'" class="tab-pane active">
                     <div class="comments-section">
                       <!-- Add Comment -->
-                      <div class="add-comment mb-4">
+                      <div class="add-comment mb-3">
                         <div class="d-flex align-items-start">
                           <img
                             :src="avatar"
@@ -381,7 +382,7 @@
                   <div v-if="activeTab === 'checklist'" class="tab-pane active">
                     <div class="checklist-section">
                       <!-- Add Checklist Item -->
-                      <div class="add-checklist-item mb-4">
+                      <div class="add-checklist-item mb-3">
                         <div class="input-group">
                           <input
                             type="text"
@@ -699,6 +700,10 @@ const props = defineProps({
   availableMembers: {
     type: Array,
     default: () => []
+  },
+  isOwner: {
+    type: Boolean,
+    default: false
   }
 });
 

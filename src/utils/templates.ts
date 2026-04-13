@@ -361,6 +361,7 @@ export function getTemplate(id: number): object {
     visibility: true,
     owner_id: auth.user?.id || "demo",
     owner_email: auth.user?.email || "demo@demo@email.com",
+    owner_avatar: auth.user?.avatar || "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y",
     config: template?.config,
     columns: template?.columns
   }

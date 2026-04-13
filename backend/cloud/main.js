@@ -439,7 +439,7 @@ Parse.Cloud.define("updateCardVotes", async (request) => {
     // Validate JWT token
     await verifyTokenParseCloudFunction(request);
 
-    const {boardId, columnId, cardId, userId, voteType} = request.params;
+    const {boardId, columnId, cardId, userId, userName, voteType} = request.params;
     const queryBoard = new Parse.Query("boards");
     queryBoard.equalTo('objectId', boardId);
 
@@ -460,29 +460,41 @@ Parse.Cloud.define("updateCardVotes", async (request) => {
       throw new Error("Card not found");
     }
 
-    // Check if user already voted
-    const upVoteUsers = card.up_vote_users || [];
-    const downVoteUsers = card.down_vote_users || [];
+    // Check if user already voted (handle both legacy string and new object structure)
+    let upVoteUsers = card.up_vote_users || [];
+    let downVoteUsers = card.down_vote_users || [];
+
+    const isUserInList = (list, id) => {
+      return list.some(item => (typeof item === 'string' ? item === id : item.userId === id));
+    };
+
+    const removeFromList = (list, id) => {
+      return list.filter(item => (typeof item === 'string' ? item !== id : item.userId !== id));
+    };
 
     // Toggle vote behavior
     if (voteType === 'up') {
-      if (upVoteUsers.includes(userId)) {
+      if (isUserInList(upVoteUsers, userId)) {
         // User already upvoted, so remove the vote
-        board.remove(`columns.${columnIndex}.itens.${cardIndex}.up_vote_users`, userId);
+        upVoteUsers = removeFromList(upVoteUsers, userId);
+        board.set(`columns.${columnIndex}.itens.${cardIndex}.up_vote_users`, upVoteUsers);
         board.increment(`columns.${columnIndex}.itens.${cardIndex}.up_vote`, -1);
       } else {
         // Add new upvote
-        board.addUnique(`columns.${columnIndex}.itens.${cardIndex}.up_vote_users`, userId);
+        upVoteUsers.push({ userId, name: userName || 'User' });
+        board.set(`columns.${columnIndex}.itens.${cardIndex}.up_vote_users`, upVoteUsers);
         board.increment(`columns.${columnIndex}.itens.${cardIndex}.up_vote`);
       }
     } else if (voteType === 'down') {
-      if (downVoteUsers.includes(userId)) {
+      if (isUserInList(downVoteUsers, userId)) {
         // User already downvoted, so remove the vote
-        board.remove(`columns.${columnIndex}.itens.${cardIndex}.down_vote_users`, userId);
+        downVoteUsers = removeFromList(downVoteUsers, userId);
+        board.set(`columns.${columnIndex}.itens.${cardIndex}.down_vote_users`, downVoteUsers);
         board.increment(`columns.${columnIndex}.itens.${cardIndex}.down_vote`, -1);
       } else {
         // Add new downvote
-        board.addUnique(`columns.${columnIndex}.itens.${cardIndex}.down_vote_users`, userId);
+        downVoteUsers.push({ userId, name: userName || 'User' });
+        board.set(`columns.${columnIndex}.itens.${cardIndex}.down_vote_users`, downVoteUsers);
         board.increment(`columns.${columnIndex}.itens.${cardIndex}.down_vote`);
       }
     }
@@ -494,6 +506,7 @@ Parse.Cloud.define("updateCardVotes", async (request) => {
     throw error;
   }
 });
+
 
 Parse.Cloud.define("archiveCard", async (request) => {
   try {
@@ -864,12 +877,26 @@ Parse.Cloud.define("removeMemberFromBoard", async (request) => {
 
     let members = board.get('members') || [];
     const index = members.findIndex(m => m.userId === userId);
-    if (index === -1) {
-      throw new Error("user_not_member");
+    
+    // Even if not in the array, we proceed to clean up other potential records
+    if (index !== -1) {
+      members.splice(index, 1);
+      board.set('members', members);
     }
 
-    members.splice(index, 1);
-    board.set('members', members);
+    // Also remove from the Members class (table) if it exists
+    try {
+      const MembersClass = Parse.Object.extend("members");
+      const mQuery = new Parse.Query(MembersClass);
+      mQuery.equalTo("boardId", boardId);
+      mQuery.equalTo("userId", userId);
+      const memberObj = await mQuery.first({useMasterKey: true});
+      if (memberObj) {
+        await memberObj.destroy({useMasterKey: true});
+      }
+    } catch (e) {
+      console.warn("Could not delete from Members class:", e.message);
+    }
 
     // If removing a pending member, also invalidate the invite token
     if (userId.startsWith('pending:')) {
@@ -1043,10 +1070,8 @@ Parse.Cloud.define("getBoardById", async (request) => {
         const isOwner = board.get('owner_id') === userId;
         const members = board.get('members') || [];
         const isMember = members.some(m => m.userId === userId);
-        const columns = board.get('columns') || [];
-        const hasCards = columns.some(c => (c.itens || []).some(card => card.user_id === userId));
 
-        if (!isOwner && !isMember && !hasCards) {
+        if (!isOwner && !isMember) {
           throw new Parse.Error(Parse.Error.OPERATION_FORBIDDEN, "Access denied: Board is private");
         }
       }
@@ -1069,10 +1094,7 @@ Parse.Cloud.define("getParticipatingBoards", async (request) => {
 
     const matchCondition = {
       "owner_id": {$ne: userId},
-      $or: [
-        {"columns.itens.user_id": userId},
-        {"members.userId": userId}
-      ]
+      "members.userId": userId
     };
 
     // Add search filter if provided
@@ -1205,15 +1227,26 @@ Parse.Cloud.define("createBoard", async (request) => {
 
     // Add initial members if provided
     if (members && members.length > 0) {
+      // Ensure we use the correct structure for the board's members array
+      const boardMembers = members.map(m => ({
+        userId: m.userId || m.id,
+        email: m.email,
+        name: m.name,
+        avatar: m.avatar,
+        role: m.role || 'Member'
+      }));
+      boardDatabase.set('members', boardMembers);
+      await boardDatabase.save(null, { useMasterKey: true });
+
       const Members = Parse.Object.extend("members");
       for (const m of members) {
         const mem = new Members();
         await mem.save({
           boardId: boardDatabase.id,
-          userId: m.id,
+          userId: m.userId || m.id,
           email: m.email,
           name: m.name,
-          role: 'Member'
+          role: m.role || 'Member'
         }, { useMasterKey: true });
       }
     }

@@ -244,6 +244,7 @@ export default {
     settingsInviteMemberPlaceholder: 'User e-mail address',
     settingsInviteMemberLabel: 'Invite',
     settingsPendingMember: 'Invited',
+    settingsContributor: 'Contributor',
     settingsInviteMember: 'Invite Member',
     settingsUserNotFound: 'User not found in the database.',
     settingsUserAlreadyMember: 'This user is already a member of the board.',

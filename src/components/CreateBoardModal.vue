@@ -277,10 +277,21 @@ const removePending = (email) => {
 const finalizeBoardCreation = async () => {
   isCreating.value = true;
   try {
+    const members = [...localMembers.value];
+    // Adiciona o dono como membro se não estiver na lista
+    if (!members.some(m => m.userId === auth.user?.id)) {
+      members.push({
+        userId: auth.user?.id,
+        email: auth.user?.email,
+        name: auth.user?.name,
+        avatar: auth.user?.avatar || userDefault
+      });
+    }
+
     const payload = { 
       template: selectedTemplateData.value,
       is_public: isPublic.value,
-      members: localMembers.value,
+      members: members,
       pendingInviteEmails: pendingInvites.value
     };
 
