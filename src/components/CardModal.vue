@@ -769,6 +769,7 @@ const isDragging = ref(false);
 const maxFileSize = ref(5 * 1024 * 1024); // Default 5MB, will be updated from backend
 const maxTotalSize = 10 * 1024 * 1024; // 10MB in bytes
 const allowedImageTypes = ref(['image/jpeg', 'image/jpg', 'image/png', 'image/webp']);
+const allowedDocumentTypes = ref(['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet']);
 const filteredMembers = computed(() => {
   let members = props.availableMembers;
   if (props.cardData.assigned_users && props.cardData.assigned_users.length > 0) {
