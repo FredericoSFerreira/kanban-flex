@@ -12,9 +12,6 @@
                   {{ t('board.archivedMode') }}
                 </span>
               </h4>
-              <small class="text-muted">{{
-                  isEditing ? t('boardV2.editCardDescription') : t('boardV2.newCardDescription')
-                }}</small>
             </div>
           </div>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -25,9 +22,9 @@
           <div class="row g-0">
             <!-- Left Panel - Form -->
             <div class="col-lg-8 border-end">
-              <div class="p-3">
+              <div class="modal-body-panel p-3 pt-2">
                 <!-- Card Title -->
-                <div class="mb-3" v-if="boardConfig.showTitle">
+                <div class="mb-2" v-if="boardConfig.showTitle">
                   <label class="form-label fw-semibold">
                     <FileText size="16" class="me-2"/>
                     {{ $t('boardV2.title') }}
@@ -41,20 +38,20 @@
                 </div>
 
                 <!-- Card Description -->
-                <div class="mb-3" v-if="boardConfig.showDescription">
+                <div class="mb-2" v-if="boardConfig.showDescription">
                   <label class="form-label fw-semibold">
                     <AlignLeft size="16" class="me-2"/>
                     {{ $t('boardV2.description') }}
                   </label>
                   <textarea
                     class="form-control"
-                    rows="3"
+                    rows="6"
                     v-model="cardData.description"
                     :placeholder="$t('boardV2.descriptionPlaceholder')"
                   ></textarea>
                 </div>
                 <!-- Labels -->
-                <div class="mb-3" v-if="boardConfig.showTags">
+                <div class="mb-2" v-if="boardConfig.showTags">
                   <label class="form-label fw-semibold">
                     <Tag size="16" class="me-2"/>
                     {{ $t('boardV2.labels') }}
@@ -96,7 +93,7 @@
                 </div>
 
                 <!-- Assign Members -->
-                <div class="mb-3">
+                <div class="mb-2">
                   <label class="form-label fw-semibold">
                     <Users size="16" class="me-2"/>
                     {{ t('boardV2.assignedMembers') || 'Membro Atribuído' }}
@@ -170,14 +167,14 @@
                 </div>
 
                 <!--                 Attachments -->
-                <div class="mb-3">
+                <div class="mb-2">
                   <label class="form-label fw-semibold">
                     <Paperclip size="16" class="me-2"/>
                     {{ $t('boardV2.attachments') }}
                   </label>
                   <div
                     @click="triggerFileInput"
-                    class="attachment-area border border-dashed rounded p-3 text-center"
+                    class="attachment-area border border-dashed rounded p-2 text-center"
                     @dragover.prevent="onDragOver"
                     @dragleave.prevent="onDragLeave"
                     @drop.prevent="onFileDrop"
@@ -191,8 +188,8 @@
                       class="d-none"
                       accept=".jpg,.jpeg,.png,.webp,.pdf,.doc,.docx,.xlsx"
                     />
-                    <Upload size="25" class="text-muted mb-2"/>
-                    <p class="text-muted mb-2">{{ $t('boardV2.dragFilesHere') }}</p>
+                    <Upload size="20" class="text-muted mb-1"/>
+                    <p class="text-muted small mb-0">{{ $t('boardV2.dragFilesHere') }}</p>
 <!--                    <button type="button" class="btn btn-outline-primary btn-sm" @click="triggerFileInput">-->
 <!--                      {{ $t('boardV2.selectFiles') }}-->
 <!--                    </button>-->
@@ -219,15 +216,15 @@
             </div>
 
             <!-- Right Panel - Tabs -->
-            <div class="col-lg-4">
-              <div class="tabs-container h-100">
+            <div class="col-lg-4 d-flex flex-column">
+              <div class="tabs-container flex-grow-1 d-flex flex-column overflow-hidden" style="max-height: calc(100vh - 120px); min-height: 100%;">
                 <!-- Tab Navigation -->
                 <div class="tab-nav border-bottom">
                   <nav class="nav nav-tabs border-0">
                     <button
                       v-for="tab in tabs"
                       :key="tab.id"
-                      class="nav-link border-0 px-3 py-3"
+                      class="nav-link border-0 px-2 py-2 small"
                       :class="{ active: activeTab === tab.id }"
                       @click="changeTab(tab.id)"
                     >
@@ -239,12 +236,11 @@
                 </div>
 
                 <!-- Tab Content -->
-                <div class="tab-content p-3" style="height: calc(100% - 60px); overflow-y: auto;">
-                  <!-- Comments Tab -->
-                  <div v-if="activeTab === 'comments'" class="tab-pane active">
-                    <div class="comments-section">
-                      <!-- Add Comment -->
-                      <div class="add-comment mb-3">
+                <div class="tab-content p-0 flex-grow-1 d-flex flex-column overflow-hidden">
+                  <!-- Comments -->
+                  <div v-if="activeTab === 'comments'" class="tab-pane active h-100 d-flex flex-column overflow-hidden">
+                    <!-- Add Comment (Fixed) -->
+                    <div class="add-comment p-3 border-bottom">
                         <div class="d-flex align-items-start">
                           <img
                             :src="avatar"
@@ -274,8 +270,8 @@
                         </div>
                       </div>
 
-                      <!-- Comments List -->
-                      <div class="comments-list">
+                      <!-- Comments List (Scrollable) -->
+                      <div class="comments-list flex-grow-1 p-3 overflow-auto">
                         <div v-if="cardData.comments && cardData.comments.length === 0"
                              class="text-center text-muted py-4">
                           <MessageSquare size="32" class="mb-2"/>
@@ -317,11 +313,10 @@
                         </div>
                       </div>
                     </div>
-                  </div>
 
-                  <!-- Activity Tab -->
-                  <div v-if="activeTab === 'activity'" class="tab-pane active">
-                    <div class="activity-section">
+                  <!-- Activity -->
+                  <div v-if="activeTab === 'activity'" class="tab-pane active h-100 d-flex flex-column overflow-hidden">
+                    <div class="activity-section flex-grow-1 p-3 overflow-auto">
                       <div v-if="cardData.history.length === 0" class="text-center text-muted py-4">
                         <Activity size="32" class="mb-2"/>
                         <p>{{ $t('boardV2.noActivity') }}</p>
@@ -378,9 +373,10 @@
                     </div>
                   </div>
 
-                  <!-- Checklist Tab -->
-                  <div v-if="activeTab === 'checklist'" class="tab-pane active">
-                    <div class="checklist-section">
+                  <!-- Checklist -->
+                  <div v-if="activeTab === 'checklist'" class="tab-pane active h-100 d-flex flex-column overflow-hidden">
+                    <!-- Checklist Header (Fixed) -->
+                    <div class="p-3 border-bottom bg-light bg-opacity-10">
                       <!-- Add Checklist Item -->
                       <div class="add-checklist-item mb-3">
                         <div class="input-group">
@@ -403,57 +399,57 @@
                       </div>
 
                       <!-- Progress Bar -->
-                      <div v-if="cardData?.checklist && cardData.checklist.length > 0" class="checklist-progress mb-3">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                          <span class="fw-semibold">{{ $t('boardV2.progress') }}</span>
-                          <span class="text-muted">{{ completedItems }}/{{ cardData.checklist.length }}</span>
+                      <div v-if="cardData?.checklist && cardData.checklist.length > 0" class="checklist-progress">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                          <span class="fw-semibold small">{{ $t('boardV2.progress') }}</span>
+                          <span class="text-muted small">{{ completedItems }}/{{ cardData.checklist.length }}</span>
                         </div>
-                        <div class="progress">
+                        <div class="progress" style="height: 6px;">
                           <div
                             class="progress-bar"
                             :style="{ width: `${progressPercentage}%` }"
                           ></div>
                         </div>
                       </div>
+                    </div>
 
-                      <!-- Checklist Items -->
-                      <div class="checklist-items">
-                        <div v-if="cardData?.checklist && cardData.checklist.length === 0"
-                             class="text-center text-muted py-4">
-                          <CheckSquare size="32" class="mb-2"/>
-                          <p>{{ $t('boardV2.noChecklistItems') }}</p>
-                        </div>
-                        <div v-else>
-                          <div
-                            v-for="(item, index) in cardData.checklist"
-                            :key="item.id"
-                            class="checklist-item d-flex align-items-center mb-2"
-                          >
-                            <div class="form-check me-2">
-                              <input
-                                class="form-check-input"
-                                type="checkbox"
-                                v-model="item.completed"
-                                :id="`check-${item.id}`"
-                              />
-                            </div>
-                            <div class="flex-grow-1">
-                              <label
-                                :for="`check-${item.id}`"
-                                class="form-check-label"
-                                :class="{ 'text-decoration-line-through text-muted': item.completed }"
-                              >
-                                {{ item.text }}
-                              </label>
-                            </div>
-                            <button
-                              type="button"
-                              class="btn btn-sm btn-outline-danger"
-                              @click="removeChecklistItem(index)"
-                            >
-                              <Trash2 size="14"/>
-                            </button>
+                    <!-- Checklist Items (Scrollable) -->
+                    <div class="checklist-items flex-grow-1 p-3 overflow-auto">
+                      <div v-if="cardData?.checklist && cardData.checklist.length === 0"
+                           class="text-center text-muted py-4">
+                        <CheckSquare size="32" class="mb-2"/>
+                        <p>{{ $t('boardV2.noChecklistItems') }}</p>
+                      </div>
+                      <div v-else>
+                        <div
+                          v-for="(item, index) in cardData.checklist"
+                          :key="item.id"
+                          class="checklist-item d-flex align-items-center mb-2"
+                        >
+                          <div class="form-check me-2">
+                            <input
+                              class="form-check-input"
+                              type="checkbox"
+                              v-model="item.completed"
+                              :id="`check-${item.id}`"
+                            />
                           </div>
+                          <div class="flex-grow-1">
+                            <label
+                              :for="`check-${item.id}`"
+                              class="form-check-label"
+                              :class="{ 'text-decoration-line-through text-muted': item.completed }"
+                            >
+                              {{ item.text }}
+                            </label>
+                          </div>
+                          <button
+                            type="button"
+                            class="btn btn-sm btn-outline-danger"
+                            @click="removeChecklistItem(index)"
+                          >
+                            <Trash2 size="14"/>
+                          </button>
                         </div>
                       </div>
                     </div>
@@ -1218,15 +1214,10 @@ onUnmounted(() => {
 
 <style scoped>
 
-.comments-list, .activity-section, .checklist-items {
-  max-height: 350px;
+.modal-body-panel {
+  max-height: calc(100vh - 220px);
   overflow-y: auto;
-}
-
-
-.attachments-list {
-  max-height: 460px;
-  overflow-y: auto;
+  scroll-behavior: smooth;
 }
 
 .modal-dialog {
@@ -1249,8 +1240,8 @@ onUnmounted(() => {
 }
 
 .member-chip {
-  background: var(--bs-light);
-  border: 1px solid var(--bs-border-color);
+  background: var(--bg-board);
+  border: 1px solid var(--border-color);
   border-radius: 20px;
   padding: 4px 12px;
   font-size: 0.875rem;
@@ -1259,8 +1250,9 @@ onUnmounted(() => {
 .member-results {
   max-height: 200px;
   overflow-y: auto;
-  border: 1px solid var(--bs-border-color);
+  border: 1px solid var(--border-color);
   border-radius: 0.375rem;
+  background-color: var(--bg-card);
 }
 
 .attachment-area {
@@ -1274,15 +1266,15 @@ onUnmounted(() => {
 }
 
 .tabs-container {
-  background: var(--bs-light);
+  background: var(--bg-board);
 }
 
 .tab-nav {
-  background: white;
+  background: var(--bg-card);
 }
 
 .nav-tabs .nav-link {
-  color: var(--bs-secondary);
+  color: var(--text-muted);
   font-weight: 500;
   border-radius: 0;
   border-bottom: 3px solid transparent;
@@ -1290,12 +1282,12 @@ onUnmounted(() => {
 
 .nav-tabs .nav-link:hover {
   border-color: transparent;
-  background: var(--bs-light);
+  background: var(--bg-board);
 }
 
 .nav-tabs .nav-link.active {
   color: var(--bs-primary);
-  background: white;
+  background: var(--bg-card);
   border-color: transparent transparent var(--bs-primary);
 }
 
@@ -1361,62 +1353,73 @@ onUnmounted(() => {
 /* Dark mode compatibility */
 :deep(.dark-mode) {
   .modal-content {
-    background-color: #1e1e1e;
-    color: #ffffff;
+    background-color: var(--bg-card);
+    color: var(--text-main);
   }
 
-  .modal-header {
-    border-bottom-color: #2d2d2d;
-  }
-
-  .modal-footer {
-    border-top-color: #2d2d2d;
+  .modal-header, .modal-footer {
+    border-color: var(--border-color);
   }
 
   .form-control,
   .form-select {
-    background-color: #2d2d2d;
-    border-color: #404040;
-    color: #ffffff;
+    background-color: var(--bg-card);
+    border-color: var(--border-color);
+    color: var(--text-main);
   }
 
   .form-control:focus,
   .form-select:focus {
-    background-color: #363636;
-    border-color: #4a4a4a;
-    color: #ffffff;
+    background-color: var(--bg-card);
+    border-color: var(--bs-primary);
+    color: var(--text-main);
   }
 
   .tabs-container {
-    background-color: #2d2d2d;
+    background-color: var(--bg-board);
   }
 
   .tab-nav {
-    background-color: #1e1e1e;
+    background-color: var(--bg-card);
   }
 
   .nav-tabs .nav-link.active {
-    background-color: #1e1e1e;
+    background-color: var(--bg-card);
     color: var(--bs-primary);
   }
 
   .member-chip {
-    background-color: #2d2d2d;
-    border-color: #404040;
+    background-color: var(--bg-board);
+    border-color: var(--border-color);
   }
 
   .member-results {
-    border-color: #404040;
+    border-color: var(--border-color);
+    background-color: var(--bg-card);
   }
 
   .list-group-item {
-    background-color: #2d2d2d;
-    border-color: #404040;
-    color: #ffffff;
+    background-color: var(--bg-board);
+    border-color: var(--border-color);
+    color: var(--text-main);
   }
 
   .list-group-item:hover {
-    background-color: #363636;
+    background-color: var(--bg-card);
+  }
+
+  .dropdown-menu {
+    background-color: var(--bg-card);
+    border-color: var(--border-color);
+  }
+
+  .dropdown-item {
+    color: var(--text-main);
+  }
+
+  .dropdown-item:hover {
+    background-color: var(--bg-board);
+    color: var(--text-main);
   }
 
   .attachment-area {
@@ -1430,34 +1433,40 @@ onUnmounted(() => {
 }
 
 /* Custom scrollbar */
-.tab-content::-webkit-scrollbar {
+.tab-content::-webkit-scrollbar,
+.modal-body-panel::-webkit-scrollbar {
   width: 6px;
 }
 
-.tab-content::-webkit-scrollbar-track {
-  background: #f1f1f1;
+.tab-content::-webkit-scrollbar-track,
+.modal-body-panel::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.tab-content::-webkit-scrollbar-thumb,
+.modal-body-panel::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.1);
   border-radius: 10px;
 }
 
-.tab-content::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
-  border-radius: 10px;
+.tab-content::-webkit-scrollbar-thumb:hover,
+.modal-body-panel::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.2);
 }
 
-.tab-content::-webkit-scrollbar-thumb:hover {
-  background: #a8a8a8;
+:deep(.dark-mode) .tab-content::-webkit-scrollbar-track,
+:deep(.dark-mode) .modal-body-panel::-webkit-scrollbar-track {
+  background: transparent;
 }
 
-:deep(.dark-mode) .tab-content::-webkit-scrollbar-track {
-  background: #2d2d2d;
+:deep(.dark-mode) .tab-content::-webkit-scrollbar-thumb,
+:deep(.dark-mode) .modal-body-panel::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
 }
 
-:deep(.dark-mode) .tab-content::-webkit-scrollbar-thumb {
-  background: #4a4a4a;
-}
-
-:deep(.dark-mode) .tab-content::-webkit-scrollbar-thumb:hover {
-  background: #5a5a5a;
+:deep(.dark-mode) .tab-content::-webkit-scrollbar-thumb:hover,
+:deep(.dark-mode) .modal-body-panel::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
 }
 
 .text-ellipsis {

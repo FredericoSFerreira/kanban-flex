@@ -292,10 +292,36 @@ const footerColumns = [
 </script>
 
 <style>
-/* Dark mode styles */
+/* Theme Variables */
+:root {
+  --bg-app: #ffffff;
+  --bg-board: #f3f4f6;
+  --bg-header: #ffffff;
+  --bg-column: rgba(255, 255, 255, 0.7);
+  --bg-card: #ffffff;
+  --text-main: #111827;
+  --text-muted: #4b5563;
+  --border-color: rgba(0, 0, 0, 0.05);
+  --header-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.02);
+  --column-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.05);
+  --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+}
+
 .dark-mode {
+  --bg-app: #121212;
+  --bg-board: #121212;
+  --bg-header: #1e1e1e;
+  --bg-column: rgba(30, 30, 30, 0.8);
+  --bg-card: #2a2a2a;
+  --text-main: #ffffff;
+  --text-muted: #a0a0a0;
+  --border-color: rgba(255, 255, 255, 0.1);
+  --header-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+  --column-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.4);
+  --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+
   background: linear-gradient(to bottom, #1e1e1e, #121212) !important;
-  color: #ffffff !important;
+  color: var(--text-main) !important;
 }
 
 .dark-mode .card {
@@ -312,14 +338,15 @@ const footerColumns = [
 }
 
 .dark-mode .kanban-board {
-  background-color: #121212 !important;
+  background-color: var(--bg-board) !important;
 }
 
 .dark-mode .kanban-column {
-  background: linear-gradient(to bottom, #1e1e1e, #1a1a1a) !important;
-  border-color: #2d2d2d !important;
-  color: #ffffff !important;
-  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.15);
+  background: var(--bg-column) !important;
+  backdrop-filter: blur(10px);
+  border-color: var(--border-color) !important;
+  color: var(--text-main) !important;
+  box-shadow: var(--column-shadow);
 }
 
 /* Comment styles */
@@ -358,13 +385,13 @@ const footerColumns = [
 .dark-mode .form-control {
   background-color: #2d2d2d;
   border-color: #363636;
-  color: #ffffff;
+  color: var(--text-main);
 }
 
 .dark-mode .form-control:focus {
-  background-color: #363636;
-  border-color: #4a4a4a;
-  color: #ffffff;
+  background-color: #2d2d2d;
+  border-color: var(--bs-primary);
+  color: var(--text-main);
 }
 
 .dark-mode .form-floating > label {
@@ -410,25 +437,25 @@ const footerColumns = [
 }
 
 .dark-mode .bg-light {
-  background-color: #121212 !important;
-  color: #ffffff !important;
+  background-color: var(--bg-board) !important;
+  color: var(--text-main) !important;
 }
 
 .dark-mode .bg-white {
-  background-color: #1e1e1e !important;
-  color: #ffffff !important;
+  background-color: var(--bg-card) !important;
+  color: var(--text-main) !important;
 }
 
 .dark-mode .text-muted {
-  color: #a0a0a0 !important;
+  color: var(--text-muted) !important;
 }
 
 .dark-mode .text-dark {
-  color: #ffffff !important;
+  color: var(--text-main) !important;
 }
 
 .dark-mode .lead {
-  color: #ffffff;
+  color: var(--text-main);
 }
 
 .dark-mode h1,

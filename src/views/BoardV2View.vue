@@ -24,13 +24,14 @@
         <div class="btn-group" v-if="board.columns.length > 0">
           <!-- Adicionar Coluna -->
           <button
-            class="btn btn-primary"
+            class="btn btn-primary d-flex align-items-center gap-2"
             @click="newColumn()"
             data-bs-toggle="modal"
             data-bs-target="#newColumn"
             :title="t('board.addColumn')"
           >
             <Plus size="18"/>
+            {{ t('board.addColumn') }}
           </button>
 
           <!-- Estatísticas -->
@@ -2477,16 +2478,20 @@ html {
 
 .kanban-header {
   padding: 1rem;
-  background-color: #f8f9fa;
+  background-color: var(--bg-header);
+  border-bottom: 1px solid var(--border-color);
+  box-shadow: var(--header-shadow);
 }
 
 /* Kanban board com rolagem horizontal */
 .kanban-board {
   display: flex;
   overflow-x: auto;
-  padding: 1rem;
+  padding: 1.5rem;
   flex-grow: 1;
-  background-color: #e9ecef;
+  background-color: var(--bg-board);
+  background-image: radial-gradient(circle at top left, rgba(255, 255, 255, 0.03), transparent 400px),
+                    radial-gradient(circle at bottom right, rgba(255, 255, 255, 0.02), transparent 400px);
 }
 
 /* Estilo para o container draggable */
@@ -2497,38 +2502,72 @@ html {
 
 /* Configura colunas para preencher a tela em altura e ter rolagem interna */
 .kanban-column {
-  width: 300px;
+  width: 320px;
   max-height: 100%;
-  margin-right: 1rem;
+  margin-right: 1.5rem;
   position: relative;
-  background-color: #f8f9fa;
-  border: 1px solid #ddd;
-  border-radius: 8px;
+  background: var(--bg-column);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
   display: flex;
   flex-direction: column;
   overflow-y: hidden;
-  flex: 1 0 calc(20% - 1rem);
-  min-width: 300px;
-  max-width: calc(33.333% - 1rem);
+  flex: 1 0 calc(20% - 1.5rem);
+  min-width: 320px;
+  max-width: calc(33.333% - 1.5rem);
+  box-shadow: var(--column-shadow);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.kanban-column:hover {
+  box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.08);
 }
 
 .kanban-cards-container {
   overflow-y: auto;
   max-height: calc(100vh - 250px);
+  padding: 0.5rem 0.75rem !important;
 }
 
 .kanban-card {
-  margin-bottom: 1rem;
+  margin-bottom: 1.25rem;
   overflow-wrap: break-word;
-  max-width: 95%;
-  padding: 1rem;
-  border-radius: 0.5rem;
-  background-color: #f8f9fa;
-  transition: background-color 0.2s ease;
+  max-width: 100%;
+  padding: 1.25rem;
+  border-radius: 14px;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--card-shadow);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
 }
 
 .kanban-card:hover {
-  background-color: #f0f1f2;
+  background-color: var(--bg-card);
+  transform: translateY(-4px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  border-color: rgba(59, 130, 246, 0.2);
+}
+
+.column-title {
+  font-weight: 700;
+  color: var(--text-main);
+  font-size: 1rem;
+  letter-spacing: -0.01em;
+}
+
+.card-title {
+  font-weight: 600;
+  color: var(--text-main);
+  line-height: 1.4;
+  margin-bottom: 0.75rem;
+}
+
+.card-text {
+  color: var(--text-muted);
+  line-height: 1.5;
 }
 
 /* Quebra de linha para o nome do usuário e o título da tarefa */
@@ -2541,28 +2580,38 @@ html {
 }
 
 .btn-light-new-card {
-  background-color: #d3d4d5;
-  /* cor do botão */
-  border-color: #d3d4d5;
-  /* borda do botão */
+  background-color: transparent;
+  border: 1px dashed var(--text-muted);
+  color: var(--text-muted);
+  border-radius: 10px;
+  transition: all 0.2s ease;
+  font-weight: 500;
+  padding: 0.6rem;
 }
 
 .btn-light-new-card:hover {
-  background-color: #babbbc;
-  /* cor do botão ao passar o mouse */
-  border-color: #babbbc;
-  /* borda ao passar o mouse */
+  background-color: rgba(59, 130, 246, 0.05);
+  border-color: #3b82f6;
+  color: #3b82f6;
+  border-style: solid;
 }
 
 .empty-state {
-  min-height: 60vh;
+  min-height: 70vh;
   display: flex;
   align-items: center;
   justify-content: center;
+  background: transparent;
 }
 
 .empty-state-content {
-  max-width: 600px;
+  max-width: 500px;
+  padding: 3rem;
+  background: var(--bg-column);
+  backdrop-filter: blur(10px);
+  border-radius: 24px;
+  border: 1px solid var(--border-color);
+  box-shadow: var(--column-shadow);
 }
 
 .empty-state-icon {
@@ -2608,6 +2657,72 @@ html {
   background: #a8a8a8;
 }
 
+/* Modern Badges Styles */
+.badge {
+  font-weight: 500;
+  padding: 0.4em 0.75em;
+  border-radius: 6px;
+  letter-spacing: 0.01em;
+}
+
+.bg-primary { background-color: #3b82f6 !important; }
+.bg-success { background-color: #10b981 !important; }
+.bg-info { background-color: #06b6d4 !important; }
+.bg-warning { background-color: #f59e0b !important; color: #000; }
+.bg-danger { background-color: #ef4444 !important; }
+.bg-secondary { background-color: #64748b !important; }
+
+/* Soft background badges (optional, but let's stick to consistent modern primary colors for now) */
+
+/* Header Adjustments */
+.kanban-header {
+  padding: 1.25rem 2rem;
+  background-color: var(--bg-header);
+  border-bottom: 1px solid var(--border-color);
+  box-shadow: var(--header-shadow);
+}
+
+.kanban-header h2 {
+  font-weight: 800;
+  color: var(--text-main);
+  letter-spacing: -0.02em;
+}
+
+.edit-column {
+  margin-left: 0.5rem;
+  color: #94a3b8;
+  border: none;
+  background: transparent;
+}
+
+.edit-column:hover {
+  color: #3b82f6;
+  background: rgba(59, 130, 246, 0.05);
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  border: none;
+  box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3);
+  transition: all 0.2s ease;
+  border-radius: 10px;
+  font-weight: 600;
+}
+
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 15px rgba(59, 130, 246, 0.4);
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+:global(.dark-mode) .text-muted {
+  color: var(--text-muted) !important;
+}
+
 /* Chat Messages */
 .chat-messages {
   max-height: calc(100vh - 300px);
@@ -2623,8 +2738,10 @@ html {
 }
 
 .ai-bubble {
-  background-color: #f8f9fa;
-  border: 1px solid #e9ecef;
+  background-color: var(--bg-column);
+  backdrop-filter: blur(5px);
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
 }
 
 .user-bubble {
@@ -2677,12 +2794,14 @@ html {
 
 /* Quick Actions */
 .quick-actions {
-  background-color: #f8f9fa;
+  background-color: var(--bg-header);
+  border-top: 1px solid var(--border-color);
 }
 
 /* Chat Input */
 .chat-input {
-  background-color: white;
+  background-color: var(--bg-header);
+  border-top: 1px solid var(--border-color);
 }
 
 /* AI Help Button Styles */
@@ -2732,10 +2851,11 @@ html {
 }
 
 .ai-tips {
-  background-color: #f8f9fa;
+  background-color: var(--bg-board);
   padding: 1rem;
   border-radius: 0.375rem;
-  border: 1px solid #e9ecef;
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
 }
 
 @keyframes float {
