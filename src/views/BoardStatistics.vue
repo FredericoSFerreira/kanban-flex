@@ -126,6 +126,17 @@
                 />
                 <div class="flex-grow-1">
                   <h6 class="mb-0">{{ member.name }}</h6>
+                  <span
+                    class="badge mt-1"
+                    :class="{
+                      'bg-primary': member.role === 'owner',
+                      'bg-secondary': member.role === 'member',
+                      'bg-info text-dark': member.role === 'contributor',
+                    }"
+                    style="font-size: 0.65rem;"
+                  >
+                    {{ member.role || 'member' }}
+                  </span>
                 </div>
               </div>
             </div>
