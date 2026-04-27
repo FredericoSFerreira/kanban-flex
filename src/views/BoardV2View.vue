@@ -2,8 +2,10 @@
 
   <div class="container-fullscreen">
 
-    <div class="kanban-header d-flex justify-content-between align-items-center">
-      <div class="d-flex flex-row">
+    <div class="kanban-header d-flex align-items-center flex-wrap gap-2">
+
+      <!-- Left: Board title -->
+      <div class="d-flex align-items-center kanban-header-left">
         <h2 class="mb-0">{{ board.name }}
           <span
             class="badge ms-2"
@@ -28,105 +30,41 @@
         </h2>
       </div>
 
-
-      <div class="d-flex flex-row-reverse justify-content-end align-items-center gap-2">
-
-        <div class="btn-group" v-if="board.columns.length > 0">
-          <!-- Adicionar Coluna -->
+      <!-- Search bar: inline on desktop, full-width second row on mobile -->
+      <div class="d-flex align-items-center position-relative kanban-header-search" v-if="board.columns.length > 0">
+        <div class="input-group">
+          <span class="input-group-text bg-transparent border-end-0">
+            <Search size="18" class="text-muted"/>
+          </span>
+          <input
+            id="cardSearchInput"
+            type="text"
+            class="form-control border-start-0"
+            :placeholder="t('boardV2.cardSearch.placeholder')"
+            v-model="cardSearchQuery"
+            autocomplete="off"
+          />
           <button
-            class="btn btn-primary d-flex align-items-center gap-2"
-            @click="newColumn()"
-            data-bs-toggle="modal"
-            data-bs-target="#newColumn"
-            :title="t('board.addColumn')"
+            v-if="cardSearchQuery"
+            class="btn btn-outline-secondary"
+            type="button"
+            @click="cardSearchQuery = ''"
+            :title="t('boardV2.cardSearch.clear')"
           >
-            <Plus size="18"/>
-            {{ t('board.addColumn') }}
-          </button>
-
-          <!-- Estatísticas -->
-          <button
-            v-if="board?.columns.length > 0 && board?.columns.filter(column => column.itens.length > 0).length > 0 && user.id != 'demo'"
-            class="btn btn-primary"
-            :title="t('boardV2.statistics')"
-            @click="router.push(`/board/statistics/${route.params.id}`)"
-          >
-            <BarChart2 size="18"/>
-          </button>
-
-          <!-- Toggle Arquivados -->
-          <button
-            class="btn position-relative"
-            :class="showArchived ? 'btn-warning' : 'btn-outline-secondary'"
-            @click="showArchived = !showArchived"
-            :title="showArchived ? t('board.hideArchived') : t('board.showArchived')"
-          >
-            <ArchiveRestore v-if="showArchived" size="18"/>
-            <Archive v-else size="18"/>
-            <span
-              v-if="totalArchivedCards > 0"
-              class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger shadow-sm"
-              style="font-size: 0.60rem; padding: 0.25em 0.5em; z-index: 1020;"
-            >
-              {{ totalArchivedCards }}
-            </span>
-          </button>
-
-          <!-- AI Chat -->
-          <button
-            class="btn btn-primary ai-chat-toggle"
-            @click="toggleAIChat"
-            :title="t('board.aiAssist.title')"
-          >
-            <Sparkles size="18"/>
-          </button>
-
-          <!-- Configurações -->
-          <button class="btn btn-primary" @click="showBoardSettings" :title="t('board.settings')">
-            <Settings size="18"/>
+            <X size="18"/>
           </button>
         </div>
+        <!-- Badge flutuante de resultados -->
+        <transition name="fade">
+          <span v-if="cardSearchDebounced" class="badge bg-primary-subtle text-primary px-2 py-1 position-absolute" style="top: 110%; right: 0; z-index: 10;">
+            <Search size="11" class="me-1"/>
+            {{ totalFilteredCards }} {{ t('boardV2.cardSearch.results') }}
+          </span>
+        </transition>
+      </div>
 
-        <!-- Visibilidade -->
-        <div v-if="checkPermission() && boardConfig.showVisibility" @click="setVisibility()">
-          <button type="button" class="btn btn-light">
-            <Eye size="18" v-if="board.visibility"/>
-            <EyeOff size="18" v-if="!board.visibility"/>
-          </button>
-        </div>
-
-        <!-- Busca de Cards -->
-        <div class="d-flex align-items-center position-relative" style="min-width: 250px; max-width: 350px;" v-if="board.columns.length > 0">
-          <div class="input-group">
-            <span class="input-group-text bg-transparent border-end-0">
-              <Search size="18" class="text-muted"/>
-            </span>
-            <input
-              id="cardSearchInput"
-              type="text"
-              class="form-control border-start-0"
-              :placeholder="t('boardV2.cardSearch.placeholder')"
-              v-model="cardSearchQuery"
-              autocomplete="off"
-            />
-            <button
-              v-if="cardSearchQuery"
-              class="btn btn-outline-secondary"
-              type="button"
-              @click="cardSearchQuery = ''"
-              :title="t('boardV2.cardSearch.clear')"
-            >
-              <X size="18"/>
-            </button>
-          </div>
-          <!-- Badge flutuante de resultados -->
-          <transition name="fade">
-            <span v-if="cardSearchDebounced" class="badge bg-primary-subtle text-primary px-2 py-1 position-absolute" style="top: 110%; right: 0; z-index: 10;">
-              <Search size="11" class="me-1"/>
-              {{ totalFilteredCards }} {{ t('boardV2.cardSearch.results') }}
-            </span>
-          </transition>
-        </div>
+      <!-- Right: Action buttons -->
+      <div class="d-flex align-items-center gap-2 ms-auto kanban-header-right">
 
         <!-- Dropdown de Ordenação -->
         <div class="dropdown">
@@ -172,6 +110,70 @@
               </button>
             </li>
           </ul>
+        </div>
+
+        <!-- Visibilidade -->
+        <div v-if="checkPermission() && boardConfig.showVisibility" @click="setVisibility()">
+          <button type="button" class="btn btn-light">
+            <Eye size="18" v-if="board.visibility"/>
+            <EyeOff size="18" v-if="!board.visibility"/>
+          </button>
+        </div>
+
+        <div class="btn-group" v-if="board.columns.length > 0">
+          <!-- Adicionar Coluna -->
+          <button
+            class="btn btn-primary d-flex align-items-center gap-1"
+            @click="newColumn()"
+            data-bs-toggle="modal"
+            data-bs-target="#newColumn"
+            :title="t('board.addColumn')"
+          >
+            <Plus size="18"/>
+            <span class="btn-add-column-text">{{ t('board.addColumn') }}</span>
+          </button>
+
+          <!-- Estatísticas -->
+          <button
+            v-if="board?.columns.length > 0 && board?.columns.filter(column => column.itens.length > 0).length > 0 && user.id != 'demo'"
+            class="btn btn-primary"
+            :title="t('boardV2.statistics')"
+            @click="router.push(`/board/statistics/${route.params.id}`)"
+          >
+            <BarChart2 size="18"/>
+          </button>
+
+          <!-- Toggle Arquivados -->
+          <button
+            class="btn position-relative"
+            :class="showArchived ? 'btn-warning' : 'btn-outline-secondary'"
+            @click="showArchived = !showArchived"
+            :title="showArchived ? t('board.hideArchived') : t('board.showArchived')"
+          >
+            <ArchiveRestore v-if="showArchived" size="18"/>
+            <Archive v-else size="18"/>
+            <span
+              v-if="totalArchivedCards > 0"
+              class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger shadow-sm"
+              style="font-size: 0.60rem; padding: 0.25em 0.5em; z-index: 1020;"
+            >
+              {{ totalArchivedCards }}
+            </span>
+          </button>
+
+          <!-- AI Chat -->
+          <button
+            class="btn btn-primary ai-chat-toggle"
+            @click="toggleAIChat"
+            :title="t('board.aiAssist.title')"
+          >
+            <Sparkles size="18"/>
+          </button>
+
+          <!-- Configurações -->
+          <button class="btn btn-primary" @click="showBoardSettings" :title="t('board.settings')">
+            <Settings size="18"/>
+          </button>
         </div>
 
       </div>
@@ -2473,13 +2475,6 @@ html {
   height: 93vh;
 }
 
-.kanban-header {
-  padding: 1rem;
-  background-color: var(--bg-header);
-  border-bottom: 1px solid var(--border-color);
-  box-shadow: var(--header-shadow);
-}
-
 /* Kanban board com rolagem horizontal */
 .kanban-board {
   display: flex;
@@ -2864,6 +2859,54 @@ html {
   }
   100% {
     transform: translateY(0px);
+  }
+}
+
+/* Search bar: desktop fixed width */
+.kanban-header-search {
+  min-width: 220px;
+  max-width: 320px;
+  flex: 1 1 220px;
+}
+
+/* === MOBILE RESPONSIVE HEADER === */
+@media (max-width: 767.98px) {
+  .kanban-header {
+    padding: 0.6rem 0.75rem;
+    row-gap: 0.4rem;
+    column-gap: 0.35rem;
+  }
+
+  .kanban-header-left {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .kanban-header h2 {
+    font-size: 0.95rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: calc(100vw - 210px);
+  }
+
+  /* Search desce para linha inteira */
+  .kanban-header-search {
+    order: 10;
+    flex: 1 1 100%;
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  /* Botões ficam compactos */
+  .kanban-header-right .btn {
+    padding: 0.3rem 0.45rem;
+  }
+
+  /* Esconde texto do botão Adicionar Coluna, mantém só o ícone */
+  .btn-add-column-text {
+    display: none;
   }
 }
 
