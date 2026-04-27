@@ -139,6 +139,30 @@ export default {
       title: 'Artificial Intelligence',
       description: 'With the help of our AI, your workflow on the boards becomes more productive.'
     },
+    cardArchiving: {
+      title: 'Card Archiving',
+      description: 'Archive completed or irrelevant cards without losing history. Restore them anytime with a single click.'
+    },
+    checklists: {
+      title: 'Checklists & Progress',
+      description: 'Break down tasks into actionable steps with built-in checklists and track progress with a visual progress bar.'
+    },
+    attachments: {
+      title: 'File Attachments',
+      description: 'Attach images, PDFs, and documents directly to cards. All files are securely stored and accessible to your team.'
+    },
+    memberInvitation: {
+      title: 'Member Invitation',
+      description: 'Invite collaborators to your board via email. Pending invitations are tracked until the user joins the platform.'
+    },
+    cardSearch: {
+      title: 'Card Search',
+      description: 'Quickly find any card across all columns with real-time search and highlight matching text instantly.'
+    },
+    privacyControls: {
+      title: 'Privacy Controls',
+      description: 'Set your board as public or private. Private boards are only accessible to invited members, keeping your work secure.'
+    },
   },
   "pricing": {
     "title": "Simple and Transparent Pricing",

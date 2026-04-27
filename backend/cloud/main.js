@@ -694,6 +694,13 @@ Parse.Cloud.define("getMyBoards", async (request) => {
                 in: {$size: "$$col.itens"}
               }
             }
+          },
+          // Pre-compute all explicit member IDs: owner + invited members
+          explicitMemberIds: {
+            $setUnion: [
+              ["$owner_id"],
+              { $ifNull: ["$members.userId", []] }
+            ]
           }
         }
       },
@@ -705,7 +712,8 @@ Parse.Cloud.define("getMyBoards", async (request) => {
           name: {$first: "$name"},
           totalColumns: {$first: "$totalColumns"},
           totalItems: {$first: "$totalItems"},
-          unique_users: {
+          explicitMemberIds: {$first: "$explicitMemberIds"},
+          card_user_ids: {
             $addToSet: "$columns.itens.user_id"
           },
           created_at: {
@@ -719,8 +727,15 @@ Parse.Cloud.define("getMyBoards", async (request) => {
           name: 1,
           totalColumns: 1,
           totalItems: 1,
-          totalUsers: {$size: "$unique_users"},
-          created_at: 1
+          created_at: 1,
+          totalUsers: {
+            $size: {
+              $setUnion: [
+                {$ifNull: ["$explicitMemberIds", []]},
+                {$ifNull: ["$card_user_ids", []]}
+              ]
+            }
+          }
         }
       },
       {$sort: {created_at: -1}},
@@ -974,7 +989,7 @@ Parse.Cloud.define("getBoardStats", async (request) => {
             }
           }
         ],
-        unique_users: [
+        card_users: [
           {
             $group: {
               _id: "$columns.itens.user_id",
@@ -1043,9 +1058,63 @@ Parse.Cloud.define("getBoardStats", async (request) => {
     }
   ];
 
-  const results = await db.aggregate(pipeline)
-  return results[0]
+  const results = await db.aggregate(pipeline);
+  const data = results[0];
 
+  // — Build complete unique_users list from all 3 sources —
+  const boardQuery = new Parse.Query("boards");
+  boardQuery.equalTo('objectId', id);
+  const board = await boardQuery.first({useMasterKey: true});
+
+  const membersMap = new Map();
+
+  // 1. Owner — fetch from otp table to get name + avatar
+  const ownerId = board.get('owner_id');
+  if (ownerId) {
+    try {
+      const ownerQuery = new Parse.Query("otp");
+      ownerQuery.equalTo('objectId', ownerId);
+      const owner = await ownerQuery.first({useMasterKey: true});
+      if (owner) {
+        membersMap.set(ownerId, {
+          user_id: ownerId,
+          name: owner.get('name'),
+          avatar: owner.get('avatar'),
+          role: 'owner'
+        });
+      }
+    } catch (e) {
+      console.warn('Could not fetch owner for stats:', e.message);
+    }
+  }
+
+  // 2. Explicit invited members (already have name + avatar stored on the board)
+  (board.get('members') || []).forEach(m => {
+    if (m.userId && !membersMap.has(m.userId)) {
+      membersMap.set(m.userId, {
+        user_id: m.userId,
+        name: m.name,
+        avatar: m.avatar,
+        role: m.role || 'member'
+      });
+    }
+  });
+
+  // 3. Card authors (from aggregate — may not be explicit members)
+  (data.card_users || []).forEach(u => {
+    if (u.user_id && !membersMap.has(u.user_id)) {
+      membersMap.set(u.user_id, {
+        user_id: u.user_id,
+        name: u.name,
+        avatar: u.avatar,
+        role: 'contributor'
+      });
+    }
+  });
+
+  data.unique_users = Array.from(membersMap.values());
+
+  return data;
 });
 
 
@@ -1117,6 +1186,13 @@ Parse.Cloud.define("getParticipatingBoards", async (request) => {
                 in: {$size: "$$col.itens"}
               }
             }
+          },
+          // Pre-compute all explicit member IDs: owner + invited members
+          explicitMemberIds: {
+            $setUnion: [
+              ["$owner_id"],
+              { $ifNull: ["$members.userId", []] }
+            ]
           }
         }
       },
@@ -1132,7 +1208,8 @@ Parse.Cloud.define("getParticipatingBoards", async (request) => {
           name: {$first: "$name"},
           totalColumns: {$first: "$totalColumns"},
           totalItems: {$first: "$totalItems"},
-          unique_users: {
+          explicitMemberIds: {$first: "$explicitMemberIds"},
+          card_user_ids: {
             $addToSet: "$columns.itens.user_id"
           },
           created_at: {
@@ -1146,8 +1223,15 @@ Parse.Cloud.define("getParticipatingBoards", async (request) => {
           name: 1,
           totalColumns: 1,
           totalItems: 1,
-          totalUsers: {$size: "$unique_users"},
-          created_at: 1
+          created_at: 1,
+          totalUsers: {
+            $size: {
+              $setUnion: [
+                {$ifNull: ["$explicitMemberIds", []]},
+                {$ifNull: ["$card_user_ids", []]}
+              ]
+            }
+          }
         }
       },
       {$sort: {created_at: -1}}

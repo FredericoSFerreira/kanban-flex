@@ -211,6 +211,12 @@ import {
   Trello,
   ArrowRight,
   ArrowUp,
+  Archive,
+  ListChecks,
+  Paperclip,
+  UserPlus,
+  Search,
+  Lock,
 } from 'lucide-vue-next';
 import {useI18n} from "vue-i18n";
 import {getTemplate} from "@/utils/templates";
@@ -398,6 +404,36 @@ const features = ref([
     title: 'ai',
     description: 'ai',
     is_coming: false
+  },
+  {
+    icon: Archive,
+    title: 'cardArchiving',
+    description: 'cardArchiving',
+  },
+  {
+    icon: ListChecks,
+    title: 'checklists',
+    description: 'checklists',
+  },
+  {
+    icon: Paperclip,
+    title: 'attachments',
+    description: 'attachments',
+  },
+  {
+    icon: UserPlus,
+    title: 'memberInvitation',
+    description: 'memberInvitation',
+  },
+  {
+    icon: Search,
+    title: 'cardSearch',
+    description: 'cardSearch',
+  },
+  {
+    icon: Lock,
+    title: 'privacyControls',
+    description: 'privacyControls',
   },
 ]);
 

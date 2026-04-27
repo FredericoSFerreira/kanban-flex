@@ -73,7 +73,14 @@ const getBoardSummary = async (req, res) => {
 
     console.log('did not search in cache');
     const board = await callFunction("getBoardById", req.params, req.token);
-    const prompt = generateBoardSummaryPrompt(board.attributes);
+    const prompt = generateBoardSummaryPrompt(board.attributes, {
+      includeLabel: true,
+      includeMembers: true,
+      includeArchived: true,
+      includeChecklist: true,
+      includeVotes: true,
+      includeBoardMeta: true,
+    });
     const aiResponse = await getAIBoardSummary([
       {
         role: "system",
@@ -106,7 +113,18 @@ const getBoardQuestion = async (req, res) => {
     if (!question) return res.status(400).send("Invalid question");
 
     const board = await callFunction("getBoardById", req.params, req.token);
-    const context = generateBoardSummaryPrompt(board.attributes, true, true);
+    const context = generateBoardSummaryPrompt(board.attributes, {
+      includeLabel: true,
+      includeMembers: true,
+      includeArchived: true,
+      includeChecklist: true,
+      includeComments: true,
+      includeVotes: true,
+      includeHistory: true,
+      includeBoardMeta: true,
+      maxComments: 3,
+      maxHistory: 1,
+    });
     const aiResponse = await getAIBoardSummary([
       {
         role: "system",
