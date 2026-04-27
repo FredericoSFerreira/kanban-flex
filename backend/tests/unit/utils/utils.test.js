@@ -52,8 +52,8 @@ describe('generateBoardSummaryPrompt', () => {
 
     expect(prompt).toContain('Board: Sprint 1');
     expect(prompt).toContain('Coluna: To Do');
-    expect(prompt).toContain('Título: Task 1');
-    expect(prompt).toContain('Título: Sem título');
+    expect(prompt).toContain('Card 1: Task 1');
+    expect(prompt).toContain('Card 2: Sem título');
     expect(prompt).toContain('Coluna: Done');
     expect(prompt).toContain('Descrição: Description 2');
   });
