@@ -24,10 +24,11 @@
             <div class="col-lg-8 border-end">
               <div class="modal-body-panel p-3 pt-2">
                 <!-- Card Title -->
-                <div class="mb-2" v-if="boardConfig.showTitle">
+                <div class="mb-2">
                   <label class="form-label fw-semibold">
                     <FileText size="16" class="me-2"/>
                     {{ $t('boardV2.title') }}
+                    <span class="text-danger ms-1">*</span>
                   </label>
                   <input
                     type="text"
@@ -38,7 +39,7 @@
                 </div>
 
                 <!-- Card Description -->
-                <div class="mb-2" v-if="boardConfig.showDescription">
+                <div class="mb-2">
                   <label class="form-label fw-semibold">
                     <AlignLeft size="16" class="me-2"/>
                     {{ $t('boardV2.description') }}

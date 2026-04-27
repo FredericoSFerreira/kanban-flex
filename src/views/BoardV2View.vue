@@ -6,6 +6,16 @@
       <div class="d-flex flex-row">
         <h2 class="mb-0">{{ board.name }}
           <span
+            class="badge ms-2"
+            :class="board.is_public ? 'bg-success-subtle text-success' : 'bg-danger-subtle text-danger'"
+            style="font-size: 0.6rem; vertical-align: middle; font-weight: 600;"
+            :title="board.is_public ? t('board.settingsPublic') : (t('board.settingsPrivate') || 'Privado')"
+          >
+            <Globe v-if="board.is_public" :size="10" class="me-1"/>
+            <Lock v-else :size="10" class="me-1"/>
+            {{ board.is_public ? t('board.settingsPublic') : (t('board.settingsPrivate') || 'Privado') }}
+          </span>
+          <span
             v-if="showArchived"
             class="badge bg-warning text-dark ms-2"
             style="font-size: 0.6rem; vertical-align: middle; font-weight: 600;"
@@ -254,7 +264,6 @@
                         <div>
                           <h6
                             class="card-title mb-2"
-                            v-if="boardConfig.showTitle"
                             v-html="!checkPermission(card.user_id) && board.visibility === false ? cardHideText : highlightCardText(card.title)"
                           ></h6>
                           <div
@@ -462,12 +471,12 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <div class="mb-3" v-if="boardConfig.showTitle">
+          <div class="mb-3">
             <label for="cardEditTitle" class="form-label">{{ $t('boardV2.title') }}</label>
             <input type="text" class="form-control" id="cardEditTitle" v-model="cardEditTitle">
           </div>
 
-          <div class="mb-3" v-if="boardConfig.showDescription">
+          <div class="mb-3">
 
             <div class="row">
               <div class="col-11">
@@ -651,18 +660,13 @@
                 </label>
               </div>
               <div class="form-check mb-3">
-                <input type="checkbox" class="form-check-input" id="showTitle" v-model="boardConfig.showTitle">
-                <label class="form-check-label" for="showTitle">
-                  {{ t('board.settingsShowTitle') }}
-                </label>
-              </div>
-              <div class="form-check mb-3">
                 <input type="checkbox" class="form-check-input" id="showDescription"
                        v-model="boardConfig.showDescription">
                 <label class="form-check-label" for="showDescription">
                   {{ t('board.settingsShowDescription') }}
                 </label>
               </div>
+
               <div class="form-check mb-3">
                 <input type="checkbox" class="form-check-input" id="showTags" v-model="boardConfig.showTags">
                 <label class="form-check-label" for="showTags">
@@ -1356,7 +1360,7 @@ const saveCardVotes = (idColumn, idCard, upVote = false, downVote = false) => {
 const newSaveEditCard = (data) => {
   const columns = board.columns;
 
-  if (!data || (!data.description && boardConfig.showDescription)) {
+  if (!data || !data.title?.trim()) {
     return $swal.fire({
       icon: "error",
       title: t('boardV2.errors.oops'),
@@ -1426,13 +1430,6 @@ const newSaveEditCard = (data) => {
 };
 
 const saveEditCard = () => {
-  if (!cardEditDescription.value && boardConfig.showDescription) {
-    return $swal.fire({
-      icon: "error",
-      title: t('boardV2.errors.oops'),
-      text: t('boardV2.errors.descriptionRequired'),
-    });
-  }
 
   const columns = board.columns;
   const [column, columnIndex] = findColumn(columns, columnSelectedId.value);
@@ -1824,11 +1821,11 @@ const saveColumn = () => {
 };
 
 const saveCard = (data) => {
-  if (!data.description && boardConfig.showDescription) {
+  if (!data.title?.trim()) {
     return $swal.fire({
       icon: "error",
       title: t('boardV2.errors.oops'),
-      text: t('boardV2.errors.descriptionRequired'),
+      text: t('boardV2.errors.titleRequired'),
     });
   }
 
