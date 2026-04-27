@@ -139,6 +139,30 @@ export default {
       title: 'Inteligência Artificial',
       description: 'Com ajuda da nossa IA, seu fluxo de trabalho nos quadros ficam ainda mais produtivos.'
     },
+    cardArchiving: {
+      title: 'Arquivamento de Cards',
+      description: 'Arquive cards concluídos ou irrelevantes sem perder o histórico. Restaure-os a qualquer momento com um único clique.'
+    },
+    checklists: {
+      title: 'Checklists e Progresso',
+      description: 'Divida tarefas em etapas com checklists integrados e acompanhe o progresso com uma barra visual em tempo real.'
+    },
+    attachments: {
+      title: 'Anexo de Arquivos',
+      description: 'Anexe imagens, PDFs e documentos diretamente nos cards. Todos os arquivos ficam seguros e acessíveis para o time.'
+    },
+    memberInvitation: {
+      title: 'Convite de Membros',
+      description: 'Convide colaboradores para o board por e-mail. Convites pendentes ficam rastreados até o usuário entrar na plataforma.'
+    },
+    cardSearch: {
+      title: 'Busca de Cards',
+      description: 'Encontre qualquer card em todas as colunas com busca em tempo real e destaque instantâneo do texto correspondente.'
+    },
+    privacyControls: {
+      title: 'Controles de Privacidade',
+      description: 'Defina seu board como público ou privado. Boards privados só são acessíveis para membros convidados, mantendo seu trabalho seguro.'
+    },
 
   },
   pricing: {
