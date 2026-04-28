@@ -1375,6 +1375,7 @@ onUnmounted(() => {
     background-color: var(--bg-card);
     border-color: var(--bs-primary);
     color: var(--text-main);
+    box-shadow: none;
   }
 
   .tabs-container {
@@ -1393,6 +1394,7 @@ onUnmounted(() => {
   .member-chip {
     background-color: var(--bg-board);
     border-color: var(--border-color);
+    color: var(--text-main);
   }
 
   .member-results {
@@ -1432,6 +1434,61 @@ onUnmounted(() => {
     border-color: var(--bs-primary);
     background-color: rgba(var(--bs-primary-rgb), 0.1);
   }
+}
+
+/* Member search dropdown - light + dark mode fix */
+
+/* Botão trigger do dropdown de busca de membro */
+.member-search > .btn {
+  background-color: var(--bg-card, #fff);
+  color: var(--text-muted, #6c757d);
+  border-color: var(--border-color, #dee2e6);
+}
+
+.member-search > .btn:hover,
+.member-search > .btn:focus,
+.member-search > .btn:active,
+.member-search > .btn.show {
+  background-color: var(--bg-board, #f8f9fa) !important;
+  color: var(--text-main, #212529) !important;
+  border-color: var(--border-color, #dee2e6) !important;
+  box-shadow: none !important;
+}
+
+.member-search .dropdown-menu {
+  background-color: var(--bg-card, #fff);
+  color: var(--text-main, #212529);
+  border-color: var(--border-color, #dee2e6);
+}
+
+.member-search .dropdown-menu .form-control {
+  background-color: var(--bg-board, #f8f9fa);
+  color: var(--text-main, #212529);
+  border-color: var(--border-color, #dee2e6);
+}
+
+.member-search .dropdown-menu .form-control:focus {
+  background-color: var(--bg-board, #f8f9fa);
+  color: var(--text-main, #212529);
+  border-color: var(--bs-primary);
+  box-shadow: 0 0 0 0.2rem rgba(var(--bs-primary-rgb), 0.25);
+}
+
+.member-search .dropdown-menu .dropdown-item {
+  color: var(--text-main, #212529);
+}
+
+.member-search .dropdown-menu .dropdown-item:hover,
+.member-search .dropdown-menu .dropdown-item:focus {
+  background-color: var(--bg-board, #f0f0f0);
+  color: var(--text-main, #212529);
+}
+
+/* member-chip usa variaveis para funcionar em ambos os modos */
+.member-chip {
+  background-color: var(--bg-board, #f8f9fa) !important;
+  border-color: var(--border-color, #dee2e6) !important;
+  color: var(--text-main, #212529) !important;
 }
 
 /* Custom scrollbar */

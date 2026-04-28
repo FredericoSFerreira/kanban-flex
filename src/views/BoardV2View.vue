@@ -30,41 +30,44 @@
         </h2>
       </div>
 
-      <!-- Search bar: inline on desktop, full-width second row on mobile -->
-      <div class="d-flex align-items-center position-relative kanban-header-search" v-if="board.columns.length > 0">
-        <div class="input-group">
-          <span class="input-group-text bg-transparent border-end-0">
-            <Search size="18" class="text-muted"/>
-          </span>
-          <input
-            id="cardSearchInput"
-            type="text"
-            class="form-control border-start-0"
-            :placeholder="t('boardV2.cardSearch.placeholder')"
-            v-model="cardSearchQuery"
-            autocomplete="off"
-          />
-          <button
-            v-if="cardSearchQuery"
-            class="btn btn-outline-secondary"
-            type="button"
-            @click="cardSearchQuery = ''"
-            :title="t('boardV2.cardSearch.clear')"
-          >
-            <X size="18"/>
-          </button>
-        </div>
-        <!-- Badge flutuante de resultados -->
-        <transition name="fade">
-          <span v-if="cardSearchDebounced" class="badge bg-primary-subtle text-primary px-2 py-1 position-absolute" style="top: 110%; right: 0; z-index: 10;">
-            <Search size="11" class="me-1"/>
-            {{ totalFilteredCards }} {{ t('boardV2.cardSearch.results') }}
-          </span>
-        </transition>
-      </div>
+      <!-- Search + Action buttons: always together -->
+      <div class="d-flex align-items-center gap-2 ms-auto kanban-header-actions">
 
-      <!-- Right: Action buttons -->
-      <div class="d-flex align-items-center gap-2 ms-auto kanban-header-right">
+        <!-- Search bar -->
+        <div class="d-flex align-items-center position-relative kanban-header-search" v-if="board.columns.length > 0">
+          <div class="input-group">
+            <span class="input-group-text bg-transparent border-end-0">
+              <Search size="18" class="text-muted"/>
+            </span>
+            <input
+              id="cardSearchInput"
+              type="text"
+              class="form-control border-start-0"
+              :placeholder="t('boardV2.cardSearch.placeholder')"
+              v-model="cardSearchQuery"
+              autocomplete="off"
+            />
+            <button
+              v-if="cardSearchQuery"
+              class="btn btn-outline-secondary"
+              type="button"
+              @click="cardSearchQuery = ''"
+              :title="t('boardV2.cardSearch.clear')"
+            >
+              <X size="18"/>
+            </button>
+          </div>
+          <!-- Badge flutuante de resultados -->
+          <transition name="fade">
+            <span v-if="cardSearchDebounced" class="badge bg-primary-subtle text-primary px-2 py-1 position-absolute" style="top: 110%; right: 0; z-index: 10;">
+              <Search size="11" class="me-1"/>
+              {{ totalFilteredCards }} {{ t('boardV2.cardSearch.results') }}
+            </span>
+          </transition>
+        </div>
+
+        <!-- Right: Action buttons -->
+        <div class="d-flex align-items-center gap-2 kanban-header-right">
 
         <!-- Dropdown de Ordenação -->
         <div class="dropdown">
@@ -176,8 +179,9 @@
           </button>
         </div>
 
-      </div>
-    </div>
+        </div><!-- /kanban-header-right -->
+      </div><!-- /kanban-header-actions -->
+    </div><!-- /kanban-header -->
     <div class="alert alert-warning" role="alert" v-if="user.id === 'demo'">
       <AlertTriangle size="25" class=""/>
       {{ $t('board.demo.alert') }}
@@ -2865,8 +2869,13 @@ html {
 /* Search bar: desktop fixed width */
 .kanban-header-search {
   min-width: 220px;
-  max-width: 320px;
-  flex: 1 1 220px;
+  max-width: 400px;
+  flex: 1 1 260px;
+}
+
+/* Actions wrapper: desktop uses ms-auto (set in HTML) */
+.kanban-header-actions {
+  flex: 0 0 auto;
 }
 
 /* === MOBILE RESPONSIVE HEADER === */
@@ -2891,17 +2900,30 @@ html {
     max-width: calc(100vw - 210px);
   }
 
-  /* Search desce para linha inteira */
-  .kanban-header-search {
-    order: 10;
+  /* Actions wrapper ocupa a segunda linha inteira */
+  .kanban-header-actions {
     flex: 1 1 100%;
-    min-width: 0;
+    width: 100%;
+    gap: 0.35rem;
+  }
+
+  /* Search cresce dentro do actions wrapper, com mínimo razoável */
+  .kanban-header-search {
+    flex: 1 1 130px;
+    min-width: 130px;
     max-width: 100%;
   }
 
-  /* Botões ficam compactos */
-  .kanban-header-right .btn {
-    padding: 0.3rem 0.45rem;
+  /* Botões ficam bem compactos no mobile */
+  .kanban-header-right {
+    flex: 0 0 auto;
+    gap: 0.25rem !important;
+  }
+
+  .kanban-header-right .btn,
+  .kanban-header-right .btn-group .btn {
+    padding: 0.28rem 0.4rem;
+    font-size: 0.8rem;
   }
 
   /* Esconde texto do botão Adicionar Coluna, mantém só o ícone */
