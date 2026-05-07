@@ -152,12 +152,16 @@ const authGoogle = async (req, res) => {
       });
     }
 
+    const isAdmin = resultSave.isAdmin || false;
+    console.log(`[admin-google] user=${resultSave.id} isAdmin=${isAdmin}`);
+
     const jwtToken = await generateToken({
       email: email,
       name: resultSave.name,
       id: resultSave.id,
       phone: resultSave.phone || null,
       avatar: picture,
+      isAdmin,
     });
 
 

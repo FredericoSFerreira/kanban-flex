@@ -242,10 +242,6 @@ const verifyOTP = async () => {
 
         showSpinner.value = false;
 
-        // Admin users go directly to /admin
-        if ((decoded as any).isAdmin) {
-          return router.push('/admin')
-        }
 
         const redirectPath = route.query.redirect
         if (typeof redirectPath === 'string' && redirectPath !== '/login') {
