@@ -1136,12 +1136,16 @@ Parse.Cloud.define("getBoardById", async (request) => {
       const isPublic = board.get('is_public') !== false;
 
       if (!isPublic) {
-        const isOwner = board.get('owner_id') === userId;
-        const members = board.get('members') || [];
-        const isMember = members.some(m => m.userId === userId);
+        // Admin users bypass private board restriction
+        const isAdmin = request.user?.isAdmin || false;
+        if (!isAdmin) {
+          const isOwner = board.get('owner_id') === userId;
+          const members = board.get('members') || [];
+          const isMember = members.some(m => m.userId === userId);
 
-        if (!isOwner && !isMember) {
-          throw new Parse.Error(Parse.Error.OPERATION_FORBIDDEN, "Access denied: Board is private");
+          if (!isOwner && !isMember) {
+            throw new Parse.Error(Parse.Error.OPERATION_FORBIDDEN, "Access denied: Board is private");
+          }
         }
       }
     }

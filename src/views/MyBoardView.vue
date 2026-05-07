@@ -1,5 +1,16 @@
 <template>
   <div class="container py-5" style="padding-bottom: 10rem !important;">
+
+    <!-- Admin Banner -->
+    <div v-if="auth.isAdmin" class="admin-banner mb-4" @click="router.push('/admin')">
+      <div class="admin-banner-icon"><ShieldCheck :size="22" /></div>
+      <div class="admin-banner-text">
+        <strong>Painel Administrativo</strong>
+        <span>Gerencie usuários e boards com acesso total</span>
+      </div>
+      <div class="admin-banner-arrow">→</div>
+    </div>
+
     <div class="d-flex justify-content-between align-items-center mb-4" v-if="boards.length > 0 || searchTerm">
       <h1 class="h2 mb-0">{{ $t('myBoards.title') }}</h1>
       <button class="btn btn-primary" @click="openCreateBoardModal()">
@@ -153,13 +164,17 @@
 </template>
 <script setup lang="ts">
 import {ref, onMounted} from 'vue';
-import {Layout, MoreVertical, Eye, Trash2, Calendar, Users, BarChart, Search, SearchX} from 'lucide-vue-next';
+import {Layout, MoreVertical, Eye, Trash2, Calendar, Users, BarChart, Search, SearchX, ShieldCheck} from 'lucide-vue-next';
 import api from "@/utils/api";
 import {useSwal} from "@/utils/swal";
 import CreateBoardModal from "@/components/CreateBoardModal.vue";
-import {useCloudFunctions} from '@/composables/useCloudFunctions'
+import {useCloudFunctions} from '@/composables/useCloudFunctions';
+import {useAuthStore} from '@/stores/auth';
+import {useRouter} from 'vue-router';
 
-const {callFunction} = useCloudFunctions()
+const {callFunction} = useCloudFunctions();
+const auth = useAuthStore();
+const router = useRouter();
 
 const Swal = useSwal();
 
@@ -317,4 +332,67 @@ onMounted(async () => {
   color: #92400e;
 }
 
+/* ── Admin Banner ── */
+.admin-banner {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  background: linear-gradient(135deg, rgba(99,102,241,.12), rgba(139,92,246,.08));
+  border: 1px solid rgba(99,102,241,.25);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all .18s ease;
+  text-decoration: none;
+  color: inherit;
+}
+
+.admin-banner:hover {
+  background: linear-gradient(135deg, rgba(99,102,241,.2), rgba(139,92,246,.14));
+  border-color: rgba(99,102,241,.4);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 20px rgba(99,102,241,.15);
+}
+
+.admin-banner-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  border-radius: 10px;
+  color: #fff;
+}
+
+.admin-banner-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.admin-banner-text strong {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #a5b4fc;
+}
+
+.admin-banner-text span {
+  font-size: 0.78rem;
+  color: #94a3b8;
+}
+
+.admin-banner-arrow {
+  font-size: 1.1rem;
+  color: #a5b4fc;
+  flex-shrink: 0;
+  transition: transform .18s;
+}
+
+.admin-banner:hover .admin-banner-arrow {
+  transform: translateX(4px);
+}
 </style>
+

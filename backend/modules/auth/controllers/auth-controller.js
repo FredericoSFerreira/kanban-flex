@@ -2,6 +2,9 @@ import {OAuth2Client} from 'google-auth-library';
 import {generateOtp, generateToken} from "../../../utils/utils.js";
 import sendEmail from "../../../service/email-service.js";
 import { t } from "../../../i18n/index.js";
+import { getDb } from "../../../service/mongo-service.js";
+
+
 
 
 const client = new OAuth2Client()
@@ -89,12 +92,18 @@ const checkOtp = async (req, res) => {
     });
     if (otpData) {
       await updateOtp(email, generateOtp(), true);
+
+      // isAdmin already comes from the Parse checkOtp cloud function response
+      const isAdmin = otpData.isAdmin || false;
+      console.log(`[admin] user=${otpData.id} isAdmin=${isAdmin}`);
+
       const token = await generateToken({
         email: email,
         name: otpData.name,
         phone: otpData.phone,
         id: otpData.id,
         avatar: otpData.avatar || null,
+        isAdmin,
       });
       res.json({isValid: true, token: token});
     } else {

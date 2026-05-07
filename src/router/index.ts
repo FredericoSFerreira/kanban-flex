@@ -70,6 +70,26 @@ const router = createRouter({
       name: 'Privacy Policy',
       component: PrivacyPolicy
     },
+    // ── Admin routes ────────────────────────────────────────────────────────────
+    {
+      path: '/admin',
+      component: () => import('@/views/admin/AdminLayout.vue'),
+      meta: {requiresAuth: true, requiresAdmin: true},
+      children: [
+        {path: '', redirect: '/admin/users'},
+        {
+          path: 'users',
+          name: 'admin-users',
+          component: () => import('@/views/admin/AdminUsersView.vue'),
+        },
+        {
+          path: 'boards',
+          name: 'admin-boards',
+          component: () => import('@/views/admin/AdminBoardsView.vue'),
+        },
+      ],
+    },
+    // ────────────────────────────────────────────────────────────────────────────
     {
       path: "/:pathMatch(.*)*",
       name: 'error',
@@ -80,6 +100,11 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
   const auth = useAuthStore()
+
+  if (to.meta.requiresAdmin && !auth.isAdmin) {
+    return next({path: '/'})
+  }
+
   if (to.meta.requiresAuth && !auth.isAuthenticated) {
     if (to.meta.allowDemo && to.query?.demo) return next()
     next({path: '/login', query: {redirect: to.fullPath}})

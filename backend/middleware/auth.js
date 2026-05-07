@@ -49,3 +49,28 @@ export async function verifyTokenParseCloudFunction(request) {
   }
 }
 
+export async function verifyAdmin(req, res, next) {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+
+  if (!token) {
+    return res.status(401).json({ msg: 'Token not pass' });
+  }
+
+  try {
+    const { payload } = await jwtVerify(token, SECRET_KEY, {
+      algorithms: ['HS256'],
+    });
+
+    if (!payload.isAdmin) {
+      return res.status(403).json({ msg: 'Admin access required' });
+    }
+
+    req.user = payload;
+    req.token = { context: { Authorization: `Bearer ${token}` } };
+    next();
+  } catch (error) {
+    console.error(error);
+    return res.status(403).json({ msg: 'Invalid Token' });
+  }
+}

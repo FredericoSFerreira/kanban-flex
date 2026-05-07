@@ -19,8 +19,18 @@ jest.unstable_mockModule('./middleware/auth.js', () => ({
     req.user = {id: 'mock-user-id', name: 'Mock User'};
     req.token = 'fake-token';
     next();
+  },
+  verifyAdmin: (req, res, next) => {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({msg: 'Token not pass'});
+    }
+    req.user = {id: 'mock-admin-id', name: 'Mock Admin', isAdmin: true};
+    req.token = 'fake-token';
+    next();
   }
 }));
+
 
 
 const request = (await import('supertest')).default;

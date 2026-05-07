@@ -225,7 +225,7 @@ const verifyOTP = async () => {
     .then(async (response) => {
       if (response.data.isValid) {
         const token = response.data.token;
-        localStorage.setItem('token', token);
+        localStorage.setItem('token', token)
         const decoded = jwtDecode<JwtPayload>(token)
         auth.login(decoded, token)
         await sleep()
@@ -241,6 +241,12 @@ const verifyOTP = async () => {
         }
 
         showSpinner.value = false;
+
+        // Admin users go directly to /admin
+        if ((decoded as any).isAdmin) {
+          return router.push('/admin')
+        }
+
         const redirectPath = route.query.redirect
         if (typeof redirectPath === 'string' && redirectPath !== '/login') {
           router.push(redirectPath)
@@ -250,6 +256,7 @@ const verifyOTP = async () => {
           router.push('/my-boards')
         }
       }
+
     })
     .catch((error) => {
       showSpinner.value = false;

@@ -93,6 +93,13 @@
                   {{ getFirstAndLastName(auth.user) }}
                 </button>
                 <ul class="dropdown-menu" aria-labelledby="profileDropdown">
+                  <li v-if="auth.isAdmin">
+                    <button class="dropdown-item d-flex align-items-center gap-2" @click="router.push('/admin')">
+                      <ShieldCheck :size="15" class="text-primary" />
+                      Painel Admin
+                    </button>
+                  </li>
+                  <li v-if="auth.isAdmin"><hr class="dropdown-divider" /></li>
                   <li>
                     <button
                       class="dropdown-item"
@@ -170,8 +177,10 @@ import {useMetaTags} from '@/utils/head';
 import {
   Github,
   Sun,
-  Moon
+  Moon,
+  ShieldCheck
 } from 'lucide-vue-next';
+
 
 const auth = useAuthStore()
 const {locale, t} = useI18n();

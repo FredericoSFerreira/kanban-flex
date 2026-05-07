@@ -1918,6 +1918,8 @@ const getBoard = () => {
     .catch((error) => {
       console.log('Failed to get board, with error code: ' + error.message);
       if (error.message && error.message.includes("Access denied")) {
+        // Admin users can access any board — skip the redirect
+        if (auth.isAdmin) return;
         toast.error(t('board.accessDenied') || 'Acesso negado: Este board é privado e você não é membro.', {
           position: toast.POSITION.TOP_CENTER,
         });

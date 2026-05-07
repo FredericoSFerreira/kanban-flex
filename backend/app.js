@@ -8,7 +8,9 @@ import authRouter from "./modules/auth/routes/auth-routes.js";
 import accessLogsRouter from "./modules/accessLogs/routes/access-logs-routes.js";
 import usersRouter from "./modules/users/routes/users-routes.js";
 import attachmentsRouter from "./modules/attachments/routes/attachments-routes.js";
+import adminRouter from "./modules/admin/routes/admin-routes.js";
 import helmet from 'helmet';
+
 
 const app = express();
 
@@ -33,6 +35,8 @@ app.use(authRouter);
 app.use(accessLogsRouter);
 app.use(usersRouter);
 app.use(attachmentsRouter);
+app.use(adminRouter);
+
 
 
 export default app;
