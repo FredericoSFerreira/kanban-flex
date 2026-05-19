@@ -10,6 +10,10 @@
 
         <!-- Nav -->
         <nav class="nav">
+          <RouterLink to="/admin/dashboard" class="nav-link" active-class="nav-link--active">
+            <BarChart3Icon :size="17" />
+            <span>Dashboard</span>
+          </RouterLink>
           <RouterLink to="/admin/users" class="nav-link" active-class="nav-link--active">
             <UsersIcon :size="17" />
             <span>Usuários</span>
@@ -24,11 +28,6 @@
       <div class="sidebar-bottom">
         <!-- Actions -->
         <div class="sidebar-actions">
-          <button class="s-btn s-btn--ghost" @click="toggleTheme" :title="isDark ? 'Modo claro' : 'Modo escuro'">
-            <SunIcon v-if="isDark" :size="14" />
-            <MoonIcon v-else :size="14" />
-            {{ isDark ? 'Modo Claro' : 'Modo Escuro' }}
-          </button>
           <button class="s-btn s-btn--secondary" @click="goToApp">
             <ArrowLeftIcon :size="14" />
             Voltar ao App
@@ -45,18 +44,19 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { RouterLink, RouterView, useRouter } from 'vue-router'
-import { UsersIcon, LayoutDashboardIcon, ArrowLeftIcon, SunIcon, MoonIcon } from 'lucide-vue-next'
+import { UsersIcon, LayoutDashboardIcon, ArrowLeftIcon, BarChart3Icon } from 'lucide-vue-next'
 
 const router = useRouter()
 
-const isDark = ref(localStorage.getItem('theme') !== 'light')
+const isDark = ref(localStorage.getItem('theme') === 'dark')
 
-function toggleTheme() {
-  isDark.value = !isDark.value
-  localStorage.setItem('theme', isDark.value ? 'dark' : 'light')
-}
+onMounted(() => {
+  window.addEventListener('theme-changed', (e: any) => {
+    isDark.value = e.detail
+  })
+})
 
 function goToApp() { router.push('/my-boards') }
 </script>

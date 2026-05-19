@@ -212,6 +212,7 @@ onMounted(() => {
 const toggleTheme = () => {
   isDarkMode.value = !isDarkMode.value;
   localStorage.setItem('theme', isDarkMode.value ? 'dark' : 'light');
+  window.dispatchEvent(new CustomEvent('theme-changed', { detail: isDarkMode.value }));
 };
 
 const changeLocale = (newLocale: string) => {
