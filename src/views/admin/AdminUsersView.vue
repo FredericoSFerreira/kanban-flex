@@ -63,17 +63,30 @@
               </td>
               <td class="td-muted">{{ fmt(user.createdAt) }}</td>
               <td>
-                <button
-                  v-if="!user.isAdmin"
-                  class="act-btn"
-                  :class="user.active ? 'act-btn--warn' : 'act-btn--ok'"
-                  :disabled="toggling === user.id"
-                  @click="toggle(user)"
-                >
-                  <span v-if="toggling === user.id" class="spinner spinner--xs"></span>
-                  <template v-else>{{ user.active ? 'Desativar' : 'Ativar' }}</template>
-                </button>
-                <span v-else class="td-muted" style="font-size:.72rem">Protegido</span>
+                <div class="actions-cell">
+                  <button
+                    v-if="!user.isAdmin"
+                    class="act-btn"
+                    :class="user.active ? 'act-btn--warn' : 'act-btn--ok'"
+                    :disabled="toggling === user.id"
+                    @click="toggle(user)"
+                  >
+                    <span v-if="toggling === user.id" class="spinner spinner--xs"></span>
+                    <template v-else>{{ user.active ? 'Desativar' : 'Ativar' }}</template>
+                  </button>
+                  <span v-else class="td-muted" style="font-size:.72rem">Protegido</span>
+                  <button
+                    class="act-btn act-btn--admin"
+                    :disabled="adminToggling === user.id"
+                    @click="toggleAdmin(user)"
+                    :title="user.isAdmin ? 'Remover admin' : 'Tornar admin'"
+                  >
+                    <span v-if="adminToggling === user.id" class="spinner spinner--xs"></span>
+                    <ShieldOffIcon v-else-if="user.isAdmin" :size="13" />
+                    <ShieldCheckIcon v-else :size="13" />
+                    <template v-if="adminToggling !== user.id">{{ user.isAdmin ? 'Remover' : 'Admin' }}</template>
+                  </button>
+                </div>
               </td>
             </tr>
           </tbody>
@@ -104,8 +117,9 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
-import { UsersIcon, SearchIcon, AlertCircleIcon, ChevronLeftIcon, ChevronRightIcon } from 'lucide-vue-next'
+import { UsersIcon, SearchIcon, AlertCircleIcon, ChevronLeftIcon, ChevronRightIcon, ShieldCheckIcon, ShieldOffIcon } from 'lucide-vue-next'
 import api from '@/utils/api'
+import { useSwal } from '@/utils/swal'
 
 interface AdminUser {
   id: string; name: string; email: string; phone: string | null
@@ -119,8 +133,11 @@ const search   = ref('')
 const loading  = ref(false)
 const error    = ref('')
 const toggling = ref<string | null>(null)
+const adminToggling = ref<string | null>(null)
 const page     = ref(1)
 const perPage  = PER_PAGE
+
+const Swal = useSwal()
 
 // Reset page when search changes
 watch(search, () => { page.value = 1 })
@@ -175,6 +192,31 @@ async function toggle(user: AdminUser) {
     user.active = !user.active
   } catch (e) { console.error(e) }
   finally { toggling.value = null }
+}
+
+async function toggleAdmin(user: AdminUser) {
+  const action = user.isAdmin ? 'remover como admin' : 'promover a admin'
+  const result = await Swal.fire({
+    title: `Tem certeza?`,
+    text: `Deseja ${action} ${user.name || user.email}?`,
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Sim',
+    cancelButtonText: 'Cancelar',
+  })
+  if (!result.isConfirmed) return
+
+  adminToggling.value = user.id
+  try {
+    await api.patch(`/admin/users/${user.id}/admin`, { isAdmin: !user.isAdmin })
+    user.isAdmin = !user.isAdmin
+    Swal.fire({ icon: 'success', title: 'Sucesso!', timer: 1500, showConfirmButton: false })
+  } catch (e) {
+    console.error(e)
+    Swal.fire({ icon: 'error', title: 'Erro', text: 'Não foi possível alterar o papel do usuário.' })
+  } finally {
+    adminToggling.value = null
+  }
 }
 
 fetchUsers()
@@ -247,12 +289,15 @@ fetchUsers()
 .chip--off   { background: rgba(239,68,68,.1);  color: #f87171; border: 1px solid rgba(239,68,68,.18); }
 
 /* ── Action buttons ── */
+.actions-cell { display: flex; gap: 0.4rem; align-items: center; }
 .act-btn { display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.28rem 0.7rem; border-radius: 6px; font-size: 0.75rem; font-weight: 500; border: 1px solid transparent; cursor: pointer; transition: all .15s; }
 .act-btn:disabled { opacity: .45; cursor: not-allowed; }
 .act-btn--warn  { background: rgba(245,158,11,.1); border-color: rgba(245,158,11,.22); color: #fbbf24; }
 .act-btn--warn:hover:not(:disabled) { background: rgba(245,158,11,.18); }
 .act-btn--ok    { background: rgba(34,197,94,.1);  border-color: rgba(34,197,94,.22);  color: #4ade80; }
 .act-btn--ok:hover:not(:disabled) { background: rgba(34,197,94,.18); }
+.act-btn--admin { background: rgba(99,102,241,.1); border-color: rgba(99,102,241,.22); color: #a5b4fc; }
+.act-btn--admin:hover:not(:disabled) { background: rgba(99,102,241,.18); }
 
 /* ── Pagination ── */
 .pagination { display: flex; align-items: center; gap: 0.3rem; flex-wrap: wrap; }
