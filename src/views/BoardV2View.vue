@@ -1075,7 +1075,7 @@ const settingsModal = ref(null);
 
 // Modal references
 let modalColumnName = null;
-let modalCardName = null;
+const modalCardName = null;
 let modalEditColumnName = null;
 let modalBoardName = null;
 let modalCardDescription = null;
@@ -1566,7 +1566,7 @@ const inviteMember = async () => {
       inviteEmail.value = '';
     }
   } catch(e) {
-     let title = 'Atenção';
+     const title = 'Atenção';
      let message = e.message || 'Erro ao convidar membro';
 
      if (e.message?.includes('user_not_found')) {

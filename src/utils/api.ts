@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { removePathFromUrl } from './utils';
+import { swal } from './swal';
 
 const api = axios.create({
   baseURL: removePathFromUrl(import.meta.env.VITE_BACKEND_URL || ''),
@@ -28,6 +29,20 @@ api.interceptors.response.use(
       localStorage.removeItem('auth');
       window.location.href = '/login';
     }
+
+    if (error.response && error.response.status === 429) {
+      const retryAfter = parseInt(error.response.headers['retry-after'] || '60', 10);
+      swal.fire({
+        icon: 'warning',
+        title: 'Muitas tentativas',
+        text: `Você atingiu o limite de requisições. Aguarde ${retryAfter} segundo${retryAfter > 1 ? 's' : ''} antes de tentar novamente.`,
+        timer: Math.min(retryAfter * 1000, 10000),
+        timerProgressBar: true,
+        showConfirmButton: true,
+        confirmButtonText: 'Entendi'
+      });
+    }
+
     return Promise.reject(error);
   }
 );

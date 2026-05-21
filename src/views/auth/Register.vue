@@ -209,9 +209,12 @@ const requestOTP = () => {
     })
     .catch((error: any) => {
       showSpinner.value = false;
+      if (error.response?.status === 429) {
+        return;
+      }
       console.log(error)
 
-      if (error.response.status === 409) {
+      if (error.response?.status === 409) {
         return Swal.fire({
           icon: "info",
           title: "Oops...",
@@ -268,6 +271,9 @@ const verifyOTP = async () => {
     })
     .catch((error) => {
       showSpinner.value = false;
+      if (error.response?.status === 429) {
+        return;
+      }
       console.log(error);
       return Swal.fire({
         icon: "error",

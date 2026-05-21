@@ -264,7 +264,7 @@ import type { PhoneType} from '@/utils/types';
 
 const {locale, t} = useI18n();
 const user = useAuthStore().user
-let accessLogs = ref([])
+const accessLogs = ref([])
 const showSpinner = ref(false)
 const isPhoneValid = ref(false);
 const phoneObject: PhoneType = reactive({})  as PhoneType;
