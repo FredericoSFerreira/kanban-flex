@@ -1,30 +1,31 @@
 import { getRedisClient } from "../service/redis-service.js";
-import {parseBoolean} from "../utils/utils.js";
 
 export const rateLimiter = (maxRequests = 10, windowMs = 60000, keyPrefix = 'ratelimit') => {
   return async (req, res, next) => {
     try {
-      if (!parseBoolean(req.query.retry)) {
-        console.log('Ignore rate limit')
-        return next()
-      }
-      console.log('Apply rate limit')
-      const identifier = req.user?.id || req.ip;
+      const identifier = req.user?.id || req.user?.email || req.ip;
       const key = `${keyPrefix}:${req.originalUrl}:${identifier}`;
       const client = await getRedisClient();
-      const currentCount = await client.get(key);
 
-      if (currentCount && parseInt(currentCount) >= maxRequests) {
-        return res.status(429).json({
-          error: 'Too many requests, please try again later.',
-          retryAfter: Math.ceil(windowMs / 1000) // in seconds
-        });
+      // Use atomic INCR to avoid race conditions between get/set
+      const currentCount = await client.incr(key);
+
+      if (currentCount === 1) {
+        await client.expire(key, Math.ceil(windowMs / 1000));
       }
 
-      if (currentCount) {
-        await client.incr(key);
-      } else {
-        await client.setEx(key, Math.ceil(windowMs / 1000), '1');
+      const ttl = await client.ttl(key);
+      const remaining = Math.max(0, maxRequests - currentCount);
+
+      res.setHeader('X-RateLimit-Limit', String(maxRequests));
+      res.setHeader('X-RateLimit-Remaining', String(remaining));
+
+      if (currentCount > maxRequests) {
+        const retryAfter = Math.max(ttl, 1);
+        res.setHeader('Retry-After', String(retryAfter));
+        return res.status(429).json({
+          error: 'Too many requests, please try again later.'
+        });
       }
 
       next();

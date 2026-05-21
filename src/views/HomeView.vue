@@ -296,8 +296,8 @@ const allCards = computed(() => {
 })
 
 let animationTimer: number;
-let currentCardIndex = 0;
-let currentColumnIndex = 0;
+const currentCardIndex = 0;
+const currentColumnIndex = 0;
 
 const startBoardAnimation = () => {
   // Reset board

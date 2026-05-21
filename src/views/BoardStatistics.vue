@@ -287,6 +287,9 @@ const getStats = () => {
 
     })
     .catch((error) => {
+      if (error.response?.status === 429) {
+        return;
+      }
       console.log(error);
       $swal.fire({
         icon: "error",
