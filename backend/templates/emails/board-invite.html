@@ -94,17 +94,26 @@
     <!-- Body -->
     <div class="email-body">
         <p style="font-size: 18px; color: #333;">{{ t 'email.greeting' }},</p>
+        {{#if accountExists}}
+        <p style="color: #666; line-height: 1.5;">
+            {{ t 'email.boardInviteExistingMessage' boardName=boardName inviterName=inviterName }}
+        </p>
+        <div class="btn-container">
+            <a href="{{ inviteUrl }}" class="btn-invite">
+                {{ t 'email.boardInviteExistingButton' }}
+            </a>
+        </div>
+        {{else}}
         <p style="color: #666; line-height: 1.5;">
             {{ t 'email.boardInviteMessage' boardName=boardName inviterName=inviterName }}
         </p>
-
         <div class="btn-container">
             <a href="{{ inviteUrl }}" class="btn-invite">
                 {{ t 'email.boardInviteButton' }}
             </a>
         </div>
+        {{/if}}
 
-        <p style="font-size: 14px; color: #999;">{{ t 'email.disclaimer' }}</p>
         <p style="color: #666;">{{ t 'email.regards' }}<br>{{ t 'email.team' }}</p>
     </div>
 

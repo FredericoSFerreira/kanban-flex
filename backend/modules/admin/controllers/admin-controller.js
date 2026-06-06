@@ -397,6 +397,308 @@ const getDashboardInviteFunnel = async (req, res) => {
   }
 };
 
+const getActivityLog = async (req, res) => {
+  try {
+    const db = await getDb();
+    const { search, boardId, action: actionFilter, page: rawPage, limit: rawLimit } = req.query;
+    const pageNum = Math.max(1, parseInt(rawPage, 10) || 1);
+    const limitNum = Math.min(100, Math.max(1, parseInt(rawLimit, 10) || 50));
+    const filter = {};
+
+    if (search) {
+      filter.$or = [
+        { userName: { $regex: search, $options: 'i' } },
+        { boardName: { $regex: search, $options: 'i' } },
+        { cardTitle: { $regex: search, $options: 'i' } },
+      ];
+    }
+    if (boardId) filter.boardId = boardId;
+    if (actionFilter) filter.action = actionFilter;
+
+    const total = await db.collection('activityLog').countDocuments(filter);
+    const logs = await db
+      .collection('activityLog')
+      .find(filter)
+      .sort({ _created_at: -1 })
+      .skip((pageNum - 1) * limitNum)
+      .limit(limitNum)
+      .toArray();
+
+    const result = logs.map(l => ({
+      id: l._id.toString(),
+      userId: l.userId,
+      userName: l.userName,
+      userAvatar: l.userAvatar,
+      action: l.action,
+      boardId: l.boardId,
+      boardName: l.boardName,
+      cardId: l.cardId,
+      cardTitle: l.cardTitle,
+      targetUserId: l.targetUserId,
+      targetUserName: l.targetUserName,
+      details: l.details,
+      createdAt: l._created_at || l.createdAt || null,
+    }));
+
+    res.status(200).json({ logs: result, total, page: pageNum, totalPages: Math.ceil(total / limitNum) });
+  } catch (e) {
+    console.error('Error in getActivityLog:', e);
+    res.status(500).send('Error fetching activity log');
+  }
+};
+
+const getAllAttachments = async (req, res) => {
+  try {
+    const db = await getDb();
+    const { search } = req.query;
+    const filter = {};
+    if (search) filter.name = { $regex: search, $options: 'i' };
+
+    const attachments = await db
+      .collection('attachments')
+      .find(filter)
+      .sort({ _created_at: -1 })
+      .toArray();
+
+    const userIds = [...new Set(attachments.map(a => a.userId))];
+    const boardIds = [...new Set(attachments.map(a => a.boardId))];
+    const users = await db.collection('otp').find({ _id: { $in: userIds } }).toArray();
+    const boards = await db.collection('boards').find({ _id: { $in: boardIds } }).toArray();
+    const userMap = Object.fromEntries(users.map(u => [u._id.toString(), u]));
+    const boardMap = Object.fromEntries(boards.map(b => [b._id.toString(), b]));
+
+    const result = attachments.map(a => {
+      const user = userMap[a.userId];
+      const board = boardMap[a.boardId];
+      return {
+        id: a._id.toString(),
+        name: a.name,
+        url: a.url,
+        size: a.size,
+        type: a.type,
+        isImage: a.isImage,
+        userId: a.userId,
+        userName: user?.name || '---',
+        userEmail: user?.email || '---',
+        userAvatar: user?.avatar || null,
+        boardId: a.boardId,
+        boardName: board?.name || '---',
+        itemId: a.itemId,
+        createdAt: a._created_at || a.createdAt || null,
+      };
+    });
+
+    res.status(200).json(result);
+  } catch (e) {
+    console.error('Error in getAllAttachments:', e);
+    res.status(500).send('Error fetching attachments');
+  }
+};
+
+const deleteAttachmentAdmin = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const db = await getDb();
+    const attachment = await db.collection('attachments').findOne({ _id: id });
+    if (!attachment) return res.status(404).json({ msg: 'Attachment not found' });
+
+    const { deleteFileFromS3 } = await import('../../../service/s3-service.js');
+    await deleteFileFromS3(attachment.url);
+
+    await db.collection('attachments').deleteOne({ _id: id });
+
+    if (attachment.userId && attachment.size) {
+      await db.collection('otp').updateOne(
+        { _id: attachment.userId },
+        { $inc: { usedStorage: -attachment.size } }
+      );
+    }
+
+    res.status(200).json({ success: true });
+  } catch (e) {
+    console.error('Error in deleteAttachmentAdmin:', e);
+    res.status(500).send('Error deleting attachment');
+  }
+};
+
+const getAllAccessLogs = async (req, res) => {
+  try {
+    const db = await getDb();
+    const { search, page: rawPage, limit: rawLimit } = req.query;
+    const pageNum = Math.max(1, parseInt(rawPage, 10) || 1);
+    const limitNum = Math.min(100, Math.max(1, parseInt(rawLimit, 10) || 50));
+
+    const pipeline = [
+      { $sort: { _created_at: -1 } }
+    ];
+
+    if (search) {
+      pipeline.push({
+        $match: {
+          $or: [
+            { ip: { $regex: search, $options: 'i' } },
+            { id_user: { $regex: search, $options: 'i' } },
+          ]
+        }
+      });
+    }
+
+    pipeline.push(
+      { $skip: (pageNum - 1) * limitNum },
+      { $limit: limitNum }
+    );
+
+    const logs = await db.collection('accessLog').aggregate(pipeline).toArray();
+
+    const userIds = [...new Set(logs.map(l => l.id_user))];
+    const users = await db.collection('otp').find({ _id: { $in: userIds } }).toArray();
+    const userMap = Object.fromEntries(users.map(u => [u._id.toString(), u]));
+
+    const total = await db.collection('accessLog').countDocuments();
+
+    const result = logs.map(l => {
+      const user = userMap[l.id_user];
+      return {
+        id: l._id.toString(),
+        userId: l.id_user,
+        userName: user?.name || '---',
+        userEmail: user?.email || '---',
+        userAvatar: user?.avatar || null,
+        ip: l.ip,
+        browser: l.browser,
+        device: l.device || null,
+        action: l.action || 'login',
+        createdAt: l._created_at || l.createdAt || null,
+      };
+    });
+
+    res.status(200).json({ logs: result, total, page: pageNum, totalPages: Math.ceil(total / limitNum) });
+  } catch (e) {
+    console.error('Error in getAllAccessLogs:', e);
+    res.status(500).send('Error fetching access logs');
+  }
+};
+
+const getAllInvites = async (req, res) => {
+  try {
+    const db = await getDb();
+    const { search, status } = req.query;
+    const filter = {};
+
+    if (status === 'used') filter.used = true;
+    else if (status === 'expired') {
+      filter.used = false;
+      filter.expiresAt = { $lt: new Date() };
+    } else if (status === 'pending') {
+      filter.used = false;
+      filter.expiresAt = { $gte: new Date() };
+    }
+    if (search) filter.email = { $regex: search, $options: 'i' };
+
+    const invites = await db
+      .collection('boardInvites')
+      .find(filter)
+      .sort({ _created_at: -1 })
+      .toArray();
+
+    let boardMap = {};
+    let invitedByMap = {};
+    try {
+      const boardIds = [...new Set(invites.map(i => i.boardId).filter(Boolean))];
+      const userInvitedByIds = [...new Set(invites.map(i => i.invitedBy).filter(Boolean))];
+      const [boards, invitedByUsers] = await Promise.all([
+        boardIds.length ? db.collection('boards').find({ _id: { $in: boardIds } }).toArray() : [],
+        userInvitedByIds.length ? db.collection('otp').find({ _id: { $in: userInvitedByIds } }).toArray() : [],
+      ]);
+      boardMap = Object.fromEntries(boards.map(b => [b._id.toString(), b]));
+      invitedByMap = Object.fromEntries(invitedByUsers.map(u => [u._id.toString(), u]));
+    } catch (lookupErr) {
+      console.error('Error enriching invites with names:', lookupErr);
+    }
+
+    const result = invites.map((inv) => {
+      const now = new Date();
+      const isExpired = !inv.used && inv.expiresAt && new Date(inv.expiresAt) < now;
+      let statusLabel = 'pending';
+      if (inv.used) statusLabel = 'used';
+      else if (isExpired) statusLabel = 'expired';
+
+      const board = boardMap[inv.boardId];
+
+      return {
+        id: inv._id.toString(),
+        token: inv.token,
+        email: inv.email,
+        boardId: inv.boardId,
+        boardName: board?.name || board?.title || '---',
+        invitedBy: inv.invitedBy,
+        invitedByName: invitedByMap[inv.invitedBy]?.name || '---',
+        used: inv.used || false,
+        expiresAt: inv.expiresAt || null,
+        createdAt: inv._created_at || inv.createdAt || null,
+        status: statusLabel,
+      };
+    });
+
+    res.status(200).json(result);
+  } catch (e) {
+    console.error('Error in getAllInvites:', e);
+    res.status(500).send('Error fetching invites');
+  }
+};
+
+const invalidateInvite = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const db = await getDb();
+    const invite = await db.collection('boardInvites').findOne({ _id: id });
+    if (!invite) return res.status(404).json({ msg: 'Invite not found' });
+
+    await db.collection('boardInvites').updateOne({ _id: id }, { $set: { used: true } });
+    res.status(200).json({ success: true });
+  } catch (e) {
+    console.error('Error in invalidateInvite:', e);
+    res.status(500).send('Error invalidating invite');
+  }
+};
+
+const resendInvite = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const db = await getDb();
+    const invite = await db.collection('boardInvites').findOne({ _id: id });
+    if (!invite) return res.status(404).json({ msg: 'Invite not found' });
+
+    if (!invite.token || invite.used) {
+      return res.status(400).json({ msg: 'Invite already used or invalid' });
+    }
+
+    const boardQuery = new Parse.Query("boards");
+    const board = await boardQuery.get(invite.boardId, { useMasterKey: true });
+    if (!board) return res.status(404).json({ msg: 'Board not found' });
+
+    const inviterQuery = new Parse.Query("otp");
+    const inviter = await inviterQuery.get(invite.invitedBy, { useMasterKey: true });
+    const inviterName = inviter?.get("name") || "User";
+
+    const frontHost = process.env.FRONT_HOST.endsWith('/') ? process.env.FRONT_HOST.slice(0, -1) : process.env.FRONT_HOST;
+    const inviteUrl = `${frontHost}/register?invite=${invite.token}&board=${invite.boardId}`;
+
+    const sendEmail = (await import('../../../service/email-service.js')).default;
+    await sendEmail(invite.email, invite.email, 'BOARD_INVITE', req.headers['accept-language'] || 'pt-BR', {
+      boardName: board.get('name'),
+      inviterName,
+      inviteUrl,
+      accountExists: false,
+    });
+
+    res.status(200).json({ success: true });
+  } catch (e) {
+    console.error('Error in resendInvite:', e);
+    res.status(500).send('Error resending invite');
+  }
+};
+
 const getDashboardMostEngagedBoards = async (req, res) => {
   try {
     const db = await getDb();
@@ -448,4 +750,11 @@ export {
   getDashboardLoginMethods,
   getDashboardInviteFunnel,
   getDashboardMostEngagedBoards,
+  getAllAccessLogs,
+  getActivityLog,
+  getAllInvites,
+  invalidateInvite,
+  resendInvite,
+  getAllAttachments,
+  deleteAttachmentAdmin,
 };

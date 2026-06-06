@@ -22,6 +22,22 @@
             <LayoutDashboardIcon :size="17" />
             <span>Boards</span>
           </RouterLink>
+          <RouterLink to="/admin/invites" class="nav-link" active-class="nav-link--active">
+            <MailIcon :size="17" />
+            <span>Convites</span>
+          </RouterLink>
+          <RouterLink to="/admin/attachments" class="nav-link" active-class="nav-link--active">
+            <PaperclipIcon :size="17" />
+            <span>Anexos</span>
+          </RouterLink>
+          <RouterLink to="/admin/access-logs" class="nav-link" active-class="nav-link--active">
+            <FileTextIcon :size="17" />
+            <span>Logs de Acesso</span>
+          </RouterLink>
+          <RouterLink to="/admin/activity-log" class="nav-link" active-class="nav-link--active">
+            <ActivityIcon :size="17" />
+            <span>Atividades</span>
+          </RouterLink>
         </nav>
       </div>
 
@@ -46,7 +62,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { RouterLink, RouterView, useRouter } from 'vue-router'
-import { UsersIcon, LayoutDashboardIcon, ArrowLeftIcon, BarChart3Icon } from 'lucide-vue-next'
+import { UsersIcon, LayoutDashboardIcon, ArrowLeftIcon, BarChart3Icon, MailIcon, PaperclipIcon, FileTextIcon, ActivityIcon } from 'lucide-vue-next'
 
 const router = useRouter()
 

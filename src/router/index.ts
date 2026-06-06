@@ -92,6 +92,26 @@ const router = createRouter({
           name: 'admin-boards',
           component: () => import('@/views/admin/AdminBoardsView.vue'),
         },
+        {
+          path: 'invites',
+          name: 'admin-invites',
+          component: () => import('@/views/admin/AdminInvitesView.vue'),
+        },
+        {
+          path: 'attachments',
+          name: 'admin-attachments',
+          component: () => import('@/views/admin/AdminAttachmentsView.vue'),
+        },
+        {
+          path: 'access-logs',
+          name: 'admin-access-logs',
+          component: () => import('@/views/admin/AdminAccessLogsView.vue'),
+        },
+        {
+          path: 'activity-log',
+          name: 'admin-activity-log',
+          component: () => import('@/views/admin/AdminActivityLogView.vue'),
+        },
       ],
     },
     // ────────────────────────────────────────────────────────────────────────────

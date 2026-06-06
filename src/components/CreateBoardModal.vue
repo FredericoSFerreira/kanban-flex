@@ -292,7 +292,8 @@ const finalizeBoardCreation = async () => {
       template: selectedTemplateData.value,
       is_public: isPublic.value,
       members: members,
-      pendingInviteEmails: pendingInvites.value
+      pendingInviteEmails: pendingInvites.value,
+      locale: t('locale') || 'pt-BR'
     };
 
     const response: any = await callFunction('createBoard', payload);

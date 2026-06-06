@@ -56,7 +56,8 @@ export default {
     actions: {
       view: 'Ver Quadro',
       delete: 'Excluir Quadro',
-      statistics: 'Estatísticas do Quadro'
+      statistics: 'Estatísticas do Quadro',
+      duplicate: 'Duplicar Quadro'
     },
     deleteModal: {
       title: 'Excluir Quadro',

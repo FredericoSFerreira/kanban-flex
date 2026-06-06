@@ -53,7 +53,7 @@
     <!-- Boards Grid -->
     <div v-else class="row g-4 py-5">
       <div v-for="board in boards" :key="board.id" class="col-md-6 col-lg-4">
-        <div class="card h-100 board-card">
+        <div class="card h-100 board-card" @click="goToBoard(board.id, $event)">
           <div class="card-body">
             <div class="d-flex justify-content-between align-items-start mb-3">
               <h3 class="h5 mb-0" v-html="highlightSearchTerm(board.name)"></h3>
@@ -78,6 +78,12 @@
                       <BarChart :size="16" class="me-2"/>
                       {{ $t('myBoards.actions.statistics') }}
                     </router-link>
+                  </li>
+                  <li>
+                    <button class="dropdown-item" @click="duplicateBoard(board.id)">
+                      <Copy :size="16" class="me-2"/>
+                      {{ $t('myBoards.actions.duplicate') }}
+                    </button>
                   </li>
                   <li>
                     <button class="dropdown-item text-danger" @click="removeBoard(board.id)">
@@ -105,7 +111,7 @@
 
     <div class="row g-4 py-5">
       <div v-for="board in boardsParticipating" :key="board.id" class="col-md-6 col-lg-4">
-        <div class="card h-100 board-card">
+        <div class="card h-100 board-card" @click="goToBoard(board.id, $event)">
           <div class="card-body">
             <div class="d-flex justify-content-between align-items-start mb-3">
               <h3 class="h5 mb-0" v-html="highlightSearchTerm(board.name)"></h3>
@@ -154,7 +160,7 @@
 </template>
 <script setup lang="ts">
 import {ref, onMounted} from 'vue';
-import {Layout, MoreVertical, Eye, Trash2, Calendar, Users, BarChart, Search, SearchX} from 'lucide-vue-next';
+import {Layout, MoreVertical, Eye, Trash2, Calendar, Users, BarChart, Search, SearchX, Copy} from 'lucide-vue-next';
 import api from "@/utils/api";
 import {useSwal} from "@/utils/swal";
 import CreateBoardModal from "@/components/CreateBoardModal.vue";
@@ -199,6 +205,33 @@ const openCreateBoardModal = () => {
 
 const formatDate = (dateString: string) => {
   return new Date(dateString).toLocaleDateString();
+};
+
+const goToBoard = (boardId: string, event: MouseEvent) => {
+  const target = event.target as HTMLElement;
+  if (target.closest('.dropdown')) return;
+  router.push(`/board/${boardId}`);
+};
+
+const duplicateBoard = async (boardId: string) => {
+  try {
+    const result = await callFunction('duplicateBoard', { boardId });
+    if (result.success) {
+      Swal.fire({
+        icon: 'success',
+        title: 'Board duplicado com sucesso!',
+        showConfirmButton: true,
+      });
+      await Promise.all([getBoards(), getBoardsParticipating()]);
+    }
+  } catch (error: any) {
+    console.error('Erro ao duplicar board:', error);
+    Swal.fire({
+      icon: 'error',
+      title: 'Oops...',
+      text: 'Ocorreu um erro ao duplicar o board. Tente novamente.',
+    });
+  }
 };
 
 const removeBoard = async (idBoard: string) => {
@@ -308,6 +341,19 @@ onMounted(async () => {
 });
 </script>
 <style scoped>
+
+.board-card {
+  cursor: pointer;
+  transition: box-shadow 0.2s ease;
+}
+
+.board-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.board-card .dropdown-menu {
+  z-index: 1060;
+}
 
 :deep(.search-highlight) {
   background-color: #fff3cd;

@@ -21,7 +21,9 @@ export default {
     boardInviteSubject: "Board Invitation - {boardName}",
     boardInviteTitle: "Board Invitation",
     boardInviteMessage: "Hello! You have been invited by {inviterName} to join the board '{boardName}'. Click the button below to create your account.",
-    boardInviteButton: "Create my account"
+    boardInviteButton: "Create my account",
+    boardInviteExistingMessage: "Hello! You have been invited by {inviterName} to join the board '{boardName}'. Click the button below to view it.",
+    boardInviteExistingButton: "View board"
   },
   auth: {
     inactiveAccount: "Your account has been deactivated. Please contact support for assistance."

@@ -56,7 +56,8 @@ export default {
     actions: {
       view: 'View Board',
       delete: 'Delete Board',
-      statistics: 'Board Statistics'
+      statistics: 'Board Statistics',
+      duplicate: 'Duplicate Board'
     },
     deleteModal: {
       title: 'Delete Board',

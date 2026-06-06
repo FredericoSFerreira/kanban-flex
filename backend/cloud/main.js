@@ -138,6 +138,7 @@ Parse.Cloud.define("moveCardBetweenColumns", async (request) => {
     board.set(`columns.${targetColumnIndex}.itens`, targetColumn.itens);
 
     const result = await board.save(null, {useMasterKey: true});
+    saveActivityLog(request.user.id, request.user?.name || 'User', request.user?.avatar, 'move_card', boardId, board.get('name'), { cardId: card.id, cardTitle: card.title, details: `De: ${sourceColumn.name} → Para: ${targetColumn.name}` });
     return {success: true, result};
   } catch (error) {
     console.error("Error in moveCardBetweenColumns:", error);
@@ -204,6 +205,7 @@ Parse.Cloud.define("addCard", async (request) => {
     board.add(`columns.${columnIndex}.itens`, card);
 
     const result = await board.save(null, {useMasterKey: true});
+    saveActivityLog(request.user.id, request.user?.name || 'User', request.user?.avatar, 'create_card', boardId, board.get('name'), { cardId: card.id, cardTitle: card.title });
     return {success: true, result};
   } catch (error) {
     console.error("Error in addCard:", error);
@@ -547,6 +549,7 @@ Parse.Cloud.define("archiveCard", async (request) => {
     board.set(`columns.${columnIndex}.itens.${cardIndex}.updatedAt`, new Date());
 
     const result = await board.save(null, {useMasterKey: true});
+    saveActivityLog(request.user.id, request.user?.name || 'User', request.user?.avatar, archived ? 'archive_card' : 'unarchive_card', boardId, board.get('name'), { cardId, cardTitle: card.title });
     return {success: true, result};
   } catch (error) {
     console.error("Error in archiveCard:", error);
@@ -822,7 +825,7 @@ Parse.Cloud.define("inviteMemberToBoard", async (request) => {
     // Validate JWT token
     await verifyTokenParseCloudFunction(request);
 
-    const { boardId, email } = request.params;
+    const { boardId, email, locale } = request.params;
     if (!boardId || !email) throw new Error("Missing parameters");
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -865,6 +868,23 @@ Parse.Cloud.define("inviteMemberToBoard", async (request) => {
     board.set('members', members);
     await board.save(null, {useMasterKey: true});
 
+    // Send notification email to the invited user
+    const boardName = board.get('name');
+    const inviterQuery = new Parse.Query("otp");
+    const inviter = await inviterQuery.get(request.user.id, { useMasterKey: true });
+    const inviterName = inviter?.get("name") || "User";
+
+    const frontHost = process.env.FRONT_HOST.endsWith('/') ? process.env.FRONT_HOST.slice(0, -1) : process.env.FRONT_HOST;
+    const boardUrl = `${frontHost}/board/${boardId}`;
+
+    await sendEmail(email, user.get('name'), 'BOARD_INVITE', locale || 'pt-BR', {
+      boardName,
+      inviterName,
+      inviteUrl: boardUrl,
+      accountExists: true
+    });
+
+    saveActivityLog(request.user.id, request.user?.name || 'User', request.user?.avatar, 'invite_member', boardId, board.get('name'), { targetUserId: user.id, targetUserName: user.get('name') });
     return { success: true, member: members[members.length - 1] };
   } catch (error) {
     console.log('Failed to inviteMemberToBoard: ' + error.message);
@@ -942,6 +962,7 @@ Parse.Cloud.define("removeMemberFromBoard", async (request) => {
 
     await board.save(null, {useMasterKey: true});
 
+    saveActivityLog(request.user.id, request.user?.name || 'User', request.user?.avatar, 'remove_member', boardId, board.get('name'), { targetUserId: userId });
     return { success: true };
   } catch (error) {
     console.log('Failed to removeMemberFromBoard: ' + error.message);
@@ -1337,6 +1358,28 @@ Parse.Cloud.define("createBoard", async (request) => {
           role: m.role || 'Member'
         }, { useMasterKey: true });
       }
+
+      // Send notification email to each registered member except the owner
+      const boardName = boardDatabase.get('name');
+      const inviterOtp = await new Parse.Query("otp").get(request.user.id, { useMasterKey: true });
+      const inviterName = inviterOtp?.get("name") || "User";
+      const frontHost = process.env.FRONT_HOST.endsWith('/') ? process.env.FRONT_HOST.slice(0, -1) : process.env.FRONT_HOST;
+      const boardUrl = `${frontHost}/board/${boardDatabase.id}`;
+
+      for (const m of members) {
+        const memberUserId = m.userId || m.id;
+        if (memberUserId === request.user.id) continue;
+        try {
+          await sendEmail(m.email, m.name, 'BOARD_INVITE', request.params.locale || 'pt-BR', {
+            boardName,
+            inviterName,
+            inviteUrl: boardUrl,
+            accountExists: true
+          });
+        } catch (emailError) {
+          console.error(`Failed to send notification email to ${m.email}:`, emailError);
+        }
+      }
     }
 
     // Send invitations if provided
@@ -1354,6 +1397,7 @@ Parse.Cloud.define("createBoard", async (request) => {
       }
     }
 
+    saveActivityLog(request.user.id, request.user?.name || 'User', request.user?.avatar, 'create_board', boardDatabase.id, boardDatabase.get('name'));
     return {
       success: true,
       board: boardDatabase
@@ -1418,9 +1462,24 @@ Parse.Cloud.define("sendBoardInviteEmail", async (request) => {
     const userQuery = new Parse.Query("otp");
     userQuery.equalTo("email", email);
     const existingUser = await userQuery.first({ useMasterKey: true });
-    if (existingUser) return { success: false, error: "user_already_registered" };
 
-    // Create invite token
+    const frontHost = process.env.FRONT_HOST.endsWith('/') ? process.env.FRONT_HOST.slice(0, -1) : process.env.FRONT_HOST;
+
+    if (existingUser) {
+      // User exists - send email with direct board link
+      const boardUrl = `${frontHost}/board/${boardId}`;
+
+      await sendEmail(email, existingUser.get('name'), 'BOARD_INVITE', locale || 'pt-BR', {
+        boardName,
+        inviterName: fullInviterName,
+        inviteUrl: boardUrl,
+        accountExists: true
+      });
+
+      return { success: true };
+    }
+
+    // User not registered - create invite token for registration flow
     const token = crypto.randomUUID();
     const BoardInvites = Parse.Object.extend("boardInvites");
     const invite = new BoardInvites();
@@ -1437,7 +1496,6 @@ Parse.Cloud.define("sendBoardInviteEmail", async (request) => {
       used: false
     }, { useMasterKey: true });
 
-    const frontHost = process.env.FRONT_HOST.endsWith('/') ? process.env.FRONT_HOST.slice(0, -1) : process.env.FRONT_HOST;
     const inviteUrl = `${frontHost}/register?invite=${token}&board=${boardId}`;
 
     // Add pending member to board members list
@@ -1457,7 +1515,8 @@ Parse.Cloud.define("sendBoardInviteEmail", async (request) => {
     await sendEmail(email, email, 'BOARD_INVITE', locale || 'pt-BR', {
       boardName,
       inviterName: fullInviterName,
-      inviteUrl
+      inviteUrl,
+      accountExists: false
     });
 
     return { success: true };
@@ -1702,6 +1761,91 @@ Parse.Cloud.define("getItemAttachments", async (request) => {
     }));
   } catch (error) {
     console.log('Failed to getItemAttachments:', error.message);
+    throw error;
+  }
+});
+
+const saveActivityLog = async (userId, userName, userAvatar, action, boardId, boardName, extra = {}) => {
+  try {
+    const ActivityLog = Parse.Object.extend("activityLog");
+    const log = new ActivityLog();
+    await log.save({
+      userId,
+      userName,
+      userAvatar,
+      action,
+      boardId,
+      boardName,
+      cardId: extra.cardId || null,
+      cardTitle: extra.cardTitle || null,
+      targetUserId: extra.targetUserId || null,
+      targetUserName: extra.targetUserName || null,
+      details: extra.details || null,
+    }, { useMasterKey: true });
+  } catch (e) {
+    console.error('Error saving activity log:', e);
+  }
+};
+
+Parse.Cloud.define("duplicateBoard", async (request) => {
+  try {
+    await verifyTokenParseCloudFunction(request);
+
+    const { boardId, newName } = request.params;
+    if (!boardId) throw new Error("Missing boardId");
+
+    const boardQuery = new Parse.Query("boards");
+    const original = await boardQuery.get(boardId, { useMasterKey: true });
+    if (!original) throw new Error("Board not found");
+
+    const ownerId = request.user.id;
+    const ownerQuery = new Parse.Query("otp");
+    const owner = await ownerQuery.get(ownerId, { useMasterKey: true });
+
+    const clonedColumns = (original.get('columns') || []).map(col => ({
+      id: crypto.randomUUID(),
+      name: col.name,
+      itens: (col.itens || []).map(card => ({
+        id: crypto.randomUUID(),
+        name: card.name || owner.get('name'),
+        user_id: card.user_id || ownerId,
+        avatar: card.avatar || owner.get('avatar'),
+        title: card.title,
+        description: card.description || '',
+        labels: card.labels || [],
+        up_vote: 0,
+        down_vote: 0,
+        up_vote_users: [],
+        down_vote_users: [],
+        comments: card.comments || [],
+        history: [],
+        checklist: card.checklist || [],
+        assigned_users: card.assigned_users || [],
+        archived: false,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      }))
+    }));
+
+    const Boards = Parse.Object.extend("boards");
+    const clone = new Boards();
+    const boardName = newName || (original.get('name') + ' (cópia)');
+
+    await clone.save({
+      name: boardName,
+      owner: owner.get('name'),
+      owner_id: ownerId,
+      owner_email: owner.get('email'),
+      owner_avatar: owner.get('avatar'),
+      is_public: original.get('is_public'),
+      config: original.get('config') || {},
+      columns: clonedColumns,
+      members: original.get('members') || []
+    }, { useMasterKey: true });
+
+    return { success: true, board: clone };
+  } catch (error) {
+    console.error("Error in duplicateBoard:", error);
     throw error;
   }
 });

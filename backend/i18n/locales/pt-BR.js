@@ -21,7 +21,9 @@ export default {
     boardInviteSubject: "Convite para Quadro - {boardName}",
     boardInviteTitle: "Convite para o Quadro",
     boardInviteMessage: "Olá! Você foi convidado por {inviterName} para participar do quadro '{boardName}'. Clique no botão abaixo para criar sua conta.",
-    boardInviteButton: "Criar minha conta"
+    boardInviteButton: "Criar minha conta",
+    boardInviteExistingMessage: "Olá! Você foi convidado por {inviterName} para participar do quadro '{boardName}'. Clique no botão abaixo para visualizá-lo.",
+    boardInviteExistingButton: "Visualizar quadro"
   },
   auth: {
     inactiveAccount: "Sua conta foi desativada. Por favor, entre em contato com o suporte para obter assistência."

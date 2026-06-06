@@ -17,6 +17,13 @@ import {
   getDashboardLoginMethods,
   getDashboardInviteFunnel,
   getDashboardMostEngagedBoards,
+  getAllInvites,
+  invalidateInvite,
+  resendInvite,
+  getAllAttachments,
+  deleteAttachmentAdmin,
+  getAllAccessLogs,
+  getActivityLog,
 } from '../controllers/admin-controller.js';
 
 const adminRouter = express.Router();
@@ -38,5 +45,15 @@ adminRouter.get('/admin/dashboard/visibility-trend', verifyAdmin, getDashboardVi
 adminRouter.get('/admin/dashboard/login-methods', verifyAdmin, getDashboardLoginMethods);
 adminRouter.get('/admin/dashboard/invite-funnel', verifyAdmin, getDashboardInviteFunnel);
 adminRouter.get('/admin/dashboard/most-engaged-boards', verifyAdmin, getDashboardMostEngagedBoards);
+
+adminRouter.get('/admin/invites', verifyAdmin, getAllInvites);
+adminRouter.patch('/admin/invites/:id/invalidate', verifyAdmin, invalidateInvite);
+adminRouter.post('/admin/invites/:id/resend', verifyAdmin, resendInvite);
+
+adminRouter.get('/admin/attachments', verifyAdmin, getAllAttachments);
+adminRouter.delete('/admin/attachments/:id', verifyAdmin, deleteAttachmentAdmin);
+
+adminRouter.get('/admin/access-logs', verifyAdmin, getAllAccessLogs);
+adminRouter.get('/admin/activity-log', verifyAdmin, getActivityLog);
 
 export default adminRouter;

@@ -1557,7 +1557,8 @@ const inviteMember = async () => {
   try {
     const res = await callFunction('inviteMemberToBoard', {
       boardId: route.params.id,
-      email: inviteEmail.value
+      email: inviteEmail.value,
+      locale: t('locale') || 'pt-BR'
     });
     if (res && res.success) {
       if (!board.members) board.members = [];
