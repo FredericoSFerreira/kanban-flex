@@ -376,7 +376,7 @@ describe('Get Board Summary Endpoint', () => {
       "id": "chatcmpl",
       "object": "chat.completion",
       "created": 1750873447,
-      "model": "llama-3.1-8b-instant",
+      "model": "openai/gpt-oss-20b",
       "choices": [
         {
           "index": 0,
@@ -426,6 +426,37 @@ describe('Get Board Summary Endpoint', () => {
     expect(response.body).toBeInstanceOf(Object);
   });
 
+
+  it('should return 500 and not cache when GROQ returns an error', async () => {
+    mockCallFunction.mockResolvedValue({attributes: {name: 'test', columns: []}});
+
+    nock('https://api.groq.com')
+      .post('/openai/v1/chat/completions')
+      .reply(400, {error: {message: 'The model has been decommissioned', code: 'model_decommissioned'}});
+
+    const response = await request(app)
+      .get('/boards/summary/123?retry=true')
+      .set('Authorization', 'Bearer fake-token');
+
+    expect(response.status).toBe(500);
+    expect(mockRedisClient.set).not.toHaveBeenCalled();
+  });
+
+  it('should ignore empty cached summary', async () => {
+    mockRedisClient.get.mockResolvedValue(JSON.stringify({}));
+    mockCallFunction.mockResolvedValue({attributes: {name: 'test', columns: []}});
+
+    nock('https://api.groq.com')
+      .post('/openai/v1/chat/completions')
+      .reply(200, {choices: [{message: {role: 'assistant', content: 'fresh summary'}}]});
+
+    const response = await request(app)
+      .get('/boards/summary/123')
+      .set('Authorization', 'Bearer fake-token');
+
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual({summary: 'fresh summary'});
+  });
 
   it('should return 401 when not authenticated', async () => {
     const response = await request(app).get('/boards/summary/123?retry=true');
@@ -484,7 +515,7 @@ describe('Get Board Question Endpoint', () => {
       "id": "chatcmpl",
       "object": "chat.completion",
       "created": 1750873447,
-      "model": "llama-3.3-70b-versatile",
+      "model": "openai/gpt-oss-120b",
       "choices": [
         {
           "index": 0,

@@ -1,8 +1,4 @@
-async function getAIBoardSummary(messages, model = 'llama-3.1-8b-instant') {
-  if (process.env.NODE_ENV !== 'production') {
-    console.log('Using insecure connection to GROQ API');
-    process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0';
-  }
+async function getAIBoardSummary(messages, model = process.env.GROQ_SUMMARY_MODEL || 'openai/gpt-oss-20b') {
   const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
     method: "POST",
     headers: {
@@ -17,7 +13,12 @@ async function getAIBoardSummary(messages, model = 'llama-3.1-8b-instant') {
   });
 
   const data = await response.json();
-  return data.choices?.[0]?.message?.content;
+  const content = data.choices?.[0]?.message?.content;
+  if (!response.ok || !content) {
+    console.log('GROQ API error', response.status, data.error);
+    throw new Error(`GROQ API error: ${data.error?.message || response.status}`);
+  }
+  return content;
 }
 
 export {getAIBoardSummary};
