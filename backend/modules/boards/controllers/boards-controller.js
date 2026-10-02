@@ -65,9 +65,10 @@ const getBoardSummary = async (req, res) => {
 
     if (!retry) {
       const valor = await client.get(cacheKey);
-      if (valor) {
+      const cached = valor && JSON.parse(valor);
+      if (cached?.summary) {
         console.log('searched in cache');
-        return res.status(200).json(JSON.parse(valor));
+        return res.status(200).json(cached);
       }
     }
 
@@ -131,7 +132,7 @@ const getBoardQuestion = async (req, res) => {
         content: `Você é um especialista em boards kanban, seu nome é Kira. ** Responda de forma mais breve e resumida. Não mencione que a informação é do contexto. Responda apenas no idioma ${acceptLanguage}.`
       },
       {role: 'user', content: `Contexto: ${context}\n\nPergunta: ${question}`}
-    ], 'llama-3.3-70b-versatile')
+    ], process.env.GROQ_CHAT_MODEL || 'openai/gpt-oss-120b')
     res.status(200).json({reply: aiResponse});
   } catch (e) {
     console.log("Occurred error in get board summary", e);
